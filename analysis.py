@@ -16,6 +16,8 @@ def analyseNewspaper(path):
     article = ""
     regexMoney = re.compile(r"(\$|€|¥)\d+((\.\d+)?(\s(million|billion))?)?")
     regexNumber = re.compile(r"\d+((\.\d+)?(\s(million|billion))?)?")
+    f = open("parsingResult.txt", "w")
+    f.close()
     for text in tree.xpath("//DOC/TEXT"):
         article = ""
         for p in text.xpath("./P"):
@@ -25,12 +27,19 @@ def analyseNewspaper(path):
 
         tokenizer = RegexpTokenizer(r'([\w\-\<\>]+)')
         listofwords = tokenizer.tokenize(article)
+        f = open("parsingResult.txt", "a")
         for i,word in enumerate(listofwords):
             listofwords[i] = ps.stem(word)
-        print(listofwords)
+            f.write(listofwords[i] + ';')
+        # print(listofwords)
+        f.close()
 
+# TODO: Change the pathlist to latimes to parse all the files
+# pathlist = Path("data/latimes/").glob('**/la*')
+pathlist = Path("data/latimesMini/").glob('**/la*')
 
-pathlist = Path("latimes/").glob('**/la*')
-
+i = 1
 for path in pathlist:
     analyseNewspaper(path)
+    print("file "+ str(i) + " finished!")
+    i = i+1
