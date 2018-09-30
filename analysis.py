@@ -9,13 +9,14 @@ contents = Path("latimes/la010189").read_text()
 
 tree = etree.fromstring("<NEWSPAPER>"+contents+"</NEWSPAPER>")
 analyseText = ""
-for text in tree.xpath("//TEXT/P"):
-    analyseText +=text.text
-#print(analyseText)
-analyseText = re.sub(r"(\$|€|¥)\d+((\.\d+)?(\s(million|billion))?)?","<money>",analyseText)
-analyseText = re.sub(r"\d+((\.\d+)?(\s(million|billion))?)?","<number>",analyseText)
-#analyseText = re.sub(r"(\d+\.\d+)+","<decimal>",analyseText)
-#analyseText = re.sub(r"(\d)+","<number>",analyseText)
-tokenizer = RegexpTokenizer(r'(?:[\w\-](?<!_))+')
-tokenizer = RegexpTokenizer(r'([\w\-\<\>]+)')
-print(tokenizer.tokenize(analyseText))
+regexMoney = re.compile(r"(\$|€|¥)\d+((\.\d+)?(\s(million|billion))?)?")
+regexNumber = re.compile(r"\d+((\.\d+)?(\s(million|billion))?)?")
+for text in tree.xpath("//DOC/TEXT"):
+    analyseText = ""
+    for p in text.xpath("./P"):
+        analyseText += p.text
+    analyseText = re.sub(regexMoney, "<money>", analyseText)
+    analyseText = re.sub(regexNumber,"<number>",analyseText)
+  
+    tokenizer = RegexpTokenizer(r'([\w\-\<\>]+)')
+    print(tokenizer.tokenize(analyseText))
