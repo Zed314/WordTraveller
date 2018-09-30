@@ -12,8 +12,8 @@ analyseText = ""
 for text in tree.xpath("//TEXT/P"):
     analyseText +=text.text
 #print(analyseText)
-analyseText = re.sub(r"\$\d+((\.\d+)?(\s(million|billion))?)?","<money>",analyseText)
-
+analyseText = re.sub(r"(\$|€|¥)\d+((\.\d+)?(\s(million|billion))?)?","<money>",analyseText)
+analyseText = re.sub(r"\d+((\.\d+)?(\s(million|billion))?)?","<number>",analyseText)
 #analyseText = re.sub(r"(\d+\.\d+)+","<decimal>",analyseText)
 #analyseText = re.sub(r"(\d)+","<number>",analyseText)
 tokenizer = RegexpTokenizer(r'(?:[\w\-](?<!_))+')
