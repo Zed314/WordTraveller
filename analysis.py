@@ -7,15 +7,9 @@ from nltk.tokenize import RegexpTokenizer
 from pathlib import Path
 from nltk.corpus import stopwords
 
+#Global scale voc (among all documents)
 voc = dict()
-#todo : merge inverted file among several docs
-#handle parametrisation of estimation of score (instead of just incrementing)
-#store it and access it in an optimized way on/from HDD
-#add test for tokenizer
-#add perf evaluation
-#add more functions inside
-#structure & comment code
-#have fun
+
 def analyseNewspaper(path):
 
     contents = path.read_text()

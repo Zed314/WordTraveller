@@ -1,20 +1,22 @@
 # TODO
 ## Tokenization
-- [ ] Tokenization (use space as delimiter, remove punctuation, use nltk)
-- [ ] remove tags `<BYLINE>`, ..., `<P>`, `<TYPE>`
-- [ ] replace <number>,<money> to numbers or currencies
+- [X] Tokenization (use space as delimiter, remove punctuation, use nltk)
+- [X] remove tags `<BYLINE>`, ..., `<P>`, `<TYPE>`
+- [ ] replace <number>,<money> to numbers or currencies => Is not it already done ?
+- [ ] add tests for tokenizer (recommanded)
 
 ## Stemming
-- [ ] Stem words, use Porter's algorithm
+- [X] Stem words, use Porter's algorithm
 
 ## Stop words removal
-- [ ] remove stop words
+- [X] remove stop words
 
 ## Create Inverted file (IF)
-- Formula : ` <ti, ni> --> ..., <dj,score(ti, dj)>,...`
-- [ ] Build IF in RAM
+- [X] Formula : ` <ti, ni> --> ..., <dj,score(ti, dj)>,...`
+- [X] Build IF in RAM
 - [ ] When full, flush the PL and the VOC of this partial IF to the disk
-- [ ] when all the documents have been seen, merge and flushed PL to obtain the IF
+- [ ] Find an efficient datastructure to store the partial IF
+- [ ] When all the documents have been seen, merge and flushed PL to obtain the IF
 
 
 ### Score
@@ -27,3 +29,18 @@
 
 ## Ranked queries
 - [ ] Queries
+
+## Performance
+- [ ] Add a benchmark
+- [ ] Add tests to run the benchmark with
+- [ ] Add graphical way of visualizing the performances
+
+## Building
+- [ ] Find a way to specify all the dependencies required by nltk (tokenization needs a special dataset for instance, that can be grabbed using the method nltk.dowload)
+
+## Interface
+- [ ] Use parameters of the program to choose among several ways of running the program (with partial IFs, etc)
+- [ ] Write an help section when no argument or badly written argument are used or when the option -h is used
+
+## Code itself
+- [ ] Add more structure and comments to the code
