@@ -49,11 +49,10 @@ def analyseNewspaper(path):
                 voc[word] = {}
                 voc[word][numDocument] = occ #occurencies
 
-    #print the aggregation
-    for word, pl in voc.items():
-        print(word)
-        for numDoc, score in pl.items():
-            print("{} => {}.".format(numDoc, score))
+ 
+#def writeToFolder(pathFolder):
+ #   if not os.path.isdir(pathFolder):
+  #      os.makedirs(pathFolder)
 
 
 # todo : add parametrization from command line to choose which folder we shoud parse
@@ -64,3 +63,8 @@ for path in pathlist:
     analyseNewspaper(path)
     print("file "+ str(i) + " finished!")
     i = i+1
+#print the aggregation
+for word, pl in voc.items():
+    print(word)
+    for numDoc, score in pl.items():
+        print("{} => {}.".format(numDoc, score))
