@@ -1,0 +1,34 @@
+Comprssion
+trier par doc id et juste noter les Δ
+
+Pour les occurences
+
+VByte(133) : 133 = 128 + 5
+ VBYte(5) : 10000101 (on ajoute un 1 au MSB pour dire que cet octet est le dernier)
+VByte(1) : 00000001
+VByte(133) = 0000 0001 1000 0101
+
+Faggins : trier sur score
+≠
+Comprssion : trier sur id
+
+ajd : Comprssion vbyte et après bzip2
+
+Meilleur algo Efficient query evaluation using a two-level retrieval process proceedings of the 12th inetrantional … => only one Pl
+
+faire pdf conclusions
+
+23 NOVEMBRE dernière séance
+(au plus tard une semaine après, 30 NOVEMBRE)
+
+
+
+
+
+Donc
+Indexation
+wordmapper dossier -o exitFolder --zip="" => spécifier algo par défault
+wordmapper -a dossier -o exitFolder 
+Requetes
+wordtraveller dossierMapper aie,auie,bépo  -n 10  --algo "aei"
+wordtraveller dossierMapper -q file -n 10
