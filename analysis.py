@@ -1,14 +1,18 @@
 
 import re
+import nltk
 from lxml import etree
+from pathlib import Path
 from nltk import tokenize
 from nltk.stem import PorterStemmer
 from nltk.tokenize import RegexpTokenizer
-from pathlib import Path
 from nltk.corpus import stopwords
 
 #Global scale voc (among all documents)
 voc = dict()
+
+def downloadNLTKDependencies():
+    nltk.download('stopwords',"./nltk")
 
 def analyseNewspaper(path):
 
@@ -57,7 +61,7 @@ def analyseNewspaper(path):
 
 # todo : add parametrization from command line to choose which folder we shoud parse
 pathlist = Path("data/latimesMini/").glob('**/la*')
-
+downloadNLTKDependencies()
 i = 1
 for path in pathlist:
     analyseNewspaper(path)
