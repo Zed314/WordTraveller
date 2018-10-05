@@ -12,7 +12,7 @@ from nltk.corpus import stopwords
 voc = dict()
 
 def downloadNLTKDependencies():
-    nltk.download('stopwords',"./nltk")
+    nltk.download('stopwords')
 
 def analyseNewspaper(path):
 
