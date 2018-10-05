@@ -1,6 +1,6 @@
-
 import re
 import nltk
+
 from lxml import etree
 from pathlib import Path
 from nltk import tokenize
@@ -32,10 +32,8 @@ def analyseNewspaper(path):
             text += p.text
         text = re.sub(regexMoney, "<money>", text)
         text = re.sub(regexNumber,"<number>", text)
-
         tokenizer = RegexpTokenizer(r'([\w\-\<\>]+)')
         listofwords = tokenizer.tokenize(text)
-        f = open("parsingResult.txt", "a")
         for i,word in enumerate(listofwords):
             if word.lower() not in stop_words:
                 word = ps.stem(word)
@@ -51,7 +49,6 @@ def analyseNewspaper(path):
                 voc[word] = {}
                 voc[word][numDocument] = occ #occurencies
 
-        f.close()
     #print the aggregation
     for word, pl in voc.items():
         print(word)
