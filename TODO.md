@@ -2,8 +2,9 @@
 ## Tokenization
 - [X] Tokenization (use space as delimiter, remove punctuation, use nltk)
 - [X] remove tags `<BYLINE>`, ..., `<P>`, `<TYPE>`
-- [ ] replace <number>,<money> to numbers or currencies => Is not it already done ?
-- [ ] add tests for tokenizer (recommanded)
+- [X] replace <number>,<money> to numbers or currencies
+- [ ] add tests for tokenizer (recommanded) (pff…)
+- [ ] upgrade tokenizer for "Phillip J. Fry."=>[Phillip, J., Fry]
 
 ## Stemming
 - [X] Stem words, use Porter's algorithm
@@ -44,3 +45,6 @@
 
 ## Code itself
 - [ ] Add more structure and comments to the code
+
+## Tests
+- [ ] Add regression tests (one or several files) 
