@@ -1,4 +1,5 @@
 import struct
+from sortedcontainers import SortedDict
 
 
 # Record struct format
@@ -15,8 +16,8 @@ def savePostList(postingList, offset):
     try:
         file.read(8*offset)
         # Encode the record and write it to the dest file
-        for numDoc, score in postingList.items():
-            record = s.pack(numDoc, score)
+        for idDoc, score in postingList.items():
+            record = s.pack(idDoc, score)
             file.write(record)
 
     except IOError:
@@ -38,11 +39,11 @@ def saveVocabulary(voc):
 #post condition: return voc: the a dictionary of words and offset that was saved.
 def readVocabulary():
     file = open("vocabulary.vo", "r")
-    voc = dict()
+    voc = SortedDict()
     for ligne in file:
         donnees = ligne.rstrip('\n\r').split(",")
         word = donnees[0]
-        offset = int(float(donnees[1]))
+        offset = int(donnees[1])
         voc[word] = [offset]
     return voc
 
@@ -54,16 +55,16 @@ def readVocabulary():
 def readPostList(offset, length):
     #Fille to read
     file = open("postingLites.pl", "rb")
-    postingList = dict()
+    postingList = SortedDict()
     try:
         #test print(file.read(8*24))
         file.read(8*offset)
-        for x in range(0, length-1):
+        for x in range(0, length):
             record = file.read(8)
             filed = s.unpack(record)
-            numDocument = filed[0]
+            idDoc = filed[0]
             score = filed[1]
-            postingList[numDocument]= score
+            postingList[idDoc]= score
         return postingList;
             # Do stuff with record
 
@@ -76,19 +77,19 @@ def readPostList(offset, length):
 
 if __name__ == "__main__" :
     postingList = dict()
-    postingList["a"]=101
-    postingList["b"]=30023
-    postingList["c"]=308.0
-    postingList["d"]=159
-    postingList["e"]=3005
-    postingList["f"]=3006
-    #savePostList(postingList,0)
-    saveVocabulary(postingList)
-    #postingList[1]=201
-    #savePostList(postingList,6)
-    #postingList[1]=301
-    #savePostList(postingList,12)
-    #pl = readPostList(12,6)
-    voc = readVocabulary()
-    for numDoc, score in voc.items():
+    postingList[1]=101
+    postingList[2]=30023
+    postingList[34]=308.0
+    postingList[294]=159
+    postingList[2324]=3005
+    postingList[23445]=3006
+    savePostList(postingList,0)
+    #saveVocabulary(postingList)
+    postingList[1]=201
+    savePostList(postingList,6)
+    postingList[1]=301
+    savePostList(postingList,12)
+    pl = readPostList(12,6)
+    #voc = readVocabulary()
+    for numDoc, score in pl.items():
         print("{} => {}.".format(numDoc, score))
