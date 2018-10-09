@@ -10,5 +10,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Folder `workspace` with custom relative path.
 ### Changed
 - Architecture of the project. 
-- How to execute the modules. From now, to execute a modul: `python3 -m wordtraveller.[module]`. For example: `python3 -m wordtraveller.filemanager`
+- How to execute the modules. From now, to execute a module: `python3 -m wordtraveller.[module]`. For example: `python3 -m wordtraveller.filemanager`
 
