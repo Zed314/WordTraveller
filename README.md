@@ -13,3 +13,6 @@ The project is built and tested on Python 3
 
 ## Executing
 - `python3 analysis.py`
+
+## Executing tests
+- `python3 tests/test[number].py`
