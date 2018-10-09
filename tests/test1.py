@@ -1,6 +1,8 @@
 import unittest
 
 class TestIndexation(unittest.TestCase):
+    # Pour compter les mots:
+    # http://www.writewords.org.uk/word_count.asp
 
     def test_upper(self):
         self.assertEqual('foo'.upper(), 'fOO')

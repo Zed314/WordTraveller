@@ -10,30 +10,32 @@ from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 from sortedcontainers import SortedDict
 
-
-
+REGEX_MONEY = re.compile(r"(\$|€|¥)\d+((\.\d+)?(\s(million|billion))?)?")
+REGEX_NUMBER = re.compile(r"\d+((\.\d+)?(\s(million|billion))?)?")
+ps = PorterStemmer()
 
 def downloadNLTKDependencies():
     nltk.download('stopwords')
 
 def analyseNewspaper(path, voc):
 
-    contents = path.read_text()
-    ps = PorterStemmer()
-    tree = etree.fromstring("<NEWSPAPER>"+contents+"</NEWSPAPER>")
+    global REGEX_MONEY
+    global REGEX_NUMBER
+    global ps # PorterStemmer
+
+    rawContent = path.read_text()
+    tree = etree.fromstring("<NEWSPAPER>"+rawContent+"</NEWSPAPER>")
     text = ""
-    regexMoney = re.compile(r"(\$|€|¥)\d+((\.\d+)?(\s(million|billion))?)?")
-    regexNumber = re.compile(r"\d+((\.\d+)?(\s(million|billion))?)?")
     stop_words = [word.lower() for word in set(stopwords.words('english')) ]
     for document in tree.xpath("//DOC"):
         text = ""
         vocDoc = {}
         idDocument = int(document.xpath("./DOCID")[0].text)
-        numDocument = document.xpath("./DOCNO")[0].text
+        # numDocument = document.xpath("./DOCNO")[0].text
         for p in document.xpath("./TEXT/P"):
             text += p.text
-        text = re.sub(regexMoney, "<money>", text)
-        text = re.sub(regexNumber,"<number>", text)
+        text = re.sub(REGEX_MONEY, "<money>", text)
+        text = re.sub(REGEX_NUMBER,"<number>", text)
         tokenizer = RegexpTokenizer(r'([\w\-\<\>]+)')
         listofwords = tokenizer.tokenize(text)
         for i,word in enumerate(listofwords):
@@ -44,12 +46,12 @@ def analyseNewspaper(path, voc):
                     vocDoc[word] = vocDoc[word] + 1
                 else:
                     vocDoc[word] = 1
-        for word, occ in vocDoc.items():
+        for word, occurencies in vocDoc.items():
             if word in voc:
-                voc[word][idDocument] = occ #occurencies
+                voc[word][idDocument] = occurencies
             else:
                 voc[word] = {}
-                voc[word][idDocument] = occ #occurencies
+                voc[word][idDocument] = occurencies 
 
 
 #def writeToFolder(pathFolder):
@@ -58,12 +60,12 @@ def analyseNewspaper(path, voc):
 def save(voc):
     #map vocabulary offste
     vocabulary = SortedDict()
-    CurrantOffset=0
+    currentOffset = 0
     #save all the posting lists
     for word, pl in voc.items():
-        fileManager.savePostList(pl, CurrantOffset)
-        vocabulary[word] = CurrantOffset
-        CurrantOffset += len(pl)
+        fileManager.savePostList(pl, currentOffset)
+        vocabulary[word] = currentOffset
+        currentOffset += len(pl)
     #save the vocabulary
     fileManager.saveVocabulary(vocabulary)
     pass

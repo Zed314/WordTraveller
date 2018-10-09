@@ -65,7 +65,7 @@ def readPostList(offset, length):
             idDoc = filed[0]
             score = filed[1]
             postingList[idDoc]= score
-        return postingList;
+        return postingList
             # Do stuff with record
 
     except IOError:
