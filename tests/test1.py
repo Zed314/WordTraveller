@@ -32,6 +32,28 @@ class TestAnalysis(unittest.TestCase):
         self.assertEqual(mot2, {1:1, 2:1})
         self.assertEqual(mot3, {3:1})
 
+    def test_with_stopwords(self):
+        voc = SortedDict()
+        currentWorkspace = './tests/workspace/test2/'
+
+        pathlist = Path("./tests/data/test2/").glob('**/la*')
+        for path in pathlist:
+            analysis.analyseNewspaper(path,voc)
+
+        analysis.saveVocabulary(voc, currentWorkspace)
+
+        # TODO: changer quand on ait une function directe
+        savedVoc = filemanager.readVocabulary(currentWorkspace)
+        mot1 = query.get_posting_list(savedVoc,"aa", currentWorkspace)
+        mot2 = query.get_posting_list(savedVoc,"bb", currentWorkspace)
+        mot3 = query.get_posting_list(savedVoc,"cc", currentWorkspace)
+        self.assertEqual(mot1, {1:1, 2:2})
+        self.assertEqual(mot2, {1:4, 2:1})
+        self.assertEqual(mot3, {2:2})
+
+        stop1 = query.get_posting_list(savedVoc,"doing", currentWorkspace)
+        self.assertEqual(stop1, {0:0}) # TODO: penser a retourner un valeur null ou qq chose
+
 
 if __name__ == '__main__':
     unittest.main()
