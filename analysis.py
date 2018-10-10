@@ -1,6 +1,6 @@
 import re
 import nltk
-
+import os
 from lxml import etree
 from pathlib import Path
 from nltk import tokenize
@@ -27,7 +27,8 @@ def analyseNewspaper(path):
         text = ""
         vocDoc = {}
         idDocument = document.xpath("./DOCID")[0].text
-        numDocument = document.xpath("./DOCNO")[0].text
+  #      numDocument = document.xpath("./DOCNO")[0].text
+  # todo : use title too
         for p in document.xpath("./TEXT/P"):
             text += p.text
         text = re.sub(regexMoney, "<money>", text)
@@ -44,17 +45,21 @@ def analyseNewspaper(path):
                     vocDoc[word] = 1
         for word, occ in vocDoc.items():
             if word in voc:
-                voc[word][numDocument] = occ #occurencies
+                voc[word][idDocument] = occ #occurencies
             else:
                 voc[word] = {}
-                voc[word][numDocument] = occ #occurencies
+                voc[word][idDocument] = occ #occurencies
 
  
-#def writeToFolder(pathFolder):
- #   if not os.path.isdir(pathFolder):
-  #      os.makedirs(pathFolder)
+def writeToFolder(pathFolder):
+   if os.path.isdir(pathFolder):
+       raise FileExistsError("Folder already exists. Editing mode not yet supported")
+   os.makedirs(pathFolder)
+   f = open(pathFolder+"/VOC","w+")
+   f = open(pathFolder+"/PL","w+")
 
 
+writeToFolder("é")
 # todo : add parametrization from command line to choose which folder we shoud parse
 pathlist = Path("data/latimesMini/").glob('**/la*')
 downloadNLTKDependencies()
