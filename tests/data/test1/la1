@@ -2,7 +2,7 @@
 <DOCID> 1 </DOCID>
 <TEXT>
 <P>
-aa bb bb bb cc dd ff qq rr rr. The rr rr rr ee dd vv aa aa yy
+aa bb aa aa
 </P>
 </TEXT>
 </DOC>
@@ -11,7 +11,16 @@ aa bb bb bb cc dd ff qq rr rr. The rr rr rr ee dd vv aa aa yy
 <DOCID> 2 </DOCID>
 <TEXT>
 <P>
-aa aa bb aa bb cc dd cc aa cc bb bb. tt pp the aa kk aa bb bb ii jj
+aa aa bb 
+</P>
+</TEXT>
+</DOC>
+
+<DOC>
+<DOCID> 3 </DOCID>
+<TEXT>
+<P>
+aa cc 
 </P>
 </TEXT>
 </DOC>

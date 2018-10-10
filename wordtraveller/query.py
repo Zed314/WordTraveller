@@ -8,5 +8,6 @@ def get_posting_list(voc, word, workspace):
 
 if __name__ == "__main__" :
 
+    # TODO: cacher le filemanager, dés l'exterior, on ne devrait que acceder à analysis et a query
     voc = filemanager.readVocabulary("./workspace/")
     print(get_posting_list(voc,"aaa", "./workspace/"))

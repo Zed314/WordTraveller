@@ -67,7 +67,7 @@ def saveVocabulary(voc, workspace):
         currentOffset += len(pl)
     #save the vocabulary
     filemanager.saveVocabulary(vocabulary, workspace)
-    print("Vocabulary saved")
+    # print("Vocabulary saved")
     pass
 
 if __name__ == "__main__":

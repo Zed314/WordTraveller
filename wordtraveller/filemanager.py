@@ -48,6 +48,7 @@ def saveVocabulary(voc, workspace="./workspace/"):
     file = open(workspace + "vocabulary.vo", "w")
     for word, offset in voc.items():
         file.write("{},{}\n".format(word, offset))
+    file.close()
 
 #Precondtions: a dictionary is saved in vocabulary.vo
 #              workspace: is the folder where we are working in, workspace path should end by an '/'
@@ -62,6 +63,7 @@ def readVocabulary(workspace="./workspace/"):
         word = donnees[0]
         offset = int(donnees[1])
         voc[word] = [offset]
+    file.close()
     return voc
 
 
