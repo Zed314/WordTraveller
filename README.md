@@ -12,7 +12,9 @@ The project is built and tested on Python 3
 - `pip3 install -r requirements.txt`
 
 ## Executing
-- `python3 analysis.py`
+- `python3 -m wordtraveller.analysis`
+- `python3 -m wordtraveller.filemanager`
+- `python3 -m wordtraveller.query`
 
 ## Executing tests
-- `python3 tests/test[number].py`
+- `python3 -m tests.test[number].py`
