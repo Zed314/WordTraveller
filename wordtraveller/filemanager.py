@@ -2,19 +2,17 @@ import struct
 from sortedcontainers import SortedDict
 import os
 
-
 class FileManager:
 
-
-    def __init__(self, fileName, workspace="./workspace/" ):
+    def __init__(self, fileName, workspace="./workspace/"):
         self.vocabularyFileName = workspace + fileName + ".vo"
         self.postingListsFileName = workspace + fileName + ".pl"
         # Record struct format
         self.struct = struct.Struct("<lf")
-        #creat the workspace
+        # create the workspace
         if not os.path.exists(workspace):
             os.makedirs(workspace)
-        # create  the files
+        # create the files
         if not os.path.isfile(self.vocabularyFileName) :
             file = open(self.vocabularyFileName, "wb")
             file.close()
@@ -33,7 +31,7 @@ class FileManager:
                 for idDoc, score in postingList.items():
                     record = self.struct.pack(idDoc, score)
                     file.write(record)
-
+            print("PL  file saved in : " + self.postingListsFileName)
         except IOError:
         	# Your error handling here
         	# Nothing for this example
@@ -45,10 +43,8 @@ class FileManager:
     #              offet: is the numbers of paires <Doc Id, Scores> alredy witten in the binary doc
     #              workspace: is the folder where we are working in, workspace path should end by an '/'
     #Postcondtions: The fonction update the file postingLites.data withe the new postingList after "offet" paires <Doc Id, Scores>
-
     def save_postList(self, postingList, offset):
         # destination file for redin and wrting (r+)b
-
         file = open(self.postingListsFileName, "r+b")
 
         try:
@@ -65,7 +61,6 @@ class FileManager:
         finally:
             file.close()
 
-
     #Precondtions: voc: is a dictionary of words and offset.
     #              workspace: is the folder where we are working in, workspace path should end by an '/'
     #postcondition: the dictionary is saved in vocabulary.vo
@@ -74,6 +69,7 @@ class FileManager:
         for word, offset in voc.items():
             file.write("{},{}\n".format(word, offset))
         file.close()
+        print("VOC file saved in : " + self.vocabularyFileName)
 
     #Precondtions: a dictionary is saved in vocabulary.vo
     #              workspace: is the folder where we are working in, workspace path should end by an '/'
@@ -90,12 +86,10 @@ class FileManager:
         file.close()
         return voc
 
-
     #Precondtions: offet: is the numbers of paires <Doc Id, Scores> alredy witten in the binary doc
     #              length: is the number of paires <Doc Id, Scores> to be read
     #              workspace: is the folder where we are working in, workspace path should end by an '/'
     #Postcondtions: return a postiong list: a dictionary of Doc Id and Scores red between offet and length.
-
     def read_postList(self, offset, length):
 
 

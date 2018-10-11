@@ -1,6 +1,6 @@
 import re
 import nltk
-import filemanager
+from . import filemanager
 
 from lxml import etree
 from pathlib import Path
@@ -52,11 +52,7 @@ def analyseNewspaper(path, voc):
                 voc[word] = {}
                 voc[word][idDocument] = occurencies
 
-
-#def writeToFolder(pathFolder):
- #   if not os.path.isdir(pathFolder):
-  #      os.makedirs(pathFolder)
-def saveVocabulary(voc, workspace, path):
+def saveVocabulary(voc, path, workspace):
     #map vocabulary offset
     vocabulary = SortedDict()
     currentOffset = 0
@@ -69,20 +65,18 @@ def saveVocabulary(voc, workspace, path):
 
     #saving the plsting lists     
     fileManager.save_postLists_file(voc)
-    print("postingLists saved")
     #save the vocabulary
     fileManager.save_vocabulary(vocabulary)
-    print("Vocabulary saved")
     pass
 
 if __name__ == "__main__":
     voc = SortedDict()
     # todo : add parametrization from command line to choose which folder we shoud parse
-    pathlist = Path("../data/latimesMini/").glob('**/la*')
+    pathlist = Path("./data/latimesMini/").glob('**/la*')
     i = 1
     for path in pathlist:
         analyseNewspaper(path,voc)
         print("file "+ str(i) + " finished!")
         i = i+1
 
-    saveVocabulary(voc, '../workspace/',"test1" )
+    saveVocabulary(voc, 'test1', './workspace/')

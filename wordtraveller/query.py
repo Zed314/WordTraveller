@@ -1,4 +1,4 @@
-import filemanager
+from . import filemanager
 from sortedcontainers import SortedDict
 
 def get_posting_list(voc, word, fileManager):
@@ -19,6 +19,6 @@ def get_posting_list(voc, word, fileManager):
 if __name__ == "__main__" :
 
     # TODO: cacher le filemanager, dés l'exterior, on ne devrait que acceder à analysis et a query
-    fileManager = filemanager.FileManager("test1","../workspace/" )
+    fileManager = filemanager.FileManager("test1","./workspace/")
     voc = fileManager.read_vocabulary()
     print(get_posting_list(voc,"aaa", fileManager ))
