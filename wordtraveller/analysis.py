@@ -52,12 +52,12 @@ def analyseNewspaper(path, voc):
                 voc[word] = {}
                 voc[word][idDocument] = occurencies
 
-def saveVocabulary(voc, path, workspace):
+def saveVocabulary(voc, filename, workspace):
     #map vocabulary offset
     vocabulary = SortedDict()
     currentOffset = 0
     #save all the posting lists
-    fileManager = filemanager.FileManager(path,workspace )
+    fileManager = filemanager.FileManager(filename,workspace)
 
     for word, pl in voc.items():
         currentOffset += len(pl)

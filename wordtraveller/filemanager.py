@@ -39,11 +39,16 @@ class FileManager:
         finally:
             file.close()
 
-    #Precondtions: postingList: is a dictionary of Doc Id and Scores.
-    #              offet: is the numbers of paires <Doc Id, Scores> alredy witten in the binary doc
-    #              workspace: is the folder where we are working in, workspace path should end by an '/'
-    #Postcondtions: The fonction update the file postingLites.data withe the new postingList after "offet" paires <Doc Id, Scores>
+    
     def save_postList(self, postingList, offset):
+        """
+        Preconditions: 
+            postingList: is a dictionary of Doc Id and Scores.
+            offet: is the numbers of paires <Doc Id, Scores> alredy witten in the binary doc
+            workspace: is the folder where we are working in, workspace path should end by an '/'
+        Postconditions: 
+            The fonction update the file postingLites.data withe the new postingList after "offet" paires <Doc Id, Scores>
+        """
         # destination file for redin and wrting (r+)b
         file = open(self.postingListsFileName, "r+b")
 
@@ -61,21 +66,28 @@ class FileManager:
         finally:
             file.close()
 
-    #Precondtions: voc: is a dictionary of words and offset.
-    #              workspace: is the folder where we are working in, workspace path should end by an '/'
-    #postcondition: the dictionary is saved in vocabulary.vo
     def save_vocabulary(self,voc):
+        """
+        Preconditions: 
+            voc: is a dictionary of words and offset.
+            workspace: is the folder where we are working in, workspace path should end by an '/'
+        postconditions: 
+            the dictionary is saved in vocabulary.vo
+        """
         file = open(self.vocabularyFileName, "w")
         for word, offset in voc.items():
             file.write("{},{}\n".format(word, offset))
         file.close()
         print("VOC file saved in : " + self.vocabularyFileName)
 
-    #Precondtions: a dictionary is saved in vocabulary.vo
-    #              workspace: is the folder where we are working in, workspace path should end by an '/'
-    #post condition: return voc: the a dictionary of words and offset that was saved.
     def read_vocabulary(self):
-
+        """
+        Precondtions: 
+            a dictionary is saved in vocabulary.vo
+            workspace: is the folder where we are working in, workspace path should end by an '/'
+        Postcondition: 
+            return voc: the a dictionary of words and offset that was saved.
+        """
         file = open(self.vocabularyFileName, "r")
         voc = SortedDict()
         for ligne in file:
@@ -86,13 +98,15 @@ class FileManager:
         file.close()
         return voc
 
-    #Precondtions: offet: is the numbers of paires <Doc Id, Scores> alredy witten in the binary doc
-    #              length: is the number of paires <Doc Id, Scores> to be read
-    #              workspace: is the folder where we are working in, workspace path should end by an '/'
-    #Postcondtions: return a postiong list: a dictionary of Doc Id and Scores red between offet and length.
     def read_postList(self, offset, length):
-
-
+        """
+        Precondtions: 
+            offet: is the numbers of paires <Doc Id, Scores> alredy witten in the binary doc
+            length: is the number of paires <Doc Id, Scores> to be read
+            workspace: is the folder where we are working in, workspace path should end by an '/'
+        Postcondtions: 
+            return a postiong list: a dictionary of Doc Id and Scores red between offet and length.
+        """
         #Fille to read
         file = open(self.postingListsFileName, "rb")
         postingList = SortedDict()
