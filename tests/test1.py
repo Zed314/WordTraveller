@@ -57,7 +57,7 @@ class TestAnalysis(unittest.TestCase):
         self.assertEqual(mot3, {2:2})
 
         stop1 = query.get_posting_list(savedVoc,"doing", currentWorkspace)
-        self.assertEqual(stop1, {}) # TODO: penser a retourner un valeur null ou qq chose
+        self.assertEqual(stop1, {})
 
 
 if __name__ == '__main__':
