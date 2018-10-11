@@ -1,20 +1,59 @@
+import sys
+# To import parent modules
+sys.path.insert(0, '')
+
+# Atention: A partir d'ici on est en root
+
 import unittest
+from wordtraveller import analysis, filemanager, query
+from sortedcontainers import SortedDict
+from pathlib import Path
 
-class TestIndexation(unittest.TestCase):
+class TestAnalysis(unittest.TestCase):
+    # Pour compter les mots:
+    # http://www.writewords.org.uk/word_count.asp
 
-    def test_upper(self):
-        self.assertEqual('foo'.upper(), 'fOO')
+    def test_simple(self):
+        voc = SortedDict()
+        currentWorkspace = './tests/workspace/test1/'
 
-    def test_isupper(self):
-        self.assertTrue('FOO'.isupper())
-        self.assertFalse('Foo'.isupper())
+        pathlist = Path("./tests/data/test1/").glob('**/la*')
+        for path in pathlist:
+            analysis.analyseNewspaper(path,voc)
 
-    def test_split(self):
-        s = 'hello world'
-        self.assertEqual(s.split(), ['hello', 'world'])
-        # check that s.split fails when the separator is not a string
-        with self.assertRaises(TypeError):
-            s.split(2)
+        analysis.saveVocabulary(voc, currentWorkspace)
+
+        # TODO: changer quand on ait une function directe
+        savedVoc = filemanager.readVocabulary(currentWorkspace)
+        mot1 = query.get_posting_list(savedVoc,"aa", currentWorkspace)
+        mot2 = query.get_posting_list(savedVoc,"bb", currentWorkspace)
+        mot3 = query.get_posting_list(savedVoc,"cc", currentWorkspace)
+        self.assertEqual(mot1, {1:3, 2:2, 3:1})
+        self.assertEqual(mot2, {1:1, 2:1})
+        self.assertEqual(mot3, {3:1})
+
+    def test_with_stopwords(self):
+        voc = SortedDict()
+        currentWorkspace = './tests/workspace/test2/'
+
+        pathlist = Path("./tests/data/test2/").glob('**/la*')
+        for path in pathlist:
+            analysis.analyseNewspaper(path,voc)
+
+        analysis.saveVocabulary(voc, currentWorkspace)
+
+        # TODO: changer quand on ait une function directe
+        savedVoc = filemanager.readVocabulary(currentWorkspace)
+        mot1 = query.get_posting_list(savedVoc,"aa", currentWorkspace)
+        mot2 = query.get_posting_list(savedVoc,"bb", currentWorkspace)
+        mot3 = query.get_posting_list(savedVoc,"cc", currentWorkspace)
+        self.assertEqual(mot1, {1:1, 2:2})
+        self.assertEqual(mot2, {1:4, 2:1})
+        self.assertEqual(mot3, {2:2})
+
+        stop1 = query.get_posting_list(savedVoc,"doing", currentWorkspace)
+        self.assertEqual(stop1, {0:0}) # TODO: penser a retourner un valeur null ou qq chose
+
 
 if __name__ == '__main__':
     unittest.main()
