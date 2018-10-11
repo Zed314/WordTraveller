@@ -5,6 +5,13 @@ import os
 class FileManager:
 
     def __init__(self, fileName, workspace="./workspace/"):
+        """
+        Preconditions: 
+            filename: the custom filename for the voc and postinglist.
+            workspace: is the folder we want to work in. Should have an '/' at the end.
+        Postconditions: 
+            The fonction update the file postingLites.data withe the new postingList after "offet" paires <Doc Id, Scores>
+        """
         self.vocabularyFileName = workspace + fileName + ".vo"
         self.postingListsFileName = workspace + fileName + ".pl"
         # Record struct format
@@ -45,7 +52,6 @@ class FileManager:
         Preconditions: 
             postingList: is a dictionary of Doc Id and Scores.
             offet: is the numbers of paires <Doc Id, Scores> alredy witten in the binary doc
-            workspace: is the folder where we are working in, workspace path should end by an '/'
         Postconditions: 
             The fonction update the file postingLites.data withe the new postingList after "offet" paires <Doc Id, Scores>
         """
@@ -70,7 +76,6 @@ class FileManager:
         """
         Preconditions: 
             voc: is a dictionary of words and offset.
-            workspace: is the folder where we are working in, workspace path should end by an '/'
         postconditions: 
             the dictionary is saved in vocabulary.vo
         """
@@ -84,7 +89,6 @@ class FileManager:
         """
         Precondtions: 
             a dictionary is saved in vocabulary.vo
-            workspace: is the folder where we are working in, workspace path should end by an '/'
         Postcondition: 
             return voc: the a dictionary of words and offset that was saved.
         """
@@ -103,7 +107,6 @@ class FileManager:
         Precondtions: 
             offet: is the numbers of paires <Doc Id, Scores> alredy witten in the binary doc
             length: is the number of paires <Doc Id, Scores> to be read
-            workspace: is the folder where we are working in, workspace path should end by an '/'
         Postcondtions: 
             return a postiong list: a dictionary of Doc Id and Scores red between offet and length.
         """
@@ -144,7 +147,7 @@ if __name__ == "__main__" :
     filemanage.save_postList(postingList,6)
     postingList[1]=301
     filemanage.save_postList(postingList,12)
-    pl = filemanage.read_postList(12,6)
+    pl = filemanage.read_postList(0,10)
     #voc = readVocabulary('')
     for numDoc, score in pl.items():
         print("{} => {}.".format(numDoc, score))
