@@ -1,11 +1,6 @@
-import sys
-# To import parent modules
-sys.path.insert(0, '')
-
-# Atention: A partir d'ici on est en root
-
 import unittest
-import os.path
+import os
+import send2trash
 from wordtraveller import analysis, query
 from wordtraveller import filemanager as fm
 from sortedcontainers import SortedDict
@@ -54,12 +49,18 @@ class TestFileManager(unittest.TestCase):
         postingList[1]=201
         filemanager.save_postList(postingList,0)
         postingList[1]=301
-        filemanager.save_postList(postingList,6)
-        pl = filemanager.read_postList(0,5)
-        for numDoc, score in pl.items():
-            print("{} => {}.".format(numDoc, score))
-
+        filemanager.save_postList(postingList,0)
+        pl = filemanager.read_postList(0,3)
         self.assertEqual(pl, {1: 301, 23: 30023, 234: 3006}, "The sorted Dict should be the same")
+        # for numDoc, score in pl.items():
+        #     print("{} => {}.".format(numDoc, score))
+
         
 if __name__ == '__main__':
+    for folderName, subfolders, filenames in os.walk('./tests/workspace/'):
+        for filename in filenames:
+            if(filename.endswith('.vo') or filename.endswith('.pl')):
+                print('Deleting from folder ' + folderName + ': '+ filename)
+                send2trash.send2trash(folderName + '/'+filename)
+
     unittest.main()

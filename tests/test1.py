@@ -1,9 +1,3 @@
-import sys
-# To import parent modules
-sys.path.insert(0, '')
-
-# Atention: A partir d'ici on est en root
-
 import unittest
 from wordtraveller import analysis, query
 from wordtraveller import filemanager as fm
@@ -58,7 +52,6 @@ class TestAnalysis(unittest.TestCase):
 
         stop1 = query.get_posting_list(savedVoc,"doing", currentWorkspace)
         self.assertEqual(stop1, {})
-
 
 if __name__ == '__main__':
     unittest.main()
