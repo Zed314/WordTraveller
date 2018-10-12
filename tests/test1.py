@@ -15,9 +15,9 @@ class TestAnalysis(unittest.TestCase):
 
         pathlist = Path("./tests/data/test1/").glob('**/la*')
         for path in pathlist:
-            analysis.analyseNewspaper(path,voc)
+            analysis.analyse_newspaper(path, voc)
 
-        analysis.saveVocabulary(voc, filename, currentWorkspace)
+        analysis.save_vocabulary(voc, filename, currentWorkspace)
 
         filemanager = fm.FileManager(filename, currentWorkspace)
 
@@ -37,9 +37,9 @@ class TestAnalysis(unittest.TestCase):
 
         pathlist = Path("./tests/data/test2/").glob('**/la*')
         for path in pathlist:
-            analysis.analyseNewspaper(path,voc)
+            analysis.analyse_newspaper(path, voc)
 
-        analysis.saveVocabulary(voc,filename,currentWorkspace)
+        analysis.save_vocabulary(voc, filename, currentWorkspace)
         filemanager = fm.FileManager(filename,currentWorkspace)
         # TODO: changer quand on ait une function directe
         savedVoc = filemanager.read_vocabulary()
