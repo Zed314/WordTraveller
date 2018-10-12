@@ -17,4 +17,5 @@ The project is built and tested on Python 3
 - `python3 -m wordtraveller.query`
 
 ## Executing tests
-- `python3 -m tests.test[number].py`
+- `python3 -m tests.test[number] -v` (-v parameter for higher verbosity)
+- `python3 -m unittest -v` (to execute all tests)

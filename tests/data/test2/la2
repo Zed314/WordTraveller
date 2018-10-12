@@ -2,7 +2,7 @@
 <DOCID> 1 </DOCID>
 <TEXT>
 <P>
-aa bb aa aa
+aa The bb a bb with bb I bb
 </P>
 </TEXT>
 </DOC>
@@ -11,16 +11,7 @@ aa bb aa aa
 <DOCID> 2 </DOCID>
 <TEXT>
 <P>
-aa aa bb 
-</P>
-</TEXT>
-</DOC>
-
-<DOC>
-<DOCID> 3 </DOCID>
-<TEXT>
-<P>
-aa cc 
+aa cc. The bb which doing wasn't aa cc
 </P>
 </TEXT>
 </DOC>

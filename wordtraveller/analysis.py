@@ -64,18 +64,26 @@ def savePartialVocabulary(voc,workspace, number):
     filemanager.saveVocabulary(vocabulary, workspace,"partialVOC"+str(number)+".temp")
     print("Vocabulary saved")
 
-def saveVocabulary(voc, workspace):
+def saveVocabulary(voc, filename, workspace):
+
+
     #map vocabulary offset
     vocabulary = SortedDict()
     currentOffset = 0
     #save all the posting lists
+    #TODO make a btter call to the consturctore "filemanager.FileManager(..,..) seems a bit wirde
+    fileManager = filemanager.FileManager(filename,workspace)
+
     for word, pl in voc.items():
-        filemanager.savePostList(pl, currentOffset, workspace)
-        vocabulary[word] = currentOffset
         currentOffset += len(pl)
+        vocabulary[word] = currentOffset
+
+    #saving the plsting lists
+    fileManager.save_postLists_file(voc)
     #save the vocabulary
     filemanager.saveVocabulary(vocabulary, workspace)
     print("Vocabulary saved")
+
 
 
 if __name__ == "__main__":
@@ -97,3 +105,4 @@ if __name__ == "__main__":
 
     filemanager.mergePL(namePartialVoc,namePartialPL)
     #saveVocabulary(voc, './workspace/')
+    saveVocabulary(voc, 'test1', './workspace/')
