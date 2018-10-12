@@ -57,13 +57,14 @@ def saveVocabulary(voc, filename, workspace):
     vocabulary = SortedDict()
     currentOffset = 0
     #save all the posting lists
+    #TODO make a btter call to the consturctore "filemanager.FileManager(..,..) seems a bit wirde
     fileManager = filemanager.FileManager(filename,workspace)
 
     for word, pl in voc.items():
         currentOffset += len(pl)
         vocabulary[word] = currentOffset
 
-    #saving the plsting lists     
+    #saving the plsting lists
     fileManager.save_postLists_file(voc)
     #save the vocabulary
     fileManager.save_vocabulary(vocabulary)
