@@ -6,10 +6,10 @@ class FileManager:
 
     def __init__(self, fileName, workspace="./workspace/"):
         """
-        Preconditions: 
+        Preconditions:
             filename: the custom filename for the voc and postinglist.
             workspace: is the folder we want to work in. Should have an '/' at the end.
-        Postconditions: 
+        Postconditions:
             The fonction update the file postingLites.data withe the new postingList after "offet" paires <Doc Id, Scores>
         """
         self.vocabularyFileName = workspace + fileName + ".vo"
@@ -27,10 +27,17 @@ class FileManager:
             file = open(self.postingListsFileName, "wb")
             file.close()
 
-    def save_postLists_file(self, postingListsIndex):
+    def save_postLists_file(self, postingListsIndex, prefix = ""):
+        """
+        Preconditions:
+            postingListsIndex: is a SortedDict of  words and SortedDict Doc Id and Scores.
+            prefix: is a string
+        Postconditions:
+            The fonction save the pls in a file "prefix+self.postingListsFileName".
+        """
         # destination file for wrting (w)b
 
-        file = open(self.postingListsFileName , "wb")
+        file = open(prefix+self.postingListsFileName , "wb")
 
         try:
             # Encode the record and write it to the dest file
@@ -38,7 +45,7 @@ class FileManager:
                 for idDoc, score in postingList.items():
                     record = self.struct.pack(idDoc, score)
                     file.write(record)
-            print("PL  file saved in : " + self.postingListsFileName)
+            print("PL  file saved in : " +prefix+ self.postingListsFileName)
         except IOError:
         	# Your error handling here
         	# Nothing for this example
@@ -46,14 +53,28 @@ class FileManager:
         finally:
             file.close()
 
-    
+
+    def save_vocabulary(self,voc,prefix = ""):
+        """
+        Preconditions:
+            voc: is a dictionary of words and offset.
+        postconditions:
+            the dictionary is saved in vocabulary.vo
+        """
+        file = open(self.vocabularyFileName, "w")
+        for word, offset in voc.items():
+            file.write("{},{}\n".format(word, offset))
+        file.close()
+        print("VOC file saved in : " +prefix+ self.vocabularyFileName)
+
+
     def save_postList(self, postingList, offset):
         """
-        Preconditions: 
+        Preconditions:
             postingList: is a dictionary of Doc Id and Scores.
-            offet: is the numbers of paires <Doc Id, Scores> alredy witten in the binary doc
-        Postconditions: 
-            The fonction update the file postingLites.data withe the new postingList after "offet" paires <Doc Id, Scores>
+            offet: is the numbers of paires <Doc Id, Scores> alredy witten in the binary doc, the PL will be written affter  it, (offset < size of the file.)
+        Postconditions:
+            The fonction update the file postingLites.data withe the new postingList after "offet" paires <Doc Id, Scores>,
         """
         # destination file for redin and wrting (r+)b
         file = open(self.postingListsFileName, "r+b")
@@ -72,24 +93,12 @@ class FileManager:
         finally:
             file.close()
 
-    def save_vocabulary(self,voc):
-        """
-        Preconditions: 
-            voc: is a dictionary of words and offset.
-        postconditions: 
-            the dictionary is saved in vocabulary.vo
-        """
-        file = open(self.vocabularyFileName, "w")
-        for word, offset in voc.items():
-            file.write("{},{}\n".format(word, offset))
-        file.close()
-        print("VOC file saved in : " + self.vocabularyFileName)
 
     def read_vocabulary(self):
         """
-        Precondtions: 
+        Precondtions:
             a dictionary is saved in vocabulary.vo
-        Postcondition: 
+        Postcondition:
             return voc: the a dictionary of words and offset that was saved.
         """
         file = open(self.vocabularyFileName, "r")
@@ -104,10 +113,10 @@ class FileManager:
 
     def read_postList(self, offset, length):
         """
-        Precondtions: 
+        Precondtions:
             offet: is the numbers of paires <Doc Id, Scores> alredy witten in the binary doc
             length: is the number of paires <Doc Id, Scores> to be read
-        Postcondtions: 
+        Postcondtions:
             return a postiong list: a dictionary of Doc Id and Scores red between offet and length.
         """
         #Fille to read
