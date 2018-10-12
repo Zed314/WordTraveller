@@ -3,6 +3,7 @@ import nltk
 import filemanager
 
 from lxml import etree
+from filemanager import FileManager
 from pathlib import Path
 from nltk import tokenize
 from nltk.stem import PorterStemmer
@@ -99,10 +100,10 @@ if __name__ == "__main__":
   #      voc = SortedDict()
        # #saveVocabulary(voc, './workspace/', "partialVOC"+str(i)+".temp","partialPL"+str(i)+".temp")
    #     print("file "+ str(i) + " finished!")
-        namePartialPL.append("partialPL"+str(i)+".temp")
-        namePartialVoc.append("partialVOC"+str(i)+".temp")
+    #    namePartialPL.append("partialPL"+str(i)+".temp")
+     #   namePartialVoc.append("partialVOC"+str(i)+".temp")
         i = i+1
-
-    filemanager.mergePL(namePartialVoc,namePartialPL)
+    filemanager = FileManager("partialTest")
+    filemanager.mergePartialVocsAndPL(namePartialVoc,namePartialPL)
     #saveVocabulary(voc, './workspace/')
     saveVocabulary(voc, 'test1', './workspace/')
