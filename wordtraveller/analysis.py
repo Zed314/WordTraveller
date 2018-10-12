@@ -1,6 +1,6 @@
 import re
 import nltk
-from . import filemanager
+import filemanager
 
 from lxml import etree
 from pathlib import Path
@@ -30,7 +30,6 @@ def analyseNewspaper(path, voc):
         text = ""
         vocDoc = {}
         idDocument = int(document.xpath("./DOCID")[0].text)
-        # numDocument = document.xpath("./DOCNO")[0].text
         for p in document.xpath("./TEXT/P"):
             text += p.text
         text = re.sub(REGEX_MONEY, "<money>", text)
@@ -52,10 +51,19 @@ def analyseNewspaper(path, voc):
                 voc[word] = {}
                 voc[word][idDocument] = occurencies 
 
+def savePartialVocabulary(voc,workspace, number):
+     #map vocabulary offset
+    vocabulary = SortedDict()
+    currentOffset = 0
+    #save all the posting lists
+    for word, pl in voc.items():
+        filemanager.savePostList(pl, currentOffset, workspace, "partialPL"+str(number)+".temp")
+        vocabulary[word] = currentOffset
+        currentOffset += len(pl)
+    #save the vocabulary
+    filemanager.saveVocabulary(vocabulary, workspace,"partialVOC"+str(number)+".temp")
+    print("Vocabulary saved")
 
-#def writeToFolder(pathFolder):
- #   if not os.path.isdir(pathFolder):
-  #      os.makedirs(pathFolder)
 def saveVocabulary(voc, workspace):
     #map vocabulary offset
     vocabulary = SortedDict()
@@ -68,16 +76,24 @@ def saveVocabulary(voc, workspace):
     #save the vocabulary
     filemanager.saveVocabulary(vocabulary, workspace)
     print("Vocabulary saved")
-    pass
+
 
 if __name__ == "__main__":
     voc = SortedDict()
     # todo : add parametrization from command line to choose which folder we shoud parse
     pathlist = Path("data/latimesMini/").glob('**/la*')
+    namePartialVoc=[]
+    namePartialPL=[]
     i = 1
     for path in pathlist:
-        analyseNewspaper(path,voc)
-        print("file "+ str(i) + " finished!")
+   #     analyseNewspaper(path, voc)
+   #     savePartialVocabulary(voc,"./workspace/", i)
+  #      voc = SortedDict()
+       # #saveVocabulary(voc, './workspace/', "partialVOC"+str(i)+".temp","partialPL"+str(i)+".temp")
+   #     print("file "+ str(i) + " finished!")
+        namePartialPL.append("partialPL"+str(i)+".temp")
+        namePartialVoc.append("partialVOC"+str(i)+".temp")
         i = i+1
 
-    saveVocabulary(voc, './workspace/')
+    filemanager.mergePL(namePartialVoc,namePartialPL)
+    #saveVocabulary(voc, './workspace/')

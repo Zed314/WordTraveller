@@ -109,3 +109,5 @@ latimesAlex/
 
 # IDE
 .idea/
+
+*.temp
