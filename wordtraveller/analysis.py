@@ -50,34 +50,34 @@ def analyseNewspaper(path, voc):
                 voc[word][idDocument] = occurencies
             else:
                 voc[word] = {}
-                voc[word][idDocument] = occurencies 
+                voc[word][idDocument] = occurencies
 
-
-#def writeToFolder(pathFolder):
- #   if not os.path.isdir(pathFolder):
-  #      os.makedirs(pathFolder)
-def saveVocabulary(voc, workspace):
+def saveVocabulary(voc, filename, workspace):
     #map vocabulary offset
     vocabulary = SortedDict()
     currentOffset = 0
     #save all the posting lists
+    #TODO make a btter call to the consturctore "filemanager.FileManager(..,..) seems a bit wirde
+    fileManager = filemanager.FileManager(filename,workspace)
+
     for word, pl in voc.items():
-        filemanager.savePostList(pl, currentOffset, workspace)
-        vocabulary[word] = currentOffset
         currentOffset += len(pl)
+        vocabulary[word] = currentOffset
+
+    #saving the plsting lists
+    fileManager.save_postLists_file(voc)
     #save the vocabulary
-    filemanager.saveVocabulary(vocabulary, workspace)
-    print("Vocabulary saved")
+    fileManager.save_vocabulary(vocabulary)
     pass
 
 if __name__ == "__main__":
     voc = SortedDict()
     # todo : add parametrization from command line to choose which folder we shoud parse
-    pathlist = Path("data/latimesMini/").glob('**/la*')
+    pathlist = Path("./data/latimesMini/").glob('**/la*')
     i = 1
     for path in pathlist:
         analyseNewspaper(path,voc)
         print("file "+ str(i) + " finished!")
         i = i+1
 
-    saveVocabulary(voc, './workspace/')
+    saveVocabulary(voc, 'test1', './workspace/')
