@@ -69,7 +69,7 @@ if __name__ == "__main__":
     vocabulary = SortedDict()
     filemanager = FileManager("test1")
     for i, newspaper_path in enumerate(pathlist):
-        if i<2:
+        if i<1:
             analyse_newspaper(newspaper_path, vocabulary)
             filemanager.save_vocabularyAndPL_file(vocabulary, True)
             vocabulary = SortedDict()
