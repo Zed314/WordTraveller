@@ -6,7 +6,8 @@ from os import walk
 
 
 class FileManager:
-
+    CONST_SIZE_ON_DISK = 8
+    CONST_SIZE_ON_DISK_EXTENDED = 12
     def __init__(self, fileName, workspace="./workspace/"):
         """
         Preconditions:
@@ -227,7 +228,7 @@ class FileManager:
 
         try:
             if(offset!=0):
-                file.read(8*offset)
+                file.read(CONST_SIZE_ON_DISK*offset)
             # Encode the record and write it to the dest file
             for idDoc, score in postingList.items():
                 record = self.struct.pack(idDoc, score)
@@ -288,10 +289,10 @@ class FileManager:
         postingList = SortedDict()
         try:
 
-            file.read(8*offset)
+            file.read(CONST_SIZE_ON_DISK*offset)
 
             for x in range(0, length):
-                record = file.read(8)
+                record = file.read(CONST_SIZE_ON_DISK)
                 filed = self.struct.unpack(record)
                 idDoc = filed[0]
                 score = filed[1]
