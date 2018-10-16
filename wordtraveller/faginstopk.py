@@ -11,19 +11,6 @@ def createMockData(ownfilemanager):
     for path in pathlist:
         analysis.analyse_newspaper(path, voc)
     ownfilemanager.save_vocabularyAndPL_file(voc)
-    ownfilemanager.mergePartialVocsAndPL()
-
-def createMockPL(filemanager):
-    pathlist = Path("./tests/data/test1/").glob('**/la*')
-
-    vocabulary = SortedDict()
-    for i, newspaper_path in enumerate(pathlist):
-        if i<4:
-            analysis.analyse_newspaper(newspaper_path, vocabulary)
-            filemanager.save_vocabularyAndPL_file(vocabulary, True)
-            vocabulary = SortedDict()
-            print('file %s finished!' % i)
-    filemanager.mergePartialVocsAndPL()
 
 if __name__ == "__main__" :
     currentWorkspace = './tests/workspace/test1/'
