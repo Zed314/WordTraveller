@@ -75,5 +75,4 @@ if __name__ == "__main__":
             vocabulary = SortedDict()
             print('file %s finished!' % i)
     filemanager.mergePartialVocsAndPL()
-    #save_vocabulary(vocabulary,"test1","workspace/")
-    #filemanager.save_vocabularyAndPL_file(vocabulary, True)
+

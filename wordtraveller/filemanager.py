@@ -84,7 +84,7 @@ class FileManager:
             offsetNextWord.append(0)
             offsetPreWord.append(0)
         currentWords = SortedDict()
-   
+        fileVoc = open(self.getPathVoc(), "w+")
         while True :
             i = 0
            # currentWords = SortedDict()
@@ -93,10 +93,11 @@ class FileManager:
                 i = 0
                 line = ""
                 file = open(listPartialVocs[numberDoc], "r")
-                while i <= nbLinesRedInVOCs[numberDoc]:
-                    line = file.readline()
+                while i < nbLinesRedInVOCs[numberDoc]:
+                    file.readline()
                     i = i+1
-             
+                line = file.readline()
+                i = i+1
                 data = line.rstrip('\n\r').split(",")
                 word = data[0]
                 if word == "":
@@ -130,9 +131,11 @@ class FileManager:
             self.save_postList(mergingPLs)
 
             offsetVoc += len(mergingPLs)
-            voc.append([word,offsetVoc])
-            currentWords.pop(word)
             
+          #  voc.append([word,offsetVoc])
+            fileVoc.write("{},{}\n".format(word, offsetVoc))
+            currentWords.pop(word)
+        fileVoc.close()
     def save_postLists_file(self, postingListsIndex, isPartial=False):
         """
         Preconditions:
