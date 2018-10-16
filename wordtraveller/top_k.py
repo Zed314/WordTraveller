@@ -7,7 +7,7 @@ from pathlib import Path
 def naive_top_k_algo(words, voc, filemanager, k):
     posting_lists = [query.get_posting_list(voc, word, filemanager) for word in words]
     # TODO: Fonction qui permet de recuperer tous les docx?
-    aggregated_posting_list = aggregate_scores(posting_lists, [1, 2, 3], aggregative_function_sum)
+    aggregated_posting_list = aggregate_scores(posting_lists, [1, 2, 3], aggregative_function_min)
     find_top_k(aggregated_posting_list, k)
 
 
@@ -29,6 +29,20 @@ def aggregative_function_sum(scores):
     res = 0
     for score in scores:
         res += score
+    return res
+
+
+def aggregative_function_mean(scores):
+    res = 0
+    for score in scores:
+        res += score
+    return res/len(scores)
+
+
+def aggregative_function_min(scores):
+    res = scores[0]
+    for score in scores:
+        res = min(res, score)
     return res
 
 
@@ -54,6 +68,6 @@ if __name__ == "__main__" :
     filemanager = filemanager.FileManager(filename, currentWorkspace)
 
     savedVoc = filemanager.read_vocabulary()
-    words = ["aa"]
+    words = ["aa", "bb"]
     naive_top_k_algo(words, savedVoc, filemanager, 3)
 
