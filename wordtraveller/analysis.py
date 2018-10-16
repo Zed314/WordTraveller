@@ -1,11 +1,10 @@
 
 import re
 import nltk
-import filemanager
-import preprocessing
+from . import filemanager as fm
+from . import preprocessing
 
 from lxml import etree
-from filemanager import FileManager
 from pathlib import Path
 from sortedcontainers import SortedDict
 
@@ -41,34 +40,12 @@ def analyse_newspaper(path, voc):
                 voc[term] = SortedDict()
                 voc[term][id_doc] = occurrences
 
-#DEPRECATED, moved to filemanager, use save_vocabularyAndPL_file
-#Save a memory vocabulary that contains both voc and PLs to disk using
-#textual and binary format
-def save_vocabulary(voc, filename, workspace):
-    # map vocabulary offset
-    vocabulary = SortedDict()
-    current_offset = 0
-    # save all the posting lists
-    # TODO make a btter call to the consturctore "filemanager.FileManager(..,..) seems a bit wirde
-    file_manager = FileManager(filename, workspace)
-
-    for word, pl in voc.items():
-        current_offset += len(pl)
-        vocabulary[word] = current_offset
-
-    # saving the plsting lists
-    file_manager.save_postLists_file(voc)
-    # save the vocabulary
-    file_manager.save_vocabulary(vocabulary)
-
-
-
 if __name__ == "__main__":
 
     pathlist = Path("./data/latimesMini/").glob('**/la*')
 
     vocabulary = SortedDict()
-    filemanager = FileManager("test2")
+    filemanager = fm.FileManager("test2")
     for i, newspaper_path in enumerate(pathlist):
         if i<4:
             analyse_newspaper(newspaper_path, vocabulary)

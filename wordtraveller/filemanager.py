@@ -205,7 +205,7 @@ class FileManager:
         if isPartial:
             file = open(self.getPathVocPartial(self.numberPartialFiles), "w")
         else:
-            file = open(self.getPathPL(), "w")
+            file = open(self.getPathVoc(), "w")
         for word, offset in voc.items():
             file.write("{},{}\n".format(word, offset))
         file.close()
@@ -248,7 +248,7 @@ class FileManager:
         Preconditions:
             voc: is a SortedDict of  words and SortedDict Doc Id and Scores.
         """
-        numberPartialFiles += 1
+        self.numberPartialFiles += 1
         self.save_vocabularyAndPL_file(voc, True)
         pass
 
