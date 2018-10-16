@@ -26,7 +26,8 @@ def analyse_newspaper(path, voc):
         voc_doc = {}
         id_doc = int(document.xpath("./DOCID")[0].text)
         terms = preprocessor.process(text)
-
+       
+        terms.append("***NumberDifferentDocs***")
         for term in terms:
             if term in voc_doc:
                 voc_doc[term] = voc_doc[term] + 1
@@ -69,7 +70,7 @@ if __name__ == "__main__":
     vocabulary = SortedDict()
     filemanager = FileManager("test2")
     for i, newspaper_path in enumerate(pathlist):
-        if i<2:
+        if i<4:
             analyse_newspaper(newspaper_path, vocabulary)
             filemanager.save_vocabularyAndPL_file(vocabulary, True)
             vocabulary = SortedDict()
