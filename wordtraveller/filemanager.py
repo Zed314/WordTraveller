@@ -59,20 +59,17 @@ class FileManager:
         for i in range(0, self.numberPartialFiles):
             listPartialVocs.append(self.getPathVocPartial(i))
         return listPartialVocs
-
+    # Merge all the partial vocs and pl created during analysis
     def mergePartialVocsAndPL(self):
         #Get all the PLs and VOCs
         listPartialVocs = self.getListPartialVocs()
         listPartialPLs = self.getListPartialPLs()
 
-        
- 
         nbLinesRedInVOCs = []
         totalNumberOfDocs = len (listPartialVocs)
         lengthsToReadInPLs = []
         offsetsInPLs = []
         
-        documentsCurrentlyProccessed = len(listPartialVocs)
         offsetNextWord = []
         offsetPreWord = []
         offsetVoc = 0
@@ -116,7 +113,7 @@ class FileManager:
             if len(currentWords) == 0:
                 break
             word = currentWords.keys()[0]
-
+            nbTotalOccurenciesOfThisWord = 0
             mergingPLs = SortedDict()
             for idDoc in currentWords[word]:
                 preLength = lengthsToReadInPLs[idDoc]
@@ -128,12 +125,18 @@ class FileManager:
 
                 mergingPLs.update(otherPart)
                 
-            self.save_postList(mergingPLs)
+
 
             offsetVoc += len(mergingPLs)
             
           #  voc.append([word,offsetVoc])
             fileVoc.write("{},{}\n".format(word, offsetVoc))
+
+            for idDoc, nbOccurenciesInDoc in mergingPLs:
+                nbTotalOccurenciesOfThisWord += nbOccurenciesInDoc 
+
+            self.save_postList(mergingPLs)
+
             currentWords.pop(word)
         fileVoc.close()
     def save_postLists_file(self, postingListsIndex, isPartial=False):
@@ -170,7 +173,6 @@ class FileManager:
         """
         Preconditions:
             voc: is a SortedDict of  words and SortedDict Doc Id and Scores.
-            prefix: is a string
         Postconditions:
             The fonction save the vocs in a file named self.postingListsFileName 
             pls in a file "self.postingListsFileName".
@@ -179,7 +181,7 @@ class FileManager:
         vocabulary = SortedDict()
         current_offset = 0
         # save all the posting lists
-        # TODO make a btter call to the consturctore "filemanager.FileManager(..,..) seems a bit wirde
+        # TODO make a better call to the consturctore "filemanager.FileManager(..,..) seems a bit wirde
 
         for word, pl in voc.items():
             current_offset += len(pl)
@@ -241,6 +243,10 @@ class FileManager:
     # Save vocabulary that contains number of occurencies
     # The voc and pl are saved to filename+"."+number+"."+extension+".temp"
     def savePartialVocabulary(self, voc):
+        """
+        Preconditions:
+            voc: is a SortedDict of  words and SortedDict Doc Id and Scores.
+        """
         numberPartialFiles += 1
         self.save_vocabularyAndPL_file(voc, True)
         pass
