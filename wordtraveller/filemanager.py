@@ -4,133 +4,6 @@ import os
 from sortedcontainers import SortedDict
 from os import walk
 
-# # Record struct format
-# s = struct.Struct("<lf")
-
-# def createWorkspace(path):
-#     if not os.path.exists(path):
-#         os.makedirs(path)
-
-# #Precondtions: postingList: is a dictionary of Doc Id and Scores.
-# #              offet: is the numbers of pairs <Doc Id, Scores> already written in the binary doc
-# #              workspace: is the folder where we are working in, workspace path should end by an '/'
-# #Postcondtions: The fonction update the file postingLites.data withe the new postingList after "offet" paires <Doc Id, Scores>
-# def savePostList(postingList, offset, workspace="./workspace/", fileName="postingLites.pl"):
-#     # destination file for writing (w)b
-
-#     createWorkspace(workspace)
-
-#     if offset == 0:
-#         file = open(workspace + fileName, "w+b")
-#     else:
-#         file = open(workspace + fileName, "r+b")
-
-#     try:
-#         file.read(8*offset)
-#         # Encode the record and write it to the dest file
-#         for idDoc, score in postingList.items():
-#             record = s.pack(idDoc, score)
-#             file.write(record)
-
-#     except IOError:
-#     	# Your error handling here
-#     	# Nothing for this example
-#     	pass
-#     finally:
-#         file.close()
-
-
-# #Precondtions: voc: is a dictionary of words and offset.
-# #              workspace: is the folder where we are working in, workspace path should end by an '/'
-# #Postconditions: the dictionary is saved in filename
-# def saveVocabulary(voc, workspace="./workspace/", fileName="vocabulary.vo"):
-#     createWorkspace(workspace)
-
-#     file = open(workspace + fileName, "w")
-#     for word, offset in voc.items():
-#         file.write("{},{}\n".format(word, offset))
-
-# #Precondtions: a dictionary is saved in vocabulary.vo
-# #              workspace: is the folder where we are working in, workspace path should end by an '/'
-# #Postconditions: returns voc: the a dictionary of words and offset that was saved.
-# def readVocabulary(workspace="./workspace/", fileName="vocabulary.vo"):
-#     createWorkspace(workspace)
-
-#     file = open(workspace + fileName, "r")
-#     voc = SortedDict()
-#     for ligne in file:
-#         donnees = ligne.rstrip('\n\r').split(",")
-#         word = donnees[0]
-#         offset = int(donnees[1])
-#         voc[word] = [offset]
-#     return voc
-
-
-# def mergePL(listPartialVOC, listPartialPL, workspace="./workspace/"):
-#     if len(listPartialVOC) != len(listPartialPL):
-#         return
-#     nbFiles = len(listPartialVOC)
-#     wordsAndOffsets = []
-#     wordsAndOffsets = SortedDict()
-#     nbLinesRed=[]
-#     #init words and offsets
-#     for nbVoc, filenameVoc in enumerate(listPartialVOC):
-#         file = open(workspace + filenameVoc, "r")
-#         line = file.readline()
-#         data = line.rstrip('\n\r').split(",")
-#         word = data[0]
-#         offset = int(data[1])
-#         print("Voc"+str(nbVoc)+", word:"+data[0]+"offset"+data[1])
-#         wordsAndOffsets[data[0]+"@"+str(nbVoc)]=int(data[1])
-#         nbLinesRed.append(1)
-#     preWord = ""
-#     currWord = ""
-#    # scoreCurrWord = 0
-#     vocsWithThisWord = []
-#     offsetsCurrWord = []
-#     while wordsAndOffsets:
-#         keyCurrWord = wordsAndOffsets.keys()[0].split("@")
-#         numDocProcessed = int(keyCurrWord[1])
-#         currWord = keyCurrWord[0]
-#         if preWord != currWord and currWord !="":
-#             #flush
-#             print("Curr word :"+currWord)
-#             #scoreCurrWord = 0
-#           #  print("Vocs with this word"+vocsWithThisWord)
-#             #now, we combine the PL
-#             filenamesPLWithThisWord = []
-#             lenghts = []
-#             for numVoc in vocsWithThisWord:
-#                 filenamesPLWithThisWord.append(listPartialPL[int(numVoc)])
-#                 lenghts.append(1)
-#             #todo :replace 1 with lenghtS
-#             combinePL(filenamesPLWithThisWord,offsetsCurrWord,lenghts,"eeee",0)
-#             vocsWithThisWord = []
-#         preWord = currWord
-#         vocsWithThisWord.append(numDocProcessed)
-#   #      scoreCurrWord += float(wordsAndOffsets.values()[1])
-#         offsetsCurrWord.append(int(wordsAndOffsets.values()[1]))
-#         wordsAndOffsets.pop(wordsAndOffsets.keys()[0])
-#         #grab the missing one
-#         file = open(workspace + listPartialVOC[numDocProcessed], "r")
-#         line = ""
-#         i = 0
-#         #todo : optimize this
-#         while i < nbLinesRed[numDocProcessed]:
-#             line = file.readline()
-#             i=i+1
-#         data = line.rstrip('\n\r').split(",")
-#         word = data[0]
-#         offset = int(data[1])
-#         wordsAndOffsets[data[0]+"@"+str(numDocProcessed)]=int(data[1])
-#     #    print("Voc"+str(numDocProcessed)+", word:"+data[0]+"offset"+data[1])
-#         nbLinesRed[numDocProcessed]+=1
-#     for nbVoc, wordAndOffset in enumerate(wordsAndOffsets):
-#         if wordAndOffset[0] == minWord[0]:
-#             print(wordAndOffset[1][0]) #offset
-#             print(wordAndOffset[1][1]) #offset
-#             print(wordAndOffset[0]+str(read_postList(wordAndOffset[1][0],1,"./workspace/",listPartialPL[nbVoc]).values()[0]))
-
 
 class FileManager:
 
@@ -186,45 +59,6 @@ class FileManager:
         for i in range(0, self.numberPartialFiles):
             listPartialVocs.append(self.getPathVocPartial(i))
         return listPartialVocs
-    #combine all PL
-    def combinePostingList(self, filenamesToProceed, offsets, lengths):
-
-        # init
-        lengthsDone = []
-        idAndScore = SortedDict()
-        for nbPL, filename in enumerate(filenamesToProceed):
-            data = self.read_postList(offsets[nbPL], 1, True, nbPL)
-            idAndScore[str(data.keys()[0])+"@"+str(nbPL)
-                       ] = int(data.values()[0])
-            lengthsDone.append(1)
-        preID = ""
-        idDocCurr = ""
-        scoreCurrID = 0
-        PLsWithThisDoc = []
-        preID = ""
-        while idAndScore:
-            keyCurr = idAndScore.keys()[0].split("@")
-            numPLProcessed = int(keyCurr[1])
-            idDocCurr = keyCurr[0]
-            if preID != idDocCurr and preID != "":
-                # flush
-                print(idDocCurr+", score:"+str(scoreCurrID))
-                scoreCurrID = 0
-            # print("PLs with this doc (for this word)"+PLsWithThisDoc)
-                # now, we combine the PL
-
-                PLsWithThisDoc = []
-            preID = idDocCurr
-            PLsWithThisDoc.append(numPLProcessed)
-            scoreCurrID += float(idAndScore.values()[0])
-            idAndScore.pop(idAndScore.keys()[0])
-            # grab the missing one
-            data = read_postList(
-                offsets[nbPL]+lengthsDone[numPLProcessed], 1, workspace, namePLs[numPLProcessed])
-            idAndScore[str(data.keys()[0])+"@"+str(numPLProcessed)
-                       ] = int(data.values()[0])
-            lengthsDone[numPLProcessed] += 1
-        # Partial postinglist are organised as such : filename+"..1"+extension+".temp"
 
     def mergePartialVocsAndPL(self):
         #Get all the PLs and VOCs
@@ -266,14 +100,11 @@ class FileManager:
                 data = line.rstrip('\n\r').split(",")
                 word = data[0]
                 if word == "":
-                    print ("FIN doc" + str(numberDoc))
+                    pass
                 else: 
                     
                     offsetNextWord[numberDoc] = int(data[1]) 
-                 #   preLength = lengthsToReadInPLs[numberDoc]
-                #    lengthsToReadInPLs[numberDoc] = offsetNextWord - offsetsInPLs[numberDoc]
-              #      offsetsInPLs[numberDoc] = offsetsInPLs[numberDoc] + preLength
-               #     nbLinesRedInVOCs[numberDoc] += 1
+
                     if not (word in currentWords):
                         currentWords[word] = []
                         currentWords[word].append(numberDoc)
@@ -284,10 +115,7 @@ class FileManager:
             if len(currentWords) == 0:
                 break
             word = currentWords.keys()[0]
-            # print(word)
-            # print(str(currentWords[word]))
-            # print(offsetsInPLs)
-            # print(lengthsToReadInPLs)
+
             mergingPLs = SortedDict()
             for idDoc in currentWords[word]:
                 preLength = lengthsToReadInPLs[idDoc]
@@ -296,93 +124,15 @@ class FileManager:
                 offsetsInPLs[idDoc] = offsetsInPLs[idDoc] + preLength
                 nbLinesRedInVOCs[idDoc] += 1
                 otherPart = self.read_postList(offsetsInPLs[idDoc], lengthsToReadInPLs[idDoc], True, idDoc)
-                #mergingPls = {**mergingPLs, **otherPart}
+
                 mergingPLs.update(otherPart)
                 
             self.save_postList(mergingPLs)
-            #self.read_postList(offset, length, isPartial=False, number=0)
-            #append voc with word and offset+length in the res
-            #f= open("guru99.txt","w+")
+
             offsetVoc += len(mergingPLs)
             voc.append([word,offsetVoc])
             currentWords.pop(word)
             
-        print("end")
-
-    #     for nbVoc, wordAndOffset in enumerate(wordsAndOffsets):
-    #         if wordAndOffset[0] == minWord[0]:
-    #             print(wordAndOffset[1][0])  # offset
-    #             print(wordAndOffset[1][1])  # offset
-    #             print(wordAndOffset[0]+str(read_postList(wordAndOffset[1][0],
-    #                                                     1, True, nbVoc).values()[0]))
-        
-    #     # init words and offsets
-    #     for nbVoc, pathVoc in enumerate(listPartialVocs):
-    #         file = open(pathVoc, "r")
-    #         line = file.readline()
-    #         data = line.rstrip('\n\r').split(",")
-    #         word = data[0]
-    #         offset = int(data[1])
-    #         print("Voc"+str(nbVoc)+", word:"+data[0]+"offset"+data[1])
-    #         wordsAndOffsets[data[0]+"@"+str(nbVoc)] = int(data[1])
-    #         nbLinesRedInVOCs.append(1)
-    #         lengthsToReadInPLs.append(data[1])
-    #         offsetsInPLs.append(0)
-    #     preWord = ""
-    #     currWord = ""
-
-    #     vocsWithThisWord = []
-
-    #     while wordsAndOffsets:
-    #         keyCurrWord = wordsAndOffsets.keys()[0].split("@")
-    #         numDocProcessed = int(keyCurrWord[1])
-    #         currWord = keyCurrWord[0]
-    #         if preWord != currWord and currWord != "":
-    #             # flush
-    #             print("Curr word :"+currWord)
-    #             #scoreCurrWord = 0
-    #         #  print("Vocs with this word"+vocsWithThisWord)
-    #             # now, we combine the PL
-    #             filenamesPLWithThisWord = []
-
-    #             for numVoc in vocsWithThisWord:
-    #                 filenamesPLWithThisWord.append(listPartialPLs[int(numVoc)])
-    #                 lengthsToReadInPLs[numVoc] = int(lengthsToReadInPLs[numVoc]) - offsetsInPLs[numVoc]
-    #             # todo :replace 1 with lengthS
-    #          #   self.combinePostingList(filenamesPLWithThisWord,
-    #              #         offsetsCurrWord, lenghts, "eeee", 0)
-    #            # self.combinePostingList(filenamesPLWithThisWord,offsetsInPLs,lengthsToReadInPLs)
-    #             vocsWithThisWord = []
-    #         preWord = currWord
-    #         vocsWithThisWord.append(numDocProcessed)
-    # #      scoreCurrWord += float(wordsAndOffsets.values()[1])
-    #        # offsetsCurrWord.append(int(wordsAndOffsets.values()[0]))
-    #       #  offsetsInPLs[i] = 
-    #         wordsAndOffsets.pop(wordsAndOffsets.keys()[0])
-    #         # grab the missing one
-    #         file = open(listPartialVocs[numDocProcessed], "r")
-    #         line = ""
-    #         i = 0
-    #         # todo : optimize this
-    #         while i < nbLinesRedInVOCs[numDocProcessed]:
-    #             line = file.readline()
-    #             i = i+1
-    #         data = line.rstrip('\n\r').split(",")
-    #         word = data[0]
-    #         if word == "":
-    #             print ("FIN doc" + str(numDocProcessed))
-    #         else: 
-    #             offset = int(data[1]) 
-    #             wordsAndOffsets[data[0]+"@"+str(numDocProcessed)] = int(data[1])
-    #     #    print("Voc"+str(numDocProcessed)+", word:"+data[0]+"offset"+data[1])
-    #             nbLinesRedInVOCs[numDocProcessed] += 1
-    #     for nbVoc, wordAndOffset in enumerate(wordsAndOffsets):
-    #         if wordAndOffset[0] == minWord[0]:
-    #             print(wordAndOffset[1][0])  # offset
-    #             print(wordAndOffset[1][1])  # offset
-    #             print(wordAndOffset[0]+str(read_postList(wordAndOffset[1][0],
-    #                                                     1, True, nbVoc).values()[0]))
-
     def save_postLists_file(self, postingListsIndex, isPartial=False):
         """
         Preconditions:
@@ -405,8 +155,6 @@ class FileManager:
             for word, postingList in postingListsIndex.items():
                 for idDoc, score in postingList.items():
                     record = self.struct.pack(idDoc, score)
-                    if len(record) != 8:
-                        print("Here")
                     file.write(record)
         except IOError:
             print("Error during the writing")
@@ -455,11 +203,6 @@ class FileManager:
         for word, offset in voc.items():
             file.write("{},{}\n".format(word, offset))
         file.close()
-        if isPartial:
-            print("Partial VOC file save in : " +
-                  self.getPathVocPartial(self.numberPartialFiles))
-        else:
-            print("VOC file saved in : " + self.getPathVoc())
 
     def save_postList(self, postingList, offset=-1):
         """
@@ -531,17 +274,13 @@ class FileManager:
             filename = self.getPathPLPartial(number) 
         else:
             filename = self.getPathPL()
-        print(filename)
+
         file = open(filename, "rb")
         postingList = SortedDict()
         try:
-            # test print(file.read(8*24))
+
             file.read(8*offset)
-           # if (offset > 20218):
-            #    print("aa")
-             #   for x in range(0, length):
-             #       record = file.read(8)
-             #   return postingList
+
             for x in range(0, length):
                 record = file.read(8)
                 filed = self.struct.unpack(record)
