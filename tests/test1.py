@@ -36,8 +36,8 @@ class TestAnalysis(unittest.TestCase):
         for path in pathlist:
             analysis.analyse_newspaper(path, voc)
 
-        analysis.save_vocabulary(voc, filename, currentWorkspace)
         filemanager = fm.FileManager(filename,currentWorkspace)
+        filemanager.save_vocabularyAndPL_file(voc)
         # TODO: changer quand on ait une function directe
         savedVoc = filemanager.read_vocabulary()
         mot1 = query.get_posting_list(savedVoc,"aa", filemanager)
