@@ -228,7 +228,7 @@ class FileManager:
 
         try:
             if(offset!=0):
-                file.read(CONST_SIZE_ON_DISK*offset)
+                file.read(self.CONST_SIZE_ON_DISK*offset)
             # Encode the record and write it to the dest file
             for idDoc, score in postingList.items():
                 record = self.struct.pack(idDoc, score)
@@ -289,10 +289,10 @@ class FileManager:
         postingList = SortedDict()
         try:
 
-            file.read(CONST_SIZE_ON_DISK*offset)
+            file.read(self.CONST_SIZE_ON_DISK*offset)
 
             for x in range(0, length):
-                record = file.read(CONST_SIZE_ON_DISK)
+                record = file.read(self.CONST_SIZE_ON_DISK)
                 filed = self.struct.unpack(record)
                 idDoc = filed[0]
                 score = filed[1]
