@@ -67,9 +67,9 @@ if __name__ == "__main__":
     pathlist = Path("./data/latimesMini/").glob('**/la*')
 
     vocabulary = SortedDict()
-    filemanager = FileManager("test1")
+    filemanager = FileManager("test2")
     for i, newspaper_path in enumerate(pathlist):
-        if i<1:
+        if i<2:
             analyse_newspaper(newspaper_path, vocabulary)
             filemanager.save_vocabularyAndPL_file(vocabulary, True)
             vocabulary = SortedDict()

@@ -239,14 +239,18 @@ class FileManager:
         offsetsInPLs = []
         
         documentsCurrentlyProccessed = len(listPartialVocs)
-        
-       
-
+        offsetNextWord = []
+        offsetPreWord = []
+        offsetVoc = 0
+        voc = []
         for nbVoc, pathVoc in enumerate(listPartialVocs):
             offsetsInPLs.append(0)
             nbLinesRedInVOCs.append(0)
             lengthsToReadInPLs.append(0)
+            offsetNextWord.append(0)
+            offsetPreWord.append(0)
         currentWords = SortedDict()
+   
         while True :
             i = 0
            # currentWords = SortedDict()
@@ -265,7 +269,7 @@ class FileManager:
                     print ("FIN doc" + str(numberDoc))
                 else: 
                     
-                    offsetNextWord = int(data[1]) 
+                    offsetNextWord[numberDoc] = int(data[1]) 
                  #   preLength = lengthsToReadInPLs[numberDoc]
                 #    lengthsToReadInPLs[numberDoc] = offsetNextWord - offsetsInPLs[numberDoc]
               #      offsetsInPLs[numberDoc] = offsetsInPLs[numberDoc] + preLength
@@ -280,25 +284,29 @@ class FileManager:
             if len(currentWords) == 0:
                 break
             word = currentWords.keys()[0]
-
-            print(str(currentWords[word]))
-            print(offsetsInPLs)
-            print(lengthsToReadInPLs)
+            # print(word)
+            # print(str(currentWords[word]))
+            # print(offsetsInPLs)
+            # print(lengthsToReadInPLs)
             mergingPLs = SortedDict()
             for idDoc in currentWords[word]:
                 preLength = lengthsToReadInPLs[idDoc]
-                lengthsToReadInPLs[idDoc] = offsetNextWord - offsetsInPLs[idDoc]
+                lengthsToReadInPLs[idDoc] = offsetNextWord[idDoc] - offsetPreWord[idDoc]
+                offsetPreWord[idDoc] = offsetNextWord[idDoc]
                 offsetsInPLs[idDoc] = offsetsInPLs[idDoc] + preLength
                 nbLinesRedInVOCs[idDoc] += 1
                 otherPart = self.read_postList(offsetsInPLs[idDoc], lengthsToReadInPLs[idDoc], True, idDoc)
-                mergingPls = {**mergingPLs, **otherPart}
+                #mergingPls = {**mergingPLs, **otherPart}
+                mergingPLs.update(otherPart)
                 
             self.save_postList(mergingPLs)
             #self.read_postList(offset, length, isPartial=False, number=0)
             #append voc with word and offset+length in the res
             #f= open("guru99.txt","w+")
-
+            offsetVoc += len(mergingPLs)
+            voc.append([word,offsetVoc])
             currentWords.pop(word)
+            
         print("end")
 
     #     for nbVoc, wordAndOffset in enumerate(wordsAndOffsets):
@@ -397,12 +405,9 @@ class FileManager:
             for word, postingList in postingListsIndex.items():
                 for idDoc, score in postingList.items():
                     record = self.struct.pack(idDoc, score)
+                    if len(record) != 8:
+                        print("Here")
                     file.write(record)
-            if isPartial:
-                print("Partial PL file saved in : " +
-                      self.getPathPLPartial(self.numberPartialFiles))
-            else:
-                print("PL file saved in : " + self.getPathPL())
         except IOError:
             print("Error during the writing")
             pass
@@ -518,7 +523,7 @@ class FileManager:
             offet: is the numbers of paires <Doc Id, Scores> alredy witten in the binary doc
             length: is the number of paires <Doc Id, Scores> to be read
         Postcondtions:
-            return a postiong list: a dictionary of Doc Id and Scores red between offet and length.
+            return a posting list: a dictionary of Doc Id and Scores red between offet and length.
         """
         # File to read
         filename = ""
@@ -526,11 +531,17 @@ class FileManager:
             filename = self.getPathPLPartial(number) 
         else:
             filename = self.getPathPL()
+        print(filename)
         file = open(filename, "rb")
         postingList = SortedDict()
         try:
             # test print(file.read(8*24))
             file.read(8*offset)
+           # if (offset > 20218):
+            #    print("aa")
+             #   for x in range(0, length):
+             #       record = file.read(8)
+             #   return postingList
             for x in range(0, length):
                 record = file.read(8)
                 filed = self.struct.unpack(record)
