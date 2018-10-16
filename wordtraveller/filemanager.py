@@ -132,7 +132,7 @@ class FileManager:
           #  voc.append([word,offsetVoc])
             fileVoc.write("{},{}\n".format(word, offsetVoc))
 
-            for idDoc, nbOccurenciesInDoc in mergingPLs:
+            for idDoc, nbOccurenciesInDoc in mergingPLs.items():
                 nbTotalOccurenciesOfThisWord += nbOccurenciesInDoc 
 
             self.save_postList(mergingPLs)
