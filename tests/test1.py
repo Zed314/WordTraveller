@@ -50,7 +50,7 @@ class TestAnalysis(unittest.TestCase):
         self.assertEqual(mot2, {1:4, 2:1})
         self.assertEqual(mot3, {2:2})
 
-        stop1 = query.get_posting_list(savedVoc,"doing", currentWorkspace)
+        stop1 = query.get_posting_list(savedVoc,"doing", filemanager)
         self.assertEqual(stop1, {})
 
 if __name__ == '__main__':
