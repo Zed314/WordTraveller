@@ -16,13 +16,10 @@ class TestAnalysis(unittest.TestCase):
         pathlist = Path("./tests/data/test1/").glob('**/la*')
         for path in pathlist:
             analysis.analyse_newspaper(path, voc)
-
-        analysis.save_vocabulary(voc, filename, currentWorkspace)
-
         filemanager = fm.FileManager(filename, currentWorkspace)
-
-        # TODO: changer quand on ait une function directe
+        filemanager.save_vocabularyAndPL_file(voc)
         savedVoc = filemanager.read_vocabulary()
+
         mot1 = query.get_posting_list(savedVoc,"aa", filemanager)
         mot2 = query.get_posting_list(savedVoc,"bb", filemanager)
         mot3 = query.get_posting_list(savedVoc,"cc", filemanager)
@@ -39,8 +36,8 @@ class TestAnalysis(unittest.TestCase):
         for path in pathlist:
             analysis.analyse_newspaper(path, voc)
 
-        analysis.save_vocabulary(voc, filename, currentWorkspace)
         filemanager = fm.FileManager(filename,currentWorkspace)
+        filemanager.save_vocabularyAndPL_file(voc)
         # TODO: changer quand on ait une function directe
         savedVoc = filemanager.read_vocabulary()
         mot1 = query.get_posting_list(savedVoc,"aa", filemanager)
