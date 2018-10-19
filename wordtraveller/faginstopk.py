@@ -30,6 +30,7 @@ def fagins_top_k_algo(words, voc, filemanager, k):
     pl1 = dict()
     pl2 = dict()
     pl1[0.90] = [2]
+    pl1[0.90] += [3]
     pl1[0.80] = [5]
     pl1[0.70] = [6]
     pl1[0.60] = [4]
@@ -45,10 +46,29 @@ def fagins_top_k_algo(words, voc, filemanager, k):
     posting_lists.append(pl1)
     posting_lists.append(pl2)
     dictlist = mergeAndOrderDict(posting_lists)
-    print(dictlist)
-    for i in sorted(dictlist, reverse=True):
-        print(i)
-        print(dictlist[i])
+    
+    postingListsOrderedByScore = [pl1,pl2]
+    print(postingListsOrderedByScore)
+    iterators = dict()
+    currentScores = SortedDict()
+    i = 0
+    for postingList in postingListsOrderedByScore:
+        iterators[i] = iter(postingList)
+        score = next(iterators[i])
+        idsDoc = postingList[score]
+
+        currentScores[score] = dict()
+        for idDoc in idsDoc:
+            currentScores[score][len(currentScores[score])] = [idDoc, i]
+        i += 1
+
+    while True:
+        pass
+        # item = currentScores.popitem() # ça donne le dernier du sortedDict = +haut score
+        # score = 
+        # if(len(item) == 1) or item[0]:
+
+    # print(currentScores)
 
 
 if __name__ == "__main__" :
