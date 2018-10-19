@@ -3,6 +3,8 @@ from wordtraveller import analysis, query
 from wordtraveller import filemanager as fm
 from sortedcontainers import SortedDict
 from pathlib import Path
+import send2trash
+import os
 
 class TestAnalysis(unittest.TestCase):
     # Pour compter les mots:
@@ -16,13 +18,10 @@ class TestAnalysis(unittest.TestCase):
         pathlist = Path("./tests/data/test1/").glob('**/la*')
         for path in pathlist:
             analysis.analyse_newspaper(path, voc)
-
-        analysis.save_vocabulary(voc, filename, currentWorkspace)
-
         filemanager = fm.FileManager(filename, currentWorkspace)
-
-        # TODO: changer quand on ait une function directe
+        filemanager.save_vocabularyAndPL_file(voc, False)
         savedVoc = filemanager.read_vocabulary()
+
         mot1 = query.get_posting_list(savedVoc,"aa", filemanager)
         mot2 = query.get_posting_list(savedVoc,"bb", filemanager)
         mot3 = query.get_posting_list(savedVoc,"cc", filemanager)
@@ -39,8 +38,8 @@ class TestAnalysis(unittest.TestCase):
         for path in pathlist:
             analysis.analyse_newspaper(path, voc)
 
-        analysis.save_vocabulary(voc, filename, currentWorkspace)
         filemanager = fm.FileManager(filename,currentWorkspace)
+        filemanager.save_vocabularyAndPL_file(voc)
         # TODO: changer quand on ait une function directe
         savedVoc = filemanager.read_vocabulary()
         mot1 = query.get_posting_list(savedVoc,"aa", filemanager)
@@ -53,5 +52,92 @@ class TestAnalysis(unittest.TestCase):
         stop1 = query.get_posting_list(savedVoc,"doing", filemanager)
         self.assertEqual(stop1, {})
 
+    def test_merging(self):
+        voc = SortedDict()
+        currentWorkspace = './tests/workspace/test3/'
+        filename = 'test3'
+
+        pathlist = Path("./tests/data/test3/").glob('**/la*')
+
+        filemanager = fm.FileManager(filename,currentWorkspace)
+
+        for path in pathlist:
+            analysis.analyse_newspaper(path, voc)
+            filemanager.save_vocabularyAndPL_file(voc, True)
+            voc = SortedDict()
+
+        filemanager.mergePartialVocsAndPL()
+
+        # TODO: changer quand on ait une function directe
+        savedVoc = filemanager.read_vocabulary()
+        mot = query.get_posting_list(savedVoc,"aa", filemanager)
+        self.assertEqual(mot, {1:3, 2:2, 3:1, 4:3, 5:2, 6:1})
+        mot = query.get_posting_list(savedVoc,"bb", filemanager)
+        self.assertEqual(mot, {1:1, 2:1, 4:1, 5:1})
+        mot = query.get_posting_list(savedVoc,"cc", filemanager)
+        self.assertEqual(mot, {3:1, 6:1})
+
+    def test_merging_3_files(self):
+        voc = SortedDict()
+        currentWorkspace = './tests/workspace/test4/'
+        filename = 'test4'
+
+        pathlist = Path("./tests/data/test4/").glob('**/la*')
+
+        filemanager = fm.FileManager(filename,currentWorkspace)
+
+        for path in pathlist:
+            analysis.analyse_newspaper(path, voc)
+            filemanager.save_vocabularyAndPL_file(voc, True)
+            voc = SortedDict()
+
+        filemanager.mergePartialVocsAndPL()
+
+        # TODO: changer quand on ait une function directe
+        savedVoc = filemanager.read_vocabulary()
+        mot = query.get_posting_list(savedVoc,"aa", filemanager)
+        self.assertEqual(mot, {1:3, 2:6, 20:3, 21:2, 22:1, 5:1, 6:1})
+        mot = query.get_posting_list(savedVoc,"bb", filemanager)
+        self.assertEqual(mot, {1:3, 2:6, 20:1, 21:1, 4:1, 5:1})
+        mot = query.get_posting_list(savedVoc,"cc", filemanager)
+        self.assertEqual(mot, {1:1, 2:3, 22:1, 4:1, 6:1})
+        mot = query.get_posting_list(savedVoc,"dd", filemanager)
+        self.assertEqual(mot, {1:2, 2:1})
+        # 'ff' failing
+        mot = query.get_posting_list(savedVoc,"ff", filemanager)
+        self.assertEqual(mot, {1:1, 20:1, 6:1})
+        # 'qq' failing
+        mot = query.get_posting_list(savedVoc,"qq", filemanager)
+        self.assertEqual(mot, {1:1, 5:1})
+        # 'rr' failing
+        mot = query.get_posting_list(savedVoc,"rr", filemanager)
+        self.assertEqual(mot, {1:5, 21:1})
+        mot = query.get_posting_list(savedVoc,"ee", filemanager)
+        self.assertEqual(mot, {1:1, 23:1})
+        mot = query.get_posting_list(savedVoc,"vv", filemanager)
+        self.assertEqual(mot, {1:1})
+        mot = query.get_posting_list(savedVoc,"yy", filemanager)
+        self.assertEqual(mot, {1:1})
+        # 'kk' failing
+        mot = query.get_posting_list(savedVoc,"kk", filemanager)
+        self.assertEqual(mot, {2:1, 23:1})
+        mot = query.get_posting_list(savedVoc,"ii", filemanager)
+        self.assertEqual(mot, {2:1})
+        # 'jj' failing
+        mot = query.get_posting_list(savedVoc,"jj", filemanager)
+        self.assertEqual(mot, {2:1})
+        # 'hh' failing
+        mot = query.get_posting_list(savedVoc,"hh", filemanager)
+        self.assertEqual(mot, {23:1})
+        # 'll' failing
+        mot = query.get_posting_list(savedVoc,"ll", filemanager)
+        self.assertEqual(mot, {}, 'll is considered a stopword')
+
 if __name__ == '__main__':
+    for folderName, subfolders, filenames in os.walk('./tests/workspace/'):
+        for filename in filenames:
+            if(filename.endswith('.vo') or filename.endswith('.pl')):
+                print('Deleting from folder ' + folderName + ': '+ filename)
+                send2trash.send2trash(folderName + '/'+filename)
+
     unittest.main()

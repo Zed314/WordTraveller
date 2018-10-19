@@ -204,7 +204,7 @@ class FileManager:
         if isPartial:
             file = open(self.getPathVocPartial(self.numberPartialFiles), "w")
         else:
-            file = open(self.getPathPL(), "w")
+            file = open(self.getPathVoc(), "w")
         for word, offset in voc.items():
             file.write("{},{}\n".format(word, offset))
         file.close()
