@@ -89,12 +89,16 @@ def fagins_top_k_algo(words, voc, filemanager, k):
                     currentScores[score][len(currentScores[score])] = [docId, pl_id]
 
         # getting next new score
-        newScore = next(iterators[postingListId])
-        print("Score:", newScore)
-        #------------------------------------------------
-        idsDoc = postingListsOrderedByScore[postingListId][newScore]
-        # print(idsDoc)
-        add_next_score(newScore, idsDoc, postingListId, currentScores)
+        try:
+            newScore = next(iterators[postingListId])
+            print("Score:", newScore)
+            #------------------------------------------------
+            idsDoc = postingListsOrderedByScore[postingListId][newScore]
+            # print(idsDoc)
+            add_next_score(newScore, idsDoc, postingListId, currentScores)
+        except StopIteration:
+            print("No more values in postingLists")
+
 
 
 
