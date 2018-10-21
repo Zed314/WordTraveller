@@ -12,25 +12,34 @@ def createMockData(ownfilemanager):
         analysis.analyse_newspaper(path, voc)
     ownfilemanager.save_vocabularyAndPL_file(voc)
 
-def mergeAndOrderDict(dictionnaries):
-    resList = SortedDict()
-    for dictionnary in dictionnaries:
-        for key, value in dictionnary.items():
-            if(key in resList):
-                resList[key] += value
-            else:   
-                resList[key] = [] + value
-    return resList
+def mean(values):
+    sumValues = sum(values)
+    return sumValues/len(values)
+        
+
+def pushing_to_m(m,c,docId,score,nb_of_PL):
+    if(docId in m):
+        m[docId] += [score]
+        if(len(m[docId])== nb_of_PL):
+            mean_score = mean(m[docId])
+            c[docId] = mean_score
+            del m[docId]
+    else:
+        m[docId] = [score]
+    print('c: {} || m: {}'.format(c,m))
+
+def add_next_score(score, idsDoc, pl_id, currentScores):
+    for idDoc in idsDoc:
+        if(score not in currentScores):
+            currentScores[score] = dict()  
+        # on met en dernier [idDoc, idPostingList] 
+        currentScores[score][len(currentScores[score])] = [idDoc, pl_id]
 
 def fagins_top_k_algo(words, voc, filemanager, k):
-    # for word in words:
-    #     postList = query.get_posting_list(voc, word, filemanager)
-    #     print(postList)
-    # posting_lists = [query.get_posting_list(voc, word, filemanager) for word in words]
     pl1 = dict()
     pl2 = dict()
     pl1[0.90] = [2]
-    pl1[0.90] += [3]
+    # pl1[0.90] += [3]
     pl1[0.80] = [5]
     pl1[0.70] = [6]
     pl1[0.60] = [4]
@@ -45,7 +54,6 @@ def fagins_top_k_algo(words, voc, filemanager, k):
     posting_lists = []
     posting_lists.append(pl1)
     posting_lists.append(pl2)
-    dictlist = mergeAndOrderDict(posting_lists)
     
     postingListsOrderedByScore = [pl1,pl2]
     print(postingListsOrderedByScore)
@@ -54,21 +62,60 @@ def fagins_top_k_algo(words, voc, filemanager, k):
     i = 0
     for postingList in postingListsOrderedByScore:
         iterators[i] = iter(postingList)
+        # next donne la clé
         score = next(iterators[i])
         idsDoc = postingList[score]
-
-        currentScores[score] = dict()
-        for idDoc in idsDoc:
-            currentScores[score][len(currentScores[score])] = [idDoc, i]
+        # On initialise la structure de donnees du score
+        add_next_score(score, idsDoc, i, currentScores)
+        # for idDoc in idsDoc:
+        #     if(score not in currentScores):
+        #         currentScores[score] = dict()  
+        #     # on met en dernier [idDoc, idPostingList] 
+        #     currentScores[score][len(currentScores[score])] = [idDoc, i]
         i += 1
+    print("Current: {}".format(currentScores))
 
-    while True:
-        pass
-        # item = currentScores.popitem() # ça donne le dernier du sortedDict = +haut score
-        # score = 
-        # if(len(item) == 1) or item[0]:
+    c = dict()
+    m = dict()
+    count = 0
+    while len(c) < k:
+        item = currentScores.popitem()
+        # print('item: {}, {}'.format(item, len(item[1])))
+        score = item[0]
+        postingListId = item[1][0][1]
+        if(len(item[1]) == 1):
+            # print('eeeoo {}'.format(item[1]))
+            # print('eefdgdfd {}'.format(postingListId))
+            docId = item[1][0][0]
+            pushing_to_m(m, c, docId, score, len(postingListsOrderedByScore))
+        else:
+            # on a plus d'item pour un meme score
 
-    # print(currentScores)
+            # postingListId = item[1][0][1]
+            docId = item[1][0][0]
+            pushing_to_m(m,c,docId,score, len(postingListsOrderedByScore))
+            currentScores[score] = dict()
+            for i,doc in enumerate(item[1]):
+                pl_id = item[1][doc][1]
+                if(i>0):
+                    currentScores[score][len(currentScores[score])] = [docId, pl_id]
+            # print("Sorteeeed: {}".format(currentScores))
+
+        # getting next new score
+        newScore = next(iterators[postingListId])
+        print("Score:", newScore)
+        #------------------------------------------------
+        idsDoc = postingListsOrderedByScore[postingListId][newScore]
+        print(idsDoc)
+        # On initialise la structure de donnees du score
+        add_next_score(newScore, idsDoc, postingListId, currentScores)
+        # for idDoc in idsDoc:
+        #     if(newScore not in currentScores):
+        #         currentScores[newScore] = dict()  
+        #     # on met en dernier [idDoc, idPostingList] 
+        #     currentScores[newScore][len(currentScores[newScore])] = [idDoc, postingListId]
+
+
 
 
 if __name__ == "__main__" :
