@@ -22,6 +22,7 @@ def pushing_to_m(m,c,docId,score,nb_of_PL):
         m[docId] += [score]
         if(len(m[docId])== nb_of_PL):
             mean_score = mean(m[docId])
+            # print('calculMean: {}|{}|{}'.format(docId,m[docId],mean_score))
             c[docId] = mean_score
             del m[docId]
     else:
@@ -56,7 +57,7 @@ def fagins_top_k_algo(words, voc, filemanager, k):
     posting_lists.append(pl2)
     
     postingListsOrderedByScore = [pl1,pl2]
-    print(postingListsOrderedByScore)
+    print('postingListsOrderedByScore: {}'.format(postingListsOrderedByScore))
     iterators = dict()
     currentScores = SortedDict()
     i = 0
@@ -67,54 +68,33 @@ def fagins_top_k_algo(words, voc, filemanager, k):
         idsDoc = postingList[score]
         # On initialise la structure de donnees du score
         add_next_score(score, idsDoc, i, currentScores)
-        # for idDoc in idsDoc:
-        #     if(score not in currentScores):
-        #         currentScores[score] = dict()  
-        #     # on met en dernier [idDoc, idPostingList] 
-        #     currentScores[score][len(currentScores[score])] = [idDoc, i]
         i += 1
     print("Current: {}".format(currentScores))
 
     c = dict()
     m = dict()
-    count = 0
-    while len(c) < k:
+    while len(c) <= k:
         item = currentScores.popitem()
-        # print('item: {}, {}'.format(item, len(item[1])))
         score = item[0]
         postingListId = item[1][0][1]
-        if(len(item[1]) == 1):
-            # print('eeeoo {}'.format(item[1]))
-            # print('eefdgdfd {}'.format(postingListId))
-            docId = item[1][0][0]
-            pushing_to_m(m, c, docId, score, len(postingListsOrderedByScore))
-        else:
-            # on a plus d'item pour un meme score
+        docId = item[1][0][0]
 
-            # postingListId = item[1][0][1]
-            docId = item[1][0][0]
-            pushing_to_m(m,c,docId,score, len(postingListsOrderedByScore))
+        pushing_to_m(m, c, docId, score, len(postingListsOrderedByScore))
+
+        if(len(item[1]) > 1):
             currentScores[score] = dict()
             for i,doc in enumerate(item[1]):
                 pl_id = item[1][doc][1]
                 if(i>0):
                     currentScores[score][len(currentScores[score])] = [docId, pl_id]
-            # print("Sorteeeed: {}".format(currentScores))
 
         # getting next new score
         newScore = next(iterators[postingListId])
         print("Score:", newScore)
         #------------------------------------------------
         idsDoc = postingListsOrderedByScore[postingListId][newScore]
-        print(idsDoc)
-        # On initialise la structure de donnees du score
+        # print(idsDoc)
         add_next_score(newScore, idsDoc, postingListId, currentScores)
-        # for idDoc in idsDoc:
-        #     if(newScore not in currentScores):
-        #         currentScores[newScore] = dict()  
-        #     # on met en dernier [idDoc, idPostingList] 
-        #     currentScores[newScore][len(currentScores[newScore])] = [idDoc, postingListId]
-
 
 
 
