@@ -20,7 +20,8 @@ def mean(values):
 def pushing_to_m(m,c,docId,score,nb_of_PL):
     if(docId in m):
         m[docId] += [score]
-        if(len(m[docId])== nb_of_PL):
+        print('--{}**{}--{},.... --> {}'.format(m[docId],nb_of_PL,len(m[docId]),docId))
+        if(len(m[docId]) == nb_of_PL):
             mean_score = mean(m[docId])
             # print('calculMean: {}|{}|{}'.format(docId,m[docId],mean_score))
             c[docId] = mean_score
@@ -79,15 +80,16 @@ def fagins_top_k_algo(words, voc, filemanager, k):
         postingListId = item[1][0][1]
         docId = item[1][0][0]
 
+        # FIXME: potential Bug: peut-etre que je suis en train de mettre deu docId dans currentScores
         pushing_to_m(m, c, docId, score, len(postingListsOrderedByScore))
-
+        # print("KFFK: {}".format(currentScores))
         if(len(item[1]) > 1):
             currentScores[score] = dict()
             for i,doc in enumerate(item[1]):
                 pl_id = item[1][doc][1]
                 if(i>0):
                     currentScores[score][len(currentScores[score])] = [docId, pl_id]
-
+            print("CurrentNow {}".format(currentScores))
         # getting next new score
         try:
             newScore = next(iterators[postingListId])
@@ -99,7 +101,10 @@ def fagins_top_k_algo(words, voc, filemanager, k):
         except StopIteration:
             print("No more values in postingLists")
 
-
+    for remaining in m:
+        print("Remaining ",m[remaining],remaining)
+        # for each --> random access to get score of remaining
+        # if some is bigger than score of c --> insert
 
 
 if __name__ == "__main__" :
