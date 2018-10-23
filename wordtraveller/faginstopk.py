@@ -10,17 +10,35 @@ last_score_of_c = 0
 
 
 def aggregative_function_mean(values):
+    """
+    Preconditions:
+        values: array of values (int or float).
+    Postconditions:
+        Returns the mean of this values.
+    """
     sumValues = sum(values)
     return sumValues/len(values)
 
 
-def push_to_m(m, c, docId, score, nb_of_PL):
+def push_to_m(m, c, docId, score, nb_of_PL, aggregative_function):
+    """
+    Preconditions:
+        m: dictionnary with the documents already seen.
+        c: dictionnary with the documents already seen by all the posting lists.
+        docId: document ID.
+        score: score of this document in the posting list.
+        nb_of_PL: number of posting lists used in the algorithm.
+    Postconditions:
+        The function save the tuple [docId,score] to m.
+        If the tuple has been already seen by all the posting list apply 
+        aggregation function to and save the result to c.
+    """
     global last_score_of_c
     if(docId in m):
         # print('[{}],[{}],[{}],[{}]'.format(m[docId],nb_of_PL,len(m[docId]),docId))
         m[docId] += [score]
         if(len(m[docId]) == nb_of_PL):
-            mean_score = aggregative_function_mean(m[docId])
+            mean_score = aggregative_function(m[docId])
             # print('calculMean: {}|{}|{}'.format(docId,m[docId],mean_score))
             c[docId] = mean_score
             last_score_of_c = mean_score
@@ -30,12 +48,22 @@ def push_to_m(m, c, docId, score, nb_of_PL):
     print('c: {} || m: {}'.format(c, m))
 
 
-def add_next_score(score, idsDoc, pl_id, currentScores):
+def add_next_score(score, idsDoc, pl_id, current_scores):
+    """
+    Preconditions:
+        score: is a score to be added to the current_scores.
+        idsDoc: an array of document-ids having the score.
+        pl_id: posting list id, usually the term.
+        current_scores: SortedDict with the scores we are working on.
+    Postconditions:
+        The fonction save add the tuple [docId, pl_id] to the array current_scores.
+        We use this function to add a new value to the scores' array we are working on.
+    """
     for idDoc in idsDoc:
-        if(score not in currentScores):
-            currentScores[score] = dict()
+        if(score not in current_scores):
+            current_scores[score] = dict()
         # on met en dernier [idDoc, idPostingList]
-        currentScores[score][len(currentScores[score])] = [idDoc, pl_id]
+        current_scores[score][len(current_scores[score])] = [idDoc, pl_id]
 
 
 def get_score_by_doc_id(doc_id, postingListsOrderedById, aggregation_function):
@@ -53,7 +81,7 @@ def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k):
 
     iterators = dict()
     currentScores = SortedDict()
-    # posting_list_id sera le terme du posting_list
+    # posting_list_id sera le terme de la posting_list
     for posting_list_id in postingListsOrderedByScore:
         iterators[posting_list_id] = iter(
             postingListsOrderedByScore[posting_list_id])
@@ -71,30 +99,26 @@ def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k):
         score = item[0]
         postingListId = item[1][0][1]
         docId = item[1][0][0]
-        push_to_m(m, c, docId, score, len(postingListsOrderedByScore))
+        push_to_m(m, c, docId, score, len(postingListsOrderedByScore),aggregative_function_mean)
         if(len(item[1]) > 1):
-            for i, doc in enumerate(item[1]):
+            for doc in item[1]:
                 used_docId = item[1][doc][0]
                 pl_id = item[1][doc][1]
-                # print("EXNUMerate: {},{}".format(i,value_from_list))
-                if(docId == used_docId and pl_id == postingListId):
-                    pass
-                else:
+                if(not (docId == used_docId and pl_id == postingListId)):
                     if score not in currentScores:
                         currentScores[score] = dict()
                     currentScores[score][len(currentScores[score])] = [
                         used_docId, pl_id]
 
-        # getting next new score
+        # getting next new score and add it to currentScores
         try:
             newScore = next(iterators[postingListId])
-            # print("Score:", newScore)
             idsDoc = postingListsOrderedByScore[postingListId][newScore]
-            # print('idsDoc:{}'.format(idsDoc))
             add_next_score(newScore, idsDoc, postingListId, currentScores)
         except StopIteration:
             print("No more values in postingLists")
 
+    # Verify if there is a better score in the values seen (m)
     for doc_id in m:
         score = get_score_by_doc_id(
             doc_id, postingListsOrderedById, aggregative_function_mean)
