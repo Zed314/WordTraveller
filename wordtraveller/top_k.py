@@ -26,16 +26,11 @@ def aggregate_scores(posting_lists, docs, aggregative_function):
 
 
 def aggregative_function_sum(scores):
-    res = 0
-    for score in scores:
-        res += score
-    return res
+    return sum(scores)
 
 
 def aggregative_function_mean(scores):
-    res = 0
-    for score in scores:
-        res += score
+    res = sum(scores)
     return res/len(scores)
 
 
