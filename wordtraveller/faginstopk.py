@@ -143,12 +143,13 @@ def createMockData():
     postingListsOrderedById = dict()
     postingListsOrderedById['aaa'] = pl1_id
     postingListsOrderedById['bbb'] = pl2_id
-
+    print('postingListsOrderedById : {}'.format(postingListsOrderedById))
+    print('postingListsOrderedByScore : {}'.format(postingListsOrderedByScore))
     return postingListsOrderedById, postingListsOrderedByScore
 
 
 if __name__ == "__main__":
-    currentWorkspace = './tests/workspace/test1/'
+    currentWorkspace = './workspace/testalex/'
     filename = 'test1'
     filemanag = fm.FileManager(filename, currentWorkspace)
 
@@ -156,6 +157,7 @@ if __name__ == "__main__":
 
     pathlist = Path("./tests/data/test1/").glob('**/la*')
     for path in pathlist:
+        print(path)
         analysis.analyse_newspaper(path, voc)
     filemanag.save_vocabularyAndPL_file(voc)
 
