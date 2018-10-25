@@ -63,7 +63,7 @@ class FileManager:
             listPartialVocs.append(self.getPathVocPartial(i))
         return listPartialVocs
     # Merge all the partial vocs and pl created during analysis
-    def mergePartialVocsAndPL(self):
+    def mergePartialVocsAndPL(self, recomputeIDF = True):
         #Get all the PLs and VOCs
         listPartialVocs = self.getListPartialVocs()
         listPartialPLs = self.getListPartialPLs()
@@ -72,7 +72,7 @@ class FileManager:
         totalNumberOfDocs = len (listPartialVocs)
         lengthsToReadInPLs = []
         offsetsInPLs = []
-        nbTotalWords = 0
+        nbTotalDocuments = 0
         offsetNextWord = []
         offsetPreWord = []
         offsetVoc = 0
@@ -128,7 +128,8 @@ class FileManager:
 
                 mergingPLs.update(otherPart)
             if word == "***NumberDifferentDocs***":
-                nbTotalWords = len(mergingPLs)
+                print("Nbdiffdocs"+str(mergingPLs))
+                nbTotalDocuments = len(mergingPLs)
 
 
             offsetVoc += len(mergingPLs)
@@ -138,9 +139,13 @@ class FileManager:
 
             for idDoc, nbOccurenciesInDoc in mergingPLs.items():
                 nbTotalOccurenciesOfThisWord += nbOccurenciesInDoc[0] 
-
-            for idfAndScore in mergingPLs.values():
-                 idfAndScore[0]=(1+math.log(idfAndScore[1]))*math.log(nbTotalWords/(1+len(mergingPLs)))
+            if recomputeIDF:
+                for idfAndScore in mergingPLs.values():
+                    idfAndScore[0]=(1+math.log(idfAndScore[1]))*math.log(nbTotalDocuments/(1+len(mergingPLs)))
+                    if idfAndScore[0]<= 0:
+                        print(idfAndScore)
+                        print(nbTotalDocuments)
+                        print(len(mergingPLs))
             self.save_postList(mergingPLs)
 
             currentWords.pop(word)
@@ -223,7 +228,7 @@ class FileManager:
             offset: is the numbers of paires <Doc Id, Scores> alredy written in the binary doc, the PL will be written affter  it, (offset < size of the file.)
                     if == -1, we append
         Postconditions:
-            The fonction update the file postingLites.data withe the new postingList after "offet" paires <Doc Id, Scores>,
+            The fonction update the file postingLites.data withe the new postingList after "offet" pairs <Doc Id, Scores>,
         """
         # destination file for redin and wrting (r+)b
         if(offset == -1):
@@ -271,7 +276,7 @@ class FileManager:
             donnees = ligne.rstrip('\n\r').split(",")
             word = donnees[0]
             offset = int(donnees[1])
-            voc[word] = [offset]
+            voc[word] = offset
 
         file.close()
         return voc

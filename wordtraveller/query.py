@@ -6,10 +6,10 @@ def get_posting_list(voc, word, fileManager):
         index = voc.index(word)
         if index == 0:
             offset = 0
-            length = voc.get(word)[0]
+            length = voc.get(word)
         else:
-            offset = voc.peekitem(voc.index(word)-1)[1][0]
-            length = voc.get(word)[0] - offset
+            offset = voc.peekitem(voc.index(word)-1)[1]
+            length = voc.get(word) - offset
         return fileManager.read_postList(offset, length)
     else:
         return SortedDict()

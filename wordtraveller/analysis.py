@@ -1,8 +1,8 @@
 
 import re
 import nltk
-import filemanager as fm
-import preprocessing
+from . import filemanager as fm
+from . import preprocessing
 import math
 
 from lxml import etree
