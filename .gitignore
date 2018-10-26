@@ -114,4 +114,4 @@ tests/workspace/
 # IDE
 .idea/
 .vscode/
-
+.swp/
