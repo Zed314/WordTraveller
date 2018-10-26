@@ -1,12 +1,15 @@
 import struct
 import os
+import math
 
 from sortedcontainers import SortedDict
 from os import walk
 
 
 class FileManager:
-
+    CONST_SIZE_ON_DISK = 12
+        #8
+    CONST_SIZE_ON_DISK_EXTENDED = 12
     def __init__(self, fileName, workspace="./workspace/"):
         """
         Preconditions:
@@ -22,7 +25,7 @@ class FileManager:
         self.extensionVoc = ".vo"
         self.extensionPL = ".pl"
         # Record struct format
-        self.struct = struct.Struct("<lf")
+        self.struct = struct.Struct("<lff")
         # create the workspace
         if not os.path.exists(workspace):
             os.makedirs(workspace)
@@ -60,7 +63,7 @@ class FileManager:
             listPartialVocs.append(self.getPathVocPartial(i))
         return listPartialVocs
     # Merge all the partial vocs and pl created during analysis
-    def mergePartialVocsAndPL(self):
+    def mergePartialVocsAndPL(self, recomputeIDF = True):
         #Get all the PLs and VOCs
         listPartialVocs = self.getListPartialVocs()
         listPartialPLs = self.getListPartialPLs()
@@ -69,7 +72,7 @@ class FileManager:
         totalNumberOfDocs = len (listPartialVocs)
         lengthsToReadInPLs = []
         offsetsInPLs = []
-        
+        nbTotalDocuments = 0
         offsetNextWord = []
         offsetPreWord = []
         offsetVoc = 0
@@ -124,7 +127,9 @@ class FileManager:
                 otherPart = self.read_postList(offsetsInPLs[idDoc], lengthsToReadInPLs[idDoc], True, idDoc)
 
                 mergingPLs.update(otherPart)
-                
+            if word == "***NumberDifferentDocs***":
+                print("Nbdiffdocs"+str(mergingPLs))
+                nbTotalDocuments = len(mergingPLs)
 
 
             offsetVoc += len(mergingPLs)
@@ -133,12 +138,19 @@ class FileManager:
             fileVoc.write("{},{}\n".format(word, offsetVoc))
 
             for idDoc, nbOccurenciesInDoc in mergingPLs.items():
-                nbTotalOccurenciesOfThisWord += nbOccurenciesInDoc 
-
+                nbTotalOccurenciesOfThisWord += nbOccurenciesInDoc[0] 
+            if recomputeIDF:
+                for idfAndScore in mergingPLs.values():
+                    idfAndScore[0]=(1+math.log(idfAndScore[1]))*math.log(nbTotalDocuments/(1+len(mergingPLs)))
+                    if idfAndScore[0]<= 0:
+                        print(idfAndScore)
+                        print(nbTotalDocuments)
+                        print(len(mergingPLs))
             self.save_postList(mergingPLs)
 
             currentWords.pop(word)
         fileVoc.close()
+
     def save_postLists_file(self, postingListsIndex, isPartial=False):
         """
         Preconditions:
@@ -160,7 +172,7 @@ class FileManager:
             # Encode the record and write it to the dest file
             for word, postingList in postingListsIndex.items():
                 for idDoc, score in postingList.items():
-                    record = self.struct.pack(idDoc, score)
+                    record = self.struct.pack(idDoc,score[0], score[1])
                     file.write(record)
         except IOError:
             print("Error during the writing")
@@ -216,7 +228,7 @@ class FileManager:
             offset: is the numbers of paires <Doc Id, Scores> alredy written in the binary doc, the PL will be written affter  it, (offset < size of the file.)
                     if == -1, we append
         Postconditions:
-            The fonction update the file postingLites.data withe the new postingList after "offet" paires <Doc Id, Scores>,
+            The fonction update the file postingLites.data withe the new postingList after "offet" pairs <Doc Id, Scores>,
         """
         # destination file for redin and wrting (r+)b
         if(offset == -1):
@@ -227,10 +239,10 @@ class FileManager:
 
         try:
             if(offset!=0):
-                file.read(8*offset)
+                file.read(self.CONST_SIZE_ON_DISK*offset)
             # Encode the record and write it to the dest file
             for idDoc, score in postingList.items():
-                record = self.struct.pack(idDoc, score)
+                record = self.struct.pack(idDoc, score[0], score[1])
                 file.write(record)
 
         except IOError:
@@ -264,7 +276,7 @@ class FileManager:
             donnees = ligne.rstrip('\n\r').split(",")
             word = donnees[0]
             offset = int(donnees[1])
-            voc[word] = [offset]
+            voc[word] = offset
 
         file.close()
         return voc
@@ -288,14 +300,17 @@ class FileManager:
         postingList = SortedDict()
         try:
 
-            file.read(8*offset)
+            file.read(self.CONST_SIZE_ON_DISK*offset)
 
             for x in range(0, length):
-                record = file.read(8)
+                record = file.read(self.CONST_SIZE_ON_DISK)
                 filed = self.struct.unpack(record)
                 idDoc = filed[0]
                 score = filed[1]
-                postingList[idDoc] = score
+                nbOccurenciesInDoc = filed[2]
+               # print("Score : "+str(score))
+              #  print("nbOccurenciesInDoc : "+str(nbOccurenciesInDoc))
+                postingList[idDoc] = [score,nbOccurenciesInDoc]
             return postingList
             # Do stuff with record
 
