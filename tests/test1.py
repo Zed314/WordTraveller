@@ -92,7 +92,7 @@ class TestAnalysis(unittest.TestCase):
             analysis.analyse_newspaper(path, voc)
             filemanager.save_vocabularyAndPL_file(voc, True)
             voc = SortedDict()
-
+        
         filemanager.mergePartialVocsAndPL(False)
 
         # TODO: changer quand on ait une function directe

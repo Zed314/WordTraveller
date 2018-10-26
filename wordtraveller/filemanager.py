@@ -87,7 +87,7 @@ class FileManager:
         fileVoc = open(self.getPathVoc(), "w+")
         while True :
             i = 0
-           # currentWords = SortedDict()
+            currentWords = SortedDict()
             #Todo : optimize
             for numberDoc in range(totalNumberOfDocs):
                 i = 0
@@ -97,7 +97,6 @@ class FileManager:
                     file.readline()
                     i = i+1
                 line = file.readline()
-                i = i+1
                 data = line.rstrip('\n\r').split(",")
                 word = data[0]
                 if word == "":
@@ -124,8 +123,8 @@ class FileManager:
                 offsetPreWord[idDoc] = offsetNextWord[idDoc]
                 offsetsInPLs[idDoc] = offsetsInPLs[idDoc] + preLength
                 nbLinesRedInVOCs[idDoc] += 1
+                #pf lengthsToReadInPLs est null pour idDoc0
                 otherPart = self.read_postList(offsetsInPLs[idDoc], lengthsToReadInPLs[idDoc], True, idDoc)
-
                 mergingPLs.update(otherPart)
             if word == "***NumberDifferentDocs***":
                 print("Nbdiffdocs"+str(mergingPLs))

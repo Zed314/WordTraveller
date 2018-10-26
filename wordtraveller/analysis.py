@@ -40,7 +40,6 @@ def analyse_newspaper(path, voc, computeIDF = False):
             else:
                 voc[term] = SortedDict()
                 voc[term][id_doc] = [0, occurrences]
-
     if computeIDF:
         nbDiffDocs = len(voc["***NumberDifferentDocs***"])
         for term, pl in voc.items():
