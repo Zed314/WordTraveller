@@ -95,7 +95,7 @@ class TestAnalysis(unittest.TestCase):
         
         filemanager.mergePartialVocsAndPL(False)
 
-        # TODO: changer quand on ait une function directe
+        # TODO: changer quand on a une function directe
         savedVoc = filemanager.read_vocabulary()
         mot = query.get_posting_list(savedVoc,"aa", filemanager)
         self.assertEqual(mot, {1:[0,3], 2:[0,6], 20:[0,3], 21:[0,2], 22:[0,1], 5:[0,1], 6:[0,1]})
@@ -105,13 +105,10 @@ class TestAnalysis(unittest.TestCase):
         self.assertEqual(mot, {1:[0,1], 2:[0,3], 22:[0,1], 4:[0,1], 6:[0,1]})
         mot = query.get_posting_list(savedVoc,"dd", filemanager)
         self.assertEqual(mot, {1:[0,2], 2:[0,1]})
-        # 'ff' failing
         mot = query.get_posting_list(savedVoc,"ff", filemanager)
         self.assertEqual(mot, {1:[0,1], 20:[0,1], 6:[0,1]}, "FF")
-        # 'qq' failing
         mot = query.get_posting_list(savedVoc,"qq", filemanager)
         self.assertEqual(mot, {1:[0,1], 5:[0,1]})
-        # 'rr' failing
         mot = query.get_posting_list(savedVoc,"rr", filemanager)
         self.assertEqual(mot, {1:[0,5], 21:[0,1]})
         mot = query.get_posting_list(savedVoc,"ee", filemanager)
@@ -120,18 +117,14 @@ class TestAnalysis(unittest.TestCase):
         self.assertEqual(mot, {1:[0,1]})
         mot = query.get_posting_list(savedVoc,"yy", filemanager)
         self.assertEqual(mot, {1:[0,1]})
-        # 'kk' failing
         mot = query.get_posting_list(savedVoc,"kk", filemanager)
         self.assertEqual(mot, {2:[0,1], 23:[0,1]})
         mot = query.get_posting_list(savedVoc,"ii", filemanager)
         self.assertEqual(mot, {2:[0,1]})
-        # 'jj' failing
         mot = query.get_posting_list(savedVoc,"jj", filemanager)
         self.assertEqual(mot, {2:[0,1]})
-        # 'hh' failing
         mot = query.get_posting_list(savedVoc,"hh", filemanager)
         self.assertEqual(mot, {23:[0,1]})
-        # 'll' failing
         mot = query.get_posting_list(savedVoc,"ll", filemanager)
         self.assertEqual(mot, {}, 'll is considered a stopword')
 
