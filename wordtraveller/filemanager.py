@@ -78,10 +78,10 @@ class FileManager:
         offsetVoc = 0
         voc = []
         docsToRead = []
-        filesToRead = []
+        vocsToRead = []
         for numberDoc in range(totalNumberOfDocs):
             docsToRead.append(True)
-            filesToRead.append(open(listPartialVocs[numberDoc], "r"))
+            vocsToRead.append(open(listPartialVocs[numberDoc], "r"))
         for nbVoc, pathVoc in enumerate(listPartialVocs):
             offsetsInPLs.append(0)
             nbLinesRedInVOCs.append(0)
@@ -89,7 +89,7 @@ class FileManager:
             offsetNextWord.append(0)
             offsetPreWord.append(0)
         currentWords = SortedDict()
-        fileVoc = open(self.getPathVoc(), "w+")
+        exitVoc = open(self.getPathVoc(), "w+")
         while True :
             i = 0
             #currentWords = SortedDict()
@@ -99,10 +99,7 @@ class FileManager:
                     continue
                 # i = 0
                 line = ""
-                file = filesToRead[numberDoc]
-                #while i < nbLinesRedInVOCs[numberDoc]:
-                #    file.readline()
-                #    i = i+1
+                file = vocsToRead[numberDoc]
                 line = file.readline()
                 data = line.rstrip('\n\r').split(",")
                 word = data[0]
@@ -115,7 +112,6 @@ class FileManager:
                         currentWords[word].append(numberDoc)
                     else:
                         currentWords[word].append(numberDoc)
-                # file.close()
                 docsToRead[numberDoc] = False
 
             if len(currentWords) == 0:
@@ -141,7 +137,7 @@ class FileManager:
             
             offsetVoc += len(mergingPLs)
             
-            fileVoc.write("{},{}\n".format(word, offsetVoc))
+            exitVoc.write("{},{}\n".format(word, offsetVoc))
 
             for idDoc, nbOccurenciesInDoc in mergingPLs.items():
                 nbTotalOccurenciesOfThisWord += nbOccurenciesInDoc[0] 
@@ -151,7 +147,9 @@ class FileManager:
             self.save_postList(mergingPLs)
 
             currentWords.pop(word)
-        fileVoc.close()
+        exitVoc.close()
+        for fileVOC in vocsToRead:
+            fileVOC.close()
 
     def save_postLists_file(self, postingListsIndex, isPartial=False):
         """
@@ -241,7 +239,7 @@ class FileManager:
 
         try:
             if(offset!=0):
-                file.read(self.CONST_SIZE_ON_DISK*offset)
+                file.seek(self.CONST_SIZE_ON_DISK*offset)
             # Encode the record and write it to the dest file
             for idDoc, score in postingList.items():
                 record = self.struct.pack(idDoc, score[0], score[1])
@@ -302,7 +300,7 @@ class FileManager:
         postingList = SortedDict()
         try:
 
-            file.read(self.CONST_SIZE_ON_DISK*offset)
+            file.seek(self.CONST_SIZE_ON_DISK*offset)
 
             for x in range(0, length):
                 record = file.read(self.CONST_SIZE_ON_DISK)
