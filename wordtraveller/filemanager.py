@@ -78,8 +78,10 @@ class FileManager:
         offsetVoc = 0
         voc = []
         docsToRead = []
+        filesToRead = []
         for numberDoc in range(totalNumberOfDocs):
             docsToRead.append(True)
+            filesToRead.append(open(listPartialVocs[numberDoc], "r"))
         for nbVoc, pathVoc in enumerate(listPartialVocs):
             offsetsInPLs.append(0)
             nbLinesRedInVOCs.append(0)
@@ -95,12 +97,12 @@ class FileManager:
             for numberDoc in range(totalNumberOfDocs):
                 if docsToRead[numberDoc] == False:
                     continue
-                i = 0
+               # i = 0
                 line = ""
-                file = open(listPartialVocs[numberDoc], "r")
-                while i < nbLinesRedInVOCs[numberDoc]:
-                    file.readline()
-                    i = i+1
+                file = filesToRead[numberDoc]
+                #while i < nbLinesRedInVOCs[numberDoc]:
+                #    file.readline()
+                #    i = i+1
                 line = file.readline()
                 data = line.rstrip('\n\r').split(",")
                 word = data[0]
@@ -113,7 +115,7 @@ class FileManager:
                         currentWords[word].append(numberDoc)
                     else:
                         currentWords[word].append(numberDoc)
-                file.close()
+                # file.close()
                 docsToRead[numberDoc] = False
 
             if len(currentWords) == 0:

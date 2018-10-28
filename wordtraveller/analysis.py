@@ -67,7 +67,7 @@ def analyse_newspaper_optimized(path, voc, computeIDF = False):
         if line.startswith("<DOCID>"):
             currDocId = int(line[len("<DOCID> "):-len(" </DOCID>\n")])
         elif line.startswith("</DOC>"):
-             #We use the data we accumulate during the process
+            # We use the data we accumulate during the process
             voc_doc = {}
             terms = preprocessor.process(documentText)
             terms.append("***NumberDifferentDocs***")
