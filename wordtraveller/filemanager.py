@@ -123,7 +123,6 @@ class FileManager:
                 offsetPreWord[idDoc] = offsetNextWord[idDoc]
                 offsetsInPLs[idDoc] = offsetsInPLs[idDoc] + preLength
                 nbLinesRedInVOCs[idDoc] += 1
-                #pf lengthsToReadInPLs est null pour idDoc0
                 otherPart = self.read_postList(offsetsInPLs[idDoc], lengthsToReadInPLs[idDoc], True, idDoc)
                 mergingPLs.update(otherPart)
             if word == "***NumberDifferentDocs***":
@@ -133,7 +132,6 @@ class FileManager:
 
             offsetVoc += len(mergingPLs)
             
-          #  voc.append([word,offsetVoc])
             fileVoc.write("{},{}\n".format(word, offsetVoc))
 
             for idDoc, nbOccurenciesInDoc in mergingPLs.items():
