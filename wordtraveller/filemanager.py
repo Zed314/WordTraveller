@@ -97,7 +97,7 @@ class FileManager:
             for numberDoc in range(totalNumberOfDocs):
                 if docsToRead[numberDoc] == False:
                     continue
-               # i = 0
+                # i = 0
                 line = ""
                 file = filesToRead[numberDoc]
                 #while i < nbLinesRedInVOCs[numberDoc]:
