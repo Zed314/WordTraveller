@@ -98,6 +98,7 @@ class TestAnalysis(unittest.TestCase):
         # TODO: changer quand on a une function directe
         savedVoc = filemanager.read_vocabulary()
         mot = query.get_posting_list(savedVoc,"aa", filemanager)
+        print(mot)
         self.assertEqual(mot, {1:[0,3], 2:[0,6], 20:[0,3], 21:[0,2], 22:[0,1], 5:[0,1], 6:[0,1]})
         mot = query.get_posting_list(savedVoc,"bb", filemanager)
         self.assertEqual(mot, {1:[0,3], 2:[0,6], 20:[0,1], 21:[0,1], 4:[0,1], 5:[0,1]})

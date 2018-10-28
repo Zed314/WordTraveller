@@ -77,6 +77,9 @@ class FileManager:
         offsetPreWord = []
         offsetVoc = 0
         voc = []
+        docsToRead = []
+        for numberDoc in range(totalNumberOfDocs):
+            docsToRead.append(True)
         for nbVoc, pathVoc in enumerate(listPartialVocs):
             offsetsInPLs.append(0)
             nbLinesRedInVOCs.append(0)
@@ -87,9 +90,11 @@ class FileManager:
         fileVoc = open(self.getPathVoc(), "w+")
         while True :
             i = 0
-            currentWords = SortedDict()
+            #currentWords = SortedDict()
             #Todo : optimize
             for numberDoc in range(totalNumberOfDocs):
+                if docsToRead[numberDoc] == False:
+                    continue
                 i = 0
                 line = ""
                 file = open(listPartialVocs[numberDoc], "r")
@@ -102,21 +107,23 @@ class FileManager:
                 if word == "":
                     pass
                 else: 
-                    
                     offsetNextWord[numberDoc] = int(data[1]) 
-
                     if not (word in currentWords):
                         currentWords[word] = []
                         currentWords[word].append(numberDoc)
                     else:
                         currentWords[word].append(numberDoc)
                 file.close()
+                docsToRead[numberDoc] = False
 
             if len(currentWords) == 0:
                 break
+            #Select the best word
             word = currentWords.keys()[0]
+            
             nbTotalOccurenciesOfThisWord = 0
             mergingPLs = SortedDict()
+            #For all the documents with this word
             for idDoc in currentWords[word]:
                 preLength = lengthsToReadInPLs[idDoc]
                 lengthsToReadInPLs[idDoc] = offsetNextWord[idDoc] - offsetPreWord[idDoc]
@@ -125,11 +132,12 @@ class FileManager:
                 nbLinesRedInVOCs[idDoc] += 1
                 otherPart = self.read_postList(offsetsInPLs[idDoc], lengthsToReadInPLs[idDoc], True, idDoc)
                 mergingPLs.update(otherPart)
+                docsToRead[idDoc] = True
             if word == "***NumberDifferentDocs***":
                 print("Nbdiffdocs"+str(mergingPLs))
                 nbTotalDocuments = len(mergingPLs)
 
-
+            
             offsetVoc += len(mergingPLs)
             
             fileVoc.write("{},{}\n".format(word, offsetVoc))
@@ -139,10 +147,6 @@ class FileManager:
             if recomputeIDF:
                 for idfAndScore in mergingPLs.values():
                     idfAndScore[0]=(1+math.log(idfAndScore[1]))*math.log(nbTotalDocuments/(1+len(mergingPLs)))
-                    if idfAndScore[0]<= 0:
-                        print(idfAndScore)
-                        print(nbTotalDocuments)
-                        print(len(mergingPLs))
             self.save_postList(mergingPLs)
 
             currentWords.pop(word)

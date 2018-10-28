@@ -126,5 +126,8 @@ if __name__ == "__main__":
             print('file %s finished!' % i)
     end = time.time()
     print(end - start)
-    #filemanager.mergePartialVocsAndPL()
+    start = time.time()
+    filemanager.mergePartialVocsAndPL()
+    end = time.time()
+    print(end - start)
 
