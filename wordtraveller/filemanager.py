@@ -136,7 +136,6 @@ class FileManager:
                 mergingPLs.update(otherPart)
                 docsToRead[idDoc] = True
             if word == "***NumberDifferentDocs***":
-                print("Nbdiffdocs"+str(mergingPLs))
                 nbTotalDocuments = len(mergingPLs)
 
             
@@ -311,8 +310,6 @@ class FileManager:
                 idDoc = filed[0]
                 score = filed[1]
                 nbOccurenciesInDoc = filed[2]
-               # print("Score : "+str(score))
-              #  print("nbOccurenciesInDoc : "+str(nbOccurenciesInDoc))
                 postingList[idDoc] = [score,nbOccurenciesInDoc]
             return postingList
             # Do stuff with record
@@ -325,22 +322,3 @@ class FileManager:
             file.close()
 
 
-if __name__ == "__main__":
-    filemanage = FileManager("test1", "./workspace/")
-    postingList = dict()
-    postingList[1] = 101
-    postingList[2] = 30023
-    postingList[34] = 308.0
-    postingList[294] = 159
-    postingList[2324] = 3005
-    postingList[23445] = 3006
-    filemanage.save_postList(postingList, 0)
-    # saveVocabulary(postingList)
-    postingList[1] = 201
-    filemanage.save_postList(postingList, 6)
-    postingList[1] = 301
-    filemanage.save_postList(postingList, 12)
-    pl = filemanage.read_postList(0, 10)
-    #voc = readVocabulary('')
-    for numDoc, score in pl.items():
-        print("{} => {}.".format(numDoc, score))
