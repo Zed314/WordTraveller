@@ -12,12 +12,12 @@ class TestFileManager(unittest.TestCase):
         currentWorkspace = './tests/workspace/testfilemanager1/'
         filename = 'testfm1'
         postingList = dict()
-        postingList[1]=101
-        postingList[2]=30023
-        postingList[34]=308.0
-        postingList[294]=159
-        postingList[2324]=3005
-        postingList[23445]=3006
+        postingList[1]=[0,101]
+        postingList[2]=[0,30023]
+        postingList[34]=[0,308.0]
+        postingList[294]=[0,159]
+        postingList[2324]=[0,3005]
+        postingList[23445]=[0,3006]
         filemanager = fm.FileManager(filename,currentWorkspace)
         filemanager.save_postList(postingList,0)
         self.assertTrue(os.path.isfile(currentWorkspace + filename + '.pl'), "The file .pl should exist")
@@ -27,31 +27,31 @@ class TestFileManager(unittest.TestCase):
         currentWorkspace = './tests/workspace/testfilemanager2/'
         filename = 'testfm2'
         postingList = dict()
-        postingList[1]=101
-        postingList[2]=30023
-        postingList[294]=159
-        postingList[23445]=3006
+        postingList[1]=[0,101]
+        postingList[2]=[0,30023]
+        postingList[294]=[0,159]
+        postingList[23445]=[0,3006]
         filemanager = fm.FileManager(filename,currentWorkspace)
         filemanager.save_postList(postingList,0)
         pl = filemanager.read_postList(0,4)
-        self.assertEqual(pl, {1: 101, 2: 30023, 294: 159, 23445:3006}, "The sorted Dict should be the same")
+        self.assertEqual(pl, {1: [0, 101], 2: [0,30023], 294: [0,159], 23445:[0,3006]}, "The sorted Dict should be the same")
     
     def test_modify_postingList(self):
         currentWorkspace = './tests/workspace/testfilemanager3/'
         filename = 'testfm3'
         postingList = dict()
-        postingList[1]=101
-        postingList[23]=30023
-        postingList[234]=3006
+        postingList[1]=[0,101]
+        postingList[23]=[0,30023]
+        postingList[234]=[0,3006]
         filemanager = fm.FileManager(filename,currentWorkspace)
         # TODO: le offset change quoi?
         filemanager.save_postList(postingList,0)
-        postingList[1]=201
+        postingList[1]=[0,201]
         filemanager.save_postList(postingList,0)
-        postingList[1]=301
+        postingList[1]=[0,301]
         filemanager.save_postList(postingList,0)
         pl = filemanager.read_postList(0,3)
-        self.assertEqual(pl, {1: 301, 23: 30023, 234: 3006}, "The sorted Dict should be the same")
+        self.assertEqual(pl, {1: [0,301], 23: [0,30023], 234: [0,3006]}, "The sorted Dict should be the same")
         # for numDoc, score in pl.items():
         #     print("{} => {}.".format(numDoc, score))
 

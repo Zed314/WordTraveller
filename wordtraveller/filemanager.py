@@ -1,12 +1,15 @@
 import struct
 import os
+import math
 
 from sortedcontainers import SortedDict
 from os import walk
 
 
 class FileManager:
-
+    CONST_SIZE_ON_DISK = 12
+        #8
+    CONST_SIZE_ON_DISK_EXTENDED = 12
     def __init__(self, fileName, workspace="./workspace/"):
         """
         Preconditions:
@@ -22,7 +25,7 @@ class FileManager:
         self.extensionVoc = ".vo"
         self.extensionPL = ".pl"
         # Record struct format
-        self.struct = struct.Struct("<lf")
+        self.struct = struct.Struct("<lff")
         # create the workspace
         if not os.path.exists(workspace):
             os.makedirs(workspace)
@@ -59,8 +62,9 @@ class FileManager:
         for i in range(0, self.numberPartialFiles):
             listPartialVocs.append(self.getPathVocPartial(i))
         return listPartialVocs
+
     # Merge all the partial vocs and pl created during analysis
-    def mergePartialVocsAndPL(self):
+    def mergePartialVocsAndPL(self, recomputeIDF = True):
         #Get all the PLs and VOCs
         listPartialVocs = self.getListPartialVocs()
         listPartialPLs = self.getListPartialPLs()
@@ -69,11 +73,16 @@ class FileManager:
         totalNumberOfDocs = len (listPartialVocs)
         lengthsToReadInPLs = []
         offsetsInPLs = []
-        
+        nbTotalDocuments = 0
         offsetNextWord = []
         offsetPreWord = []
         offsetVoc = 0
         voc = []
+        idDocsToRead = []
+        vocsToRead = []
+        for numberDoc in range(totalNumberOfDocs):
+            idDocsToRead.append(True)
+            vocsToRead.append(open(listPartialVocs[numberDoc], "r"))
         for nbVoc, pathVoc in enumerate(listPartialVocs):
             offsetsInPLs.append(0)
             nbLinesRedInVOCs.append(0)
@@ -81,40 +90,34 @@ class FileManager:
             offsetNextWord.append(0)
             offsetPreWord.append(0)
         currentWords = SortedDict()
-        fileVoc = open(self.getPathVoc(), "w+")
+        exitVoc = open(self.getPathVoc(), "w+")
         while True :
             i = 0
-           # currentWords = SortedDict()
-            #Todo : optimize
             for numberDoc in range(totalNumberOfDocs):
-                i = 0
-                line = ""
-                file = open(listPartialVocs[numberDoc], "r")
-                while i < nbLinesRedInVOCs[numberDoc]:
-                    file.readline()
-                    i = i+1
+                if idDocsToRead[numberDoc] == False:
+                    continue
+                file = vocsToRead[numberDoc]
                 line = file.readline()
-                i = i+1
                 data = line.rstrip('\n\r').split(",")
                 word = data[0]
-                if word == "":
+                if word == "": # If document is over.
                     pass
                 else: 
-                    
                     offsetNextWord[numberDoc] = int(data[1]) 
-
                     if not (word in currentWords):
                         currentWords[word] = []
                         currentWords[word].append(numberDoc)
                     else:
                         currentWords[word].append(numberDoc)
-                file.close()
+                idDocsToRead[numberDoc] = False
 
             if len(currentWords) == 0:
                 break
+
+            #Select the best word
             word = currentWords.keys()[0]
-            nbTotalOccurenciesOfThisWord = 0
             mergingPLs = SortedDict()
+            #For all the documents with this word
             for idDoc in currentWords[word]:
                 preLength = lengthsToReadInPLs[idDoc]
                 lengthsToReadInPLs[idDoc] = offsetNextWord[idDoc] - offsetPreWord[idDoc]
@@ -122,23 +125,27 @@ class FileManager:
                 offsetsInPLs[idDoc] = offsetsInPLs[idDoc] + preLength
                 nbLinesRedInVOCs[idDoc] += 1
                 otherPart = self.read_postList(offsetsInPLs[idDoc], lengthsToReadInPLs[idDoc], True, idDoc)
-
                 mergingPLs.update(otherPart)
+                idDocsToRead[idDoc] = True
                 
-
-
-            offsetVoc += len(mergingPLs)
+            if word == "***NumberDifferentDocs***":
+                nbTotalDocuments = len(mergingPLs)
             
-          #  voc.append([word,offsetVoc])
-            fileVoc.write("{},{}\n".format(word, offsetVoc))
-
-            for idDoc, nbOccurenciesInDoc in mergingPLs.items():
-                nbTotalOccurenciesOfThisWord += nbOccurenciesInDoc 
-
+            offsetVoc += len(mergingPLs)
+            exitVoc.write("{},{}\n".format(word, offsetVoc))
+            
+            if recomputeIDF:
+                for idfAndScore in mergingPLs.values():
+                    idfAndScore[0]=(1+math.log(idfAndScore[1]))*math.log(nbTotalDocuments/(1+len(mergingPLs)))
+            
             self.save_postList(mergingPLs)
 
             currentWords.pop(word)
-        fileVoc.close()
+        # Close all files
+        exitVoc.close()
+        for fileVOC in vocsToRead:
+            fileVOC.close()
+
     def save_postLists_file(self, postingListsIndex, isPartial=False):
         """
         Preconditions:
@@ -160,7 +167,7 @@ class FileManager:
             # Encode the record and write it to the dest file
             for word, postingList in postingListsIndex.items():
                 for idDoc, score in postingList.items():
-                    record = self.struct.pack(idDoc, score)
+                    record = self.struct.pack(idDoc,score[0], score[1])
                     file.write(record)
         except IOError:
             print("Error during the writing")
@@ -216,7 +223,7 @@ class FileManager:
             offset: is the numbers of paires <Doc Id, Scores> alredy written in the binary doc, the PL will be written affter  it, (offset < size of the file.)
                     if == -1, we append
         Postconditions:
-            The fonction update the file postingLites.data withe the new postingList after "offet" paires <Doc Id, Scores>,
+            The fonction update the file postingLites.data withe the new postingList after "offet" pairs <Doc Id, Scores>,
         """
         # destination file for redin and wrting (r+)b
         if(offset == -1):
@@ -227,15 +234,13 @@ class FileManager:
 
         try:
             if(offset!=0):
-                file.read(8*offset)
+                file.seek(self.CONST_SIZE_ON_DISK*offset)
             # Encode the record and write it to the dest file
             for idDoc, score in postingList.items():
-                record = self.struct.pack(idDoc, score)
+                record = self.struct.pack(idDoc, score[0], score[1])
                 file.write(record)
 
         except IOError:
-            # Your error handling here
-            # Nothing for this example
             pass
         finally:
             file.close()
@@ -264,7 +269,7 @@ class FileManager:
             donnees = ligne.rstrip('\n\r').split(",")
             word = donnees[0]
             offset = int(donnees[1])
-            voc[word] = [offset]
+            voc[word] = offset
 
         file.close()
         return voc
@@ -288,14 +293,15 @@ class FileManager:
         postingList = SortedDict()
         try:
 
-            file.read(8*offset)
+            file.seek(self.CONST_SIZE_ON_DISK*offset)
 
             for x in range(0, length):
-                record = file.read(8)
+                record = file.read(self.CONST_SIZE_ON_DISK)
                 filed = self.struct.unpack(record)
                 idDoc = filed[0]
                 score = filed[1]
-                postingList[idDoc] = score
+                nbOccurenciesInDoc = filed[2]
+                postingList[idDoc] = [score,nbOccurenciesInDoc]
             return postingList
             # Do stuff with record
 
@@ -307,22 +313,3 @@ class FileManager:
             file.close()
 
 
-if __name__ == "__main__":
-    filemanage = FileManager("test1", "./workspace/")
-    postingList = dict()
-    postingList[1] = 101
-    postingList[2] = 30023
-    postingList[34] = 308.0
-    postingList[294] = 159
-    postingList[2324] = 3005
-    postingList[23445] = 3006
-    filemanage.save_postList(postingList, 0)
-    # saveVocabulary(postingList)
-    postingList[1] = 201
-    filemanage.save_postList(postingList, 6)
-    postingList[1] = 301
-    filemanage.save_postList(postingList, 12)
-    pl = filemanage.read_postList(0, 10)
-    #voc = readVocabulary('')
-    for numDoc, score in pl.items():
-        print("{} => {}.".format(numDoc, score))

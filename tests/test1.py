@@ -25,9 +25,9 @@ class TestAnalysis(unittest.TestCase):
         mot1 = query.get_posting_list(savedVoc,"aa", filemanager)
         mot2 = query.get_posting_list(savedVoc,"bb", filemanager)
         mot3 = query.get_posting_list(savedVoc,"cc", filemanager)
-        self.assertEqual(mot1, {1:3, 2:2, 3:1})
-        self.assertEqual(mot2, {1:1, 2:1})
-        self.assertEqual(mot3, {3:1})
+        self.assertEqual(mot1, {1:[0,3], 2:[0,2], 3:[0,1]})
+        self.assertEqual(mot2, {1:[0,1], 2:[0,1]})
+        self.assertEqual(mot3, {3:[0,1]})
 
     def test_with_stopwords(self):
         voc = SortedDict()
@@ -45,9 +45,9 @@ class TestAnalysis(unittest.TestCase):
         mot1 = query.get_posting_list(savedVoc,"aa", filemanager)
         mot2 = query.get_posting_list(savedVoc,"bb", filemanager)
         mot3 = query.get_posting_list(savedVoc,"cc", filemanager)
-        self.assertEqual(mot1, {1:1, 2:2})
-        self.assertEqual(mot2, {1:4, 2:1})
-        self.assertEqual(mot3, {2:2})
+        self.assertEqual(mot1, {1:[0,1], 2:[0,2]})
+        self.assertEqual(mot2, {1:[0,4], 2:[0,1]})
+        self.assertEqual(mot3, {2:[0,2]})
 
         stop1 = query.get_posting_list(savedVoc,"doing", filemanager)
         self.assertEqual(stop1, {})
@@ -66,16 +66,18 @@ class TestAnalysis(unittest.TestCase):
             filemanager.save_vocabularyAndPL_file(voc, True)
             voc = SortedDict()
 
-        filemanager.mergePartialVocsAndPL()
+        filemanager.mergePartialVocsAndPL(False)
 
         # TODO: changer quand on ait une function directe
         savedVoc = filemanager.read_vocabulary()
+        print(savedVoc)
         mot = query.get_posting_list(savedVoc,"aa", filemanager)
-        self.assertEqual(mot, {1:3, 2:2, 3:1, 4:3, 5:2, 6:1})
+        print("Red:"+ str(mot))
+        self.assertEqual(mot, {1:[0,3], 2:[0,2], 3:[0,1], 4:[0,3], 5:[0,2], 6:[0,1]})
         mot = query.get_posting_list(savedVoc,"bb", filemanager)
-        self.assertEqual(mot, {1:1, 2:1, 4:1, 5:1})
+        self.assertEqual(mot, {1:[0,1], 2:[0,1], 4:[0,1], 5:[0,1]})
         mot = query.get_posting_list(savedVoc,"cc", filemanager)
-        self.assertEqual(mot, {3:1, 6:1})
+        self.assertEqual(mot, {3:[0,1], 6:[0,1]})
 
     def test_merging_3_files(self):
         voc = SortedDict()
@@ -90,46 +92,40 @@ class TestAnalysis(unittest.TestCase):
             analysis.analyse_newspaper(path, voc)
             filemanager.save_vocabularyAndPL_file(voc, True)
             voc = SortedDict()
+        
+        filemanager.mergePartialVocsAndPL(False)
 
-        filemanager.mergePartialVocsAndPL()
-
-        # TODO: changer quand on ait une function directe
+        # TODO: changer quand on a une function directe
         savedVoc = filemanager.read_vocabulary()
         mot = query.get_posting_list(savedVoc,"aa", filemanager)
-        self.assertEqual(mot, {1:3, 2:6, 20:3, 21:2, 22:1, 5:1, 6:1})
+        print(mot)
+        self.assertEqual(mot, {1:[0,3], 2:[0,6], 20:[0,3], 21:[0,2], 22:[0,1], 5:[0,1], 6:[0,1]})
         mot = query.get_posting_list(savedVoc,"bb", filemanager)
-        self.assertEqual(mot, {1:3, 2:6, 20:1, 21:1, 4:1, 5:1})
+        self.assertEqual(mot, {1:[0,3], 2:[0,6], 20:[0,1], 21:[0,1], 4:[0,1], 5:[0,1]})
         mot = query.get_posting_list(savedVoc,"cc", filemanager)
-        self.assertEqual(mot, {1:1, 2:3, 22:1, 4:1, 6:1})
+        self.assertEqual(mot, {1:[0,1], 2:[0,3], 22:[0,1], 4:[0,1], 6:[0,1]})
         mot = query.get_posting_list(savedVoc,"dd", filemanager)
-        self.assertEqual(mot, {1:2, 2:1})
-        # 'ff' failing
+        self.assertEqual(mot, {1:[0,2], 2:[0,1]})
         mot = query.get_posting_list(savedVoc,"ff", filemanager)
-        self.assertEqual(mot, {1:1, 20:1, 6:1})
-        # 'qq' failing
+        self.assertEqual(mot, {1:[0,1], 20:[0,1], 6:[0,1]}, "FF")
         mot = query.get_posting_list(savedVoc,"qq", filemanager)
-        self.assertEqual(mot, {1:1, 5:1})
-        # 'rr' failing
+        self.assertEqual(mot, {1:[0,1], 5:[0,1]})
         mot = query.get_posting_list(savedVoc,"rr", filemanager)
-        self.assertEqual(mot, {1:5, 21:1})
+        self.assertEqual(mot, {1:[0,5], 21:[0,1]})
         mot = query.get_posting_list(savedVoc,"ee", filemanager)
-        self.assertEqual(mot, {1:1, 23:1})
+        self.assertEqual(mot, {1:[0,1], 23:[0,1]})
         mot = query.get_posting_list(savedVoc,"vv", filemanager)
-        self.assertEqual(mot, {1:1})
+        self.assertEqual(mot, {1:[0,1]})
         mot = query.get_posting_list(savedVoc,"yy", filemanager)
-        self.assertEqual(mot, {1:1})
-        # 'kk' failing
+        self.assertEqual(mot, {1:[0,1]})
         mot = query.get_posting_list(savedVoc,"kk", filemanager)
-        self.assertEqual(mot, {2:1, 23:1})
+        self.assertEqual(mot, {2:[0,1], 23:[0,1]})
         mot = query.get_posting_list(savedVoc,"ii", filemanager)
-        self.assertEqual(mot, {2:1})
-        # 'jj' failing
+        self.assertEqual(mot, {2:[0,1]})
         mot = query.get_posting_list(savedVoc,"jj", filemanager)
-        self.assertEqual(mot, {2:1})
-        # 'hh' failing
+        self.assertEqual(mot, {2:[0,1]})
         mot = query.get_posting_list(savedVoc,"hh", filemanager)
-        self.assertEqual(mot, {23:1})
-        # 'll' failing
+        self.assertEqual(mot, {23:[0,1]})
         mot = query.get_posting_list(savedVoc,"ll", filemanager)
         self.assertEqual(mot, {}, 'll is considered a stopword')
 
