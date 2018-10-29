@@ -35,6 +35,7 @@ def aggregative_function_mean(values):
     Postconditions:
         Returns the mean of this values.
     """
+    print("VALUES {}".format(values))
     sumValues = sum(values)
     return sumValues/len(values)
 
@@ -88,9 +89,11 @@ def add_next_score(score, idsDoc, pl_id, current_scores):
 def get_score_by_doc_id(doc_id, postingListsOrderedById, aggregation_function):
     score = 0
     all_scores = []
+    print("DD {}".format(postingListsOrderedById))
     for posting_list in postingListsOrderedById:
         score_doc_id = postingListsOrderedById[posting_list][doc_id]
-        all_scores.append(score_doc_id)
+        print("WOWOOW: {}".format(score_doc_id))
+        all_scores.append(score_doc_id[1])
     score = aggregation_function(all_scores)
     return score
 
@@ -165,6 +168,7 @@ def createMockData():
     pl1_score[0.50] = [1]
     pl1_score[0.40] = [3]
 
+    # TODO: Dict o sortedDict? --> si cambiamos el orden con el que ponemos los valores en pl2_score cambia el resultado?
     pl2_score = dict()
     pl2_score[0.85] = [3]
     pl2_score[0.80] = [5]
