@@ -8,14 +8,14 @@ class TestFaginsTopK(unittest.TestCase):
 
     def test_creation_postingLists(self):
         pl1_score = SortedDict()
-        pl1_score[-0.90] = [1]
-        pl1_score[-0.80] = [2]
-        pl1_score[-0.70] = [3]
+        pl1_score[0.90] = [1]
+        pl1_score[0.70] = [3]
+        pl1_score[0.80] = [2]
 
         pl2_score = SortedDict()
-        pl2_score[-0.85] = [1]
-        pl2_score[-0.80] = [2]
-        pl2_score[-0.75] = [3]
+        pl2_score[0.80] = [2]
+        pl2_score[0.75] = [3]
+        pl2_score[0.85] = [1]
 
 
         postingListsOrderedByScore = dict()

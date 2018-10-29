@@ -14,13 +14,13 @@ def apply_top_k_algo(words, voc, filemanager, k):
         voc, word, filemanager) for word in words}
     print('ww: {}'.format(posting_lists_ordered_by_id))
 
-    pl_aa = dict()
+    pl_aa = SortedDict()
     pl_aa[3] = [1]
     pl_aa[2] = [2]
     pl_aa[1] = [3]
-    pl_bb = dict()
+    pl_bb = SortedDict()
     pl_bb[1] = [1, 2]
-    pl_cc = dict()
+    pl_cc = SortedDict()
     pl_cc[1] = [3]
 
     posting_lists_ordered_by_score = dict()
@@ -112,7 +112,7 @@ def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k):
     currentScores = SortedDict()
     # posting_list_id sera le terme de la posting_list
     for posting_list_id in postingListsOrderedByScore:
-        iterators[posting_list_id] = iter(
+        iterators[posting_list_id] = reversed(
             postingListsOrderedByScore[posting_list_id])
         # next donne la clé
         score = next(iterators[posting_list_id])
@@ -167,22 +167,21 @@ def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k):
 
 
 def createMockData():
-    pl1_score = dict()
-    pl1_score[0.90] = [2]
+    pl1_score = SortedDict()
     # pl1_score[0.90] += [3]
     pl1_score[0.80] = [5]
     pl1_score[0.70] = [6]
     pl1_score[0.60] = [4]
     pl1_score[0.50] = [1]
     pl1_score[0.40] = [3]
+    pl1_score[0.90] = [2]
 
-    # TODO: Dict o sortedDict? --> si cambiamos el orden con el que ponemos los valores en pl2_score cambia el resultado?
-    pl2_score = dict()
-    pl2_score[0.85] = [3]
+    pl2_score = SortedDict()
     pl2_score[0.80] = [5]
     pl2_score[0.75] = [2]
     pl2_score[0.74] = [6]
     pl2_score[0.74] += [1]
+    pl2_score[0.85] = [3]
     pl2_score[0.70] = [4]
 
     postingListsOrderedByScore = dict()
