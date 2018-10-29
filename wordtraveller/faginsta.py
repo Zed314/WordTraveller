@@ -17,7 +17,10 @@ def aggregative_function_mean(values):
         Returns the mean of this values.
     """
     sumValues = sum(values)
-    return sumValues/len(values)
+    if(len(values) == 0): 
+        return 0
+    else: 
+        return sumValues/len(values)
 
 
 def compute_mu(docId, postingListsOrderedById, aggregative_function):
@@ -79,7 +82,7 @@ def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k, ag
     # posting_list_id sera le terme de la posting_list
     for posting_list_id in postingListsOrderedByScore:
         print("posting_list_id {}".format(posting_list_id) )
-        iterators[posting_list_id] = iter(
+        iterators[posting_list_id] = reversed(
             postingListsOrderedByScore[posting_list_id])
         # next donne la clé
         score = next(iterators[posting_list_id])
@@ -158,7 +161,7 @@ def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k, ag
 
 
 def createMockData():
-    pl1_score = dict()
+    pl1_score = SortedDict()
     pl1_score[0.90] = [2]
     #pl1_score[0.90] += [3]
     pl1_score[0.80] = [5]
@@ -167,7 +170,7 @@ def createMockData():
     pl1_score[0.50] = [1]
     pl1_score[0.40] = [3]
 
-    pl2_score = dict()
+    pl2_score = SortedDict()
     pl2_score[0.85] = [3]
     pl2_score[0.80] = [5]
     pl2_score[0.75] = [2]
