@@ -100,6 +100,7 @@ def get_score_by_doc_id(doc_id, postingListsOrderedById, aggregation_function):
             score_doc_id = postingListsOrderedById[posting_list][doc_id]
             # TODO: score_doc_id[0] = score, score_doc_id[1] = term frequency
             all_scores.append(score_doc_id[1])
+            # Pour mockData()
             # all_scores.append(score_doc_id)
     score = aggregation_function(all_scores)
     return score
