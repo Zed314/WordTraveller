@@ -17,7 +17,10 @@ def aggregative_function_mean(values):
         Returns the mean of this values.
     """
     sumValues = sum(values)
-    return sumValues/len(values)
+    if(len(values) == 0): 
+        return 0
+    else: 
+        return sumValues/len(values)
 
 
 def compute_mu(docId, postingListsOrderedById, aggregative_function):

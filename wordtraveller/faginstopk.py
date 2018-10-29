@@ -8,8 +8,10 @@ from pathlib import Path
 # Cette variable me sert pour apres savoir si les scores qui restent dans m sont plus grands que ceux déjà existants
 last_score_of_c = 0
 
+
 def apply_top_k_algo(words, voc, filemanager, k):
-    posting_lists_ordered_by_id = {word: query.get_posting_list(voc, word, filemanager) for word in words}
+    posting_lists_ordered_by_id = {word: query.get_posting_list(
+        voc, word, filemanager) for word in words}
     print('ww: {}'.format(posting_lists_ordered_by_id))
 
     pl_aa = dict()
@@ -17,7 +19,7 @@ def apply_top_k_algo(words, voc, filemanager, k):
     pl_aa[2] = [2]
     pl_aa[1] = [3]
     pl_bb = dict()
-    pl_bb[1] = [1,2]
+    pl_bb[1] = [1, 2]
     pl_cc = dict()
     pl_cc[1] = [3]
 
@@ -25,8 +27,10 @@ def apply_top_k_algo(words, voc, filemanager, k):
     posting_lists_ordered_by_score['aa'] = pl_aa
     posting_lists_ordered_by_score['bb'] = pl_bb
     posting_lists_ordered_by_score['cc'] = pl_cc
-    
-    find_fagins_top_k(posting_lists_ordered_by_id,posting_lists_ordered_by_score,k)
+
+    find_fagins_top_k(posting_lists_ordered_by_id,
+                      posting_lists_ordered_by_score, k)
+
 
 def aggregative_function_mean(values):
     """
@@ -35,9 +39,11 @@ def aggregative_function_mean(values):
     Postconditions:
         Returns the mean of this values.
     """
-    print("VALUES {}".format(values))
     sumValues = sum(values)
-    return sumValues/len(values)
+    if(len(values) == 0):
+        return 0
+    else:
+        return sumValues/len(values)
 
 
 def push_to_m(m, c, docId, score, nb_of_PL, aggregative_function):
@@ -89,11 +95,12 @@ def add_next_score(score, idsDoc, pl_id, current_scores):
 def get_score_by_doc_id(doc_id, postingListsOrderedById, aggregation_function):
     score = 0
     all_scores = []
-    print("DD {}".format(postingListsOrderedById))
     for posting_list in postingListsOrderedById:
-        score_doc_id = postingListsOrderedById[posting_list][doc_id]
-        print("WOWOOW: {}".format(score_doc_id))
-        all_scores.append(score_doc_id[1])
+        if(doc_id in postingListsOrderedById[posting_list]):
+            score_doc_id = postingListsOrderedById[posting_list][doc_id]
+            # TODO: score_doc_id[0] = score, score_doc_id[1] = term frequency
+            all_scores.append(score_doc_id[1])
+            # all_scores.append(score_doc_id)
     score = aggregation_function(all_scores)
     return score
 
@@ -122,7 +129,8 @@ def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k):
             score = item[0]
             postingListId = item[1][0][1]
             docId = item[1][0][0]
-            push_to_m(m, c, docId, score, len(postingListsOrderedByScore),aggregative_function_mean)
+            push_to_m(m, c, docId, score, len(
+                postingListsOrderedByScore), aggregative_function_mean)
             if(len(item[1]) > 1):
                 for doc in item[1]:
                     used_docId = item[1][doc][0]
@@ -204,7 +212,7 @@ if __name__ == "__main__":
 
     tempVoc = SortedDict()
 
-    pathlist = Path("./tests/data/test1/").glob('**/la*')
+    pathlist = Path("./tests/data/test4/").glob('**/la*')
     for path in pathlist:
         analysis.analyse_newspaper(path, tempVoc)
     filemanag.save_vocabularyAndPL_file(tempVoc)
@@ -216,8 +224,8 @@ if __name__ == "__main__":
 
     print("savedDoc : {}".format(savedVoc))
 
-    print(query.get_posting_list(savedVoc,"aa", filemanag))
-    apply_top_k_algo(['aa','bb'],savedVoc,filemanag,1)
+    print(query.get_posting_list(savedVoc, "aa", filemanag))
+    apply_top_k_algo(['aa', 'bb'], savedVoc, filemanag, 5)
 
     # top_k = find_fagins_top_k(postingListsOrderedById,
     #                           postingListsOrderedByScore, 3)
