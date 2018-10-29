@@ -4,8 +4,8 @@ from . import filemanager as fm
 from sortedcontainers import SortedDict
 from pathlib import Path
 
-# Vu que les int ne peuvent pas se modifier par reference, j'ai du creer une variable global
-# Cette variable me sers pour apres savoir si les scores qui restent dans m sont plus grandes que celles déjà existantes
+# Vu que les int ne peuvent pas se modifier par reference, j'ai du creer une variable globale
+# Cette variable me sert pour apres savoir si les scores qui restent dans m sont plus grands que ceux déjà existants
 last_score_of_c = 0
 
 
@@ -185,7 +185,7 @@ if __name__ == "__main__":
         analysis.analyse_newspaper(path, voc)
     filemanag.save_vocabularyAndPL_file(voc)
 
-    # Applying Top K Algorithme
+    # Applying Top K Algorithm
     postingListsOrderedById, postingListsOrderedByScore = createMockData()
 
     savedVoc = filemanag.read_vocabulary()
