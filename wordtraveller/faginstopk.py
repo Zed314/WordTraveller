@@ -69,6 +69,13 @@ def push_to_m(m, c, docId, score, nb_of_PL, aggregative_function):
             c[docId] = mean_score
             last_score_of_c = mean_score
             del m[docId]
+    elif nb_of_PL == 1:
+        m[docId] = [score]
+        if(len(m[docId]) == nb_of_PL):
+            mean_score = aggregative_function(m[docId])
+            c[docId] = mean_score
+            last_score_of_c = mean_score
+            del m[docId]
     else:
         m[docId] = [score]
     print('c: {} || m: {}'.format(c, m))
@@ -99,7 +106,7 @@ def get_score_by_doc_id(doc_id, postingListsOrderedById, aggregation_function):
         if(doc_id in postingListsOrderedById[posting_list]):
             score_doc_id = postingListsOrderedById[posting_list][doc_id]
             # TODO: score_doc_id[0] = score, score_doc_id[1] = term frequency
-            all_scores.append(score_doc_id[1])
+            all_scores.append(score_doc_id[0])#1 ou 0 ?
             # Pour mockData()
             # all_scores.append(score_doc_id)
     score = aggregation_function(all_scores)
