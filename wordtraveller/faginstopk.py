@@ -2,6 +2,7 @@ from . import query, analysis
 from . import filemanager as fm
 from sortedcontainers import SortedDict
 from pathlib import Path
+import time
 
 # Vu que les int ne peuvent pas se modifier par reference, j'ai du creer une variable globale
 # Cette variable me sert pour apres savoir si les scores qui restent dans m sont plus grands que ceux déjà existants
@@ -222,14 +223,17 @@ if __name__ == "__main__":
 
     # Applying Top K Algorithm
     postingListsOrderedById, postingListsOrderedByScore = createMockData()
-
+    start = time.time()
     savedVoc = filemanag.read_vocabulary()
-
+    end = time.time()
+    print("Red in {} s".format(end - start))
     print("savedDoc : {}".format(savedVoc))
 
+    start = time.time()
     print(query.get_posting_list(savedVoc, "aa", filemanag))
     topk = apply_top_k_algo(['aa', 'bb'], savedVoc, filemanag, 5)
-    print('result: {}'.format(topk))
+    end = time.time()
+    print('result: {} , done in {}'.format(topk, end - start))
 
     # top_k = find_fagins_top_k(postingListsOrderedById,
     #                           postingListsOrderedByScore, 3)
