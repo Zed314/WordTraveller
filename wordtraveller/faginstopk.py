@@ -1,4 +1,3 @@
-import operator
 from . import query, analysis
 from . import filemanager as fm
 from sortedcontainers import SortedDict
@@ -28,7 +27,7 @@ def apply_top_k_algo(words, voc, filemanager, k):
     posting_lists_ordered_by_score['bb'] = pl_bb
     posting_lists_ordered_by_score['cc'] = pl_cc
 
-    find_fagins_top_k(posting_lists_ordered_by_id,
+    return find_fagins_top_k(posting_lists_ordered_by_id,
                       posting_lists_ordered_by_score, k)
 
 
@@ -197,12 +196,12 @@ def createMockData():
     postingListsOrderedByScore['bbb'] = pl2_score
 
     pl1_id = dict()
-    pl1_id[3] = 0.40
-    pl1_id[1] = 0.50
+    pl1_id[3] = [0.40,5] # query.get_posting_list nous donne [score,tf]
+    pl1_id[1] = [0.50,6]
 
     pl2_id = dict()
-    pl2_id[3] = 0.85
-    pl2_id[1] = 0.74
+    pl2_id[3] = [0.85,5]
+    pl2_id[1] = [0.74,4]
 
     postingListsOrderedById = dict()
     postingListsOrderedById['aaa'] = pl1_id
@@ -232,7 +231,8 @@ if __name__ == "__main__":
     print("savedDoc : {}".format(savedVoc))
 
     print(query.get_posting_list(savedVoc, "aa", filemanag))
-    apply_top_k_algo(['aa', 'bb'], savedVoc, filemanag, 5)
+    topk = apply_top_k_algo(['aa', 'bb'], savedVoc, filemanag, 5)
+    print('result: {}'.format(topk))
 
     # top_k = find_fagins_top_k(postingListsOrderedById,
     #                           postingListsOrderedByScore, 3)

@@ -44,35 +44,35 @@ class TestFaginsTATopK(unittest.TestCase):
         postingListsIndexedByIdSingle['aaa'] = pl1_id
 
 
-        top_k = faginstatopk.find_fagins_top_k(postingListsIndexedById,
+        top_k = faginstatopk.find_fagins_ta(postingListsIndexedById,
                               postingListsOrderedByScore, 3)
         self.assertEqual(top_k, {1:0.875, 2:0.8, 3 : 0.725}, "Topk simple, k = 3")
-        top_k = faginstatopk.find_fagins_top_k(postingListsIndexedById,
+        top_k = faginstatopk.find_fagins_ta(postingListsIndexedById,
                               postingListsOrderedByScore, 4)
         self.assertEqual(top_k, {1:0.875, 2:0.8, 3 : 0.725}, "Topk simple, k = 4")
-        top_k = faginstatopk.find_fagins_top_k(postingListsIndexedById,
+        top_k = faginstatopk.find_fagins_ta(postingListsIndexedById,
                               postingListsOrderedByScore, 2)
         self.assertEqual(top_k, {1:0.875, 2:0.8}, "Topk simple, k = 2")
-        top_k = faginstatopk.find_fagins_top_k(postingListsIndexedById,
+        top_k = faginstatopk.find_fagins_ta(postingListsIndexedById,
                               postingListsOrderedByScore, 1)
         self.assertEqual(top_k, {1:0.875}, "Topk simple, k = 1")
-        top_k = faginstatopk.find_fagins_top_k(postingListsIndexedById,
+        top_k = faginstatopk.find_fagins_ta(postingListsIndexedById,
                              postingListsOrderedByScore, 0)
         self.assertEqual(top_k, {}, "Topk simple, k = 0")
        
-        top_k = faginstatopk.find_fagins_top_k(postingListsIndexedByIdSingle,
+        top_k = faginstatopk.find_fagins_ta(postingListsIndexedByIdSingle,
                               postingListsOrderedByScoreSingle, 3)
         self.assertEqual(top_k, {1:0.9, 2:0.8, 3 : 0.7}, "Topk single, k = 3")
-        top_k = faginstatopk.find_fagins_top_k(postingListsIndexedByIdSingle,
+        top_k = faginstatopk.find_fagins_ta(postingListsIndexedByIdSingle,
                               postingListsOrderedByScoreSingle, 4)
         self.assertEqual(top_k, {1:0.9, 2:0.8, 3 : 0.7}, "Topk single, k = 4")
-        top_k = faginstatopk.find_fagins_top_k(postingListsIndexedByIdSingle,
+        top_k = faginstatopk.find_fagins_ta(postingListsIndexedByIdSingle,
                               postingListsOrderedByScoreSingle, 2)
         self.assertEqual(top_k, {1:0.9, 2:0.8}, "Topk single, k = 2")
-        top_k = faginstatopk.find_fagins_top_k(postingListsIndexedByIdSingle,
+        top_k = faginstatopk.find_fagins_ta(postingListsIndexedByIdSingle,
                               postingListsOrderedByScoreSingle, 1)
         self.assertEqual(top_k, {1:0.9}, "Topk single, k = 1")
-        top_k = faginstatopk.find_fagins_top_k(postingListsIndexedByIdSingle,
+        top_k = faginstatopk.find_fagins_ta(postingListsIndexedByIdSingle,
                              postingListsOrderedByScoreSingle, 0)
         self.assertEqual(top_k, {}, "Topk single, k = 0")
 
@@ -106,22 +106,22 @@ class TestFaginsTATopK(unittest.TestCase):
         postingListsIndexedById = dict()
         postingListsIndexedById['aaa'] = pl1_id
         postingListsIndexedById['bbb'] = pl2_id
-        top_k = faginstatopk.find_fagins_top_k(postingListsIndexedById,
+        top_k = faginstatopk.find_fagins_ta(postingListsIndexedById,
                               postingListsOrderedByScore, 3)
         self.assertEqual(top_k, {1:0.875, 2:0.8500000000000001, 3 : 0.825}, "Topk simple, k = 3")
-        top_k = faginstatopk.find_fagins_top_k(postingListsIndexedById,
+        top_k = faginstatopk.find_fagins_ta(postingListsIndexedById,
                               postingListsOrderedByScore, 4)
         self.assertEqual(top_k, {1:0.875, 2:0.8500000000000001, 3 : 0.825}, "Topk simple, k = 4")
        
-        top_k = faginstatopk.find_fagins_top_k(postingListsIndexedById,
+        top_k = faginstatopk.find_fagins_ta(postingListsIndexedById,
                              postingListsOrderedByScore, 2)
         self.assertEqual(top_k, {1:0.875, 2:0.8500000000000001}, "Topk simple, k = 2")
        
-        top_k = faginstatopk.find_fagins_top_k(postingListsIndexedById,
+        top_k = faginstatopk.find_fagins_ta(postingListsIndexedById,
                               postingListsOrderedByScore, 1)
         self.assertEqual(top_k, {1:0.875}, "Topk simple, k = 1")
         
-        top_k = faginstatopk.find_fagins_top_k(postingListsIndexedById,
+        top_k = faginstatopk.find_fagins_ta(postingListsIndexedById,
                               postingListsOrderedByScore, 0)
         self.assertEqual(top_k, {}, "Topk simple, k = 0")
        

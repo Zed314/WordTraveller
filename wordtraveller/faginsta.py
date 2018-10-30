@@ -1,12 +1,32 @@
-#import operator
-#from . import query, analysis
-#from . import filemanager as fm
+from . import query, analysis
+from . import filemanager as fm
 from sortedcontainers import SortedDict
-#from pathlib import Path
+from pathlib import Path
 
 # Vu que les int ne peuvent pas se modifier par reference, j'ai du creer une variable global
 # Cette variable me sers pour apres savoir si les scores qui restent dans m sont plus grandes que celles déjà existantes
 last_score_of_c = 0
+
+
+def apply_fagins_ta(words, voc, filemanager, k):
+    posting_lists_ordered_by_id = {word: query.get_posting_list(
+        voc, word, filemanager) for word in words}
+    # print("EEL: {}".format(posting_lists_ordered_by_id))
+    pl_aa = SortedDict()
+    pl_aa[3] = [1]
+    pl_aa[2] = [2]
+    pl_aa[1] = [3]
+    pl_bb = SortedDict()
+    pl_bb[1] = [1, 2]
+    pl_cc = SortedDict()
+    pl_cc[1] = [3]
+
+    posting_lists_ordered_by_score = dict()
+    posting_lists_ordered_by_score['aa'] = pl_aa
+    posting_lists_ordered_by_score['bb'] = pl_bb
+    posting_lists_ordered_by_score['cc'] = pl_cc
+    return find_fagins_ta(posting_lists_ordered_by_id,
+                          posting_lists_ordered_by_score, k)
 
 
 def aggregative_function_mean(values):
@@ -17,9 +37,9 @@ def aggregative_function_mean(values):
         Returns the mean of this values.
     """
     sumValues = sum(values)
-    if(len(values) == 0): 
+    if(len(values) == 0):
         return 0
-    else: 
+    else:
         return sumValues/len(values)
 
 
@@ -41,7 +61,7 @@ def compute_mu(docId, postingListsOrderedById, aggregative_function):
     for posting_list_id in postingListsOrderedById:
         if docId in postingListsOrderedById[posting_list_id]:
             values[i] = postingListsOrderedById[posting_list_id][docId]
-            i+=1
+            i += 1
     tmp = [l[0] for l in values[0:i]]
     mu = aggregative_function_mean(tmp)
     return mu
@@ -75,14 +95,14 @@ def get_score_by_doc_id(doc_id, postingListsOrderedById, aggregation_function):
     return score
 
 
-def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k, aggregative_function=aggregative_function_mean):
+def find_fagins_ta(postingListsOrderedById, postingListsOrderedByScore, k, aggregative_function=aggregative_function_mean):
     global last_score_of_c
 
     iterators = dict()
     currentScores = SortedDict()
     # posting_list_id sera le terme de la posting_list
     for posting_list_id in postingListsOrderedByScore:
-        print("posting_list_id {}".format(posting_list_id) )
+        print("posting_list_id {}".format(posting_list_id))
         iterators[posting_list_id] = reversed(
             postingListsOrderedByScore[posting_list_id])
         # next donne la clé
@@ -91,43 +111,44 @@ def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k, ag
         # On initialise la structure de donnees du score
         add_next_score(score, idsDoc, posting_list_id, currentScores)
 
-
     c = dict()
     tau_i = dict()
-    tau = 11 #10 représente ici +l'infini.
-    muMin = 10 #10 représente ici +l'infini.
-    while muMin <= tau : ## TODO: Update the condition
+    tau = 11  # 10 représente ici +l'infini.
+    muMin = 10  # 10 représente ici +l'infini.
+    while muMin <= tau:  # TODO: Update the condition
 
-        #Item is the [Score;[[doc_id 1; pl_id 1];[doc_id 2; pl_id 2]]] where scores
+        # Item is the [Score;[[doc_id 1; pl_id 1];[doc_id 2; pl_id 2]]] where scores
         # is the best unreaded score
-        item = currentScores.popitem()
-        score = item[0]
-        postingListId = item[1][0][1]
-        docId = item[1][0][0]
-        tau_i[postingListId]= score
-        mu = compute_mu(docId, postingListsOrderedById, aggregative_function)
-        if len(c)<(k) :
-            c[docId] = mu
-           # muMin = min(muMin,mu )
-            # Not sure that it changes anything tho
-            muMin = min(c.values())
-        elif muMin < mu and docId not in c:
-            #Remove the document with the smallest score from C
-            for docIdInC in c:
-                if c[docIdInC]==muMin:
-                    c.pop(docIdInC)
-                    break
-            c[docId] = mu
-            muMin = min(c.values())
+        if(len(currentScores) > 0):
+            item = currentScores.popitem()
+            score = item[0]
+            postingListId = item[1][0][1]
+            docId = item[1][0][0]
+            tau_i[postingListId] = score
+            mu = compute_mu(docId, postingListsOrderedById,
+                            aggregative_function)
+            if len(c) < (k):
+                c[docId] = mu
+            # muMin = min(muMin,mu )
+                # Not sure that it changes anything tho
+                muMin = min(c.values())
+            elif muMin < mu and docId not in c:
+                # Remove the document with the smallest score from C
+                for docIdInC in c:
+                    if c[docIdInC] == muMin:
+                        c.pop(docIdInC)
+                        break
+                c[docId] = mu
+                muMin = min(c.values())
 
-        if len(tau_i) == len(postingListsOrderedById):
-            tau = aggregative_function(tau_i.values())
+            if len(tau_i) == len(postingListsOrderedById):
+                tau = aggregative_function(tau_i.values())
+        else:
+            break
 
+        # TODO: check the following not sure it works with faginsTA.
 
-        ## TODO: check the following not sure it works with faginsTA.
-
-
-        #if there is an other document in currentScores with the same score that the curent one
+        # if there is an other document in currentScores with the same score that the curent one
         if(len(item[1]) > 1):
             for doc in item[1]:
                 used_docId = item[1][doc][0]
@@ -145,7 +166,6 @@ def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k, ag
             add_next_score(newScore, idsDoc, postingListId, currentScores)
         except StopIteration:
             print("No more values in postingLists")
-
     return c
 
 
@@ -172,21 +192,20 @@ def createMockData():
     postingListsOrderedByScore['bbb'] = pl2_score
 
     pl1_id = dict()
-    pl1_id[6] = 0.70
-    pl1_id[5] = 0.80
-    pl1_id[4] = 0.60
-    pl1_id[3] = 0.40
-    pl1_id[2] = 0.90
-    pl1_id[1] = 0.50
+    pl1_id[6] = [0.70, 4] # query.get_posting_list nous donne [score,tf]
+    pl1_id[5] = [0.80, 6]
+    pl1_id[4] = [0.60, 3]
+    pl1_id[3] = [0.40, 4]
+    pl1_id[2] = [0.90, 8]
+    pl1_id[1] = [0.50, 3]
 
     pl2_id = dict()
-    pl2_id[1] = 0.74
-    pl2_id[2] = 0.75
-    pl2_id[3] = 0.85
-    pl2_id[4] = 0.70
-    pl2_id[5] = 0.80
-    pl2_id[6] = 0.74
-
+    pl2_id[1] = [0.74, 2]
+    pl2_id[2] = [0.75, 3]
+    pl2_id[3] = [0.85, 4]
+    pl2_id[4] = [0.70, 2]
+    pl2_id[5] = [0.80, 6]
+    pl2_id[6] = [0.74, 4]
 
     postingListsOrderedById = dict()
     postingListsOrderedById['aaa'] = pl1_id
@@ -198,9 +217,22 @@ def createMockData():
 
 if __name__ == "__main__":
 
-    # Applying Top K Algorithm
-    postingListsOrderedById, postingListsOrderedByScore = createMockData()
-    c= find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, 3, aggregative_function_mean)
-    print(c)
-    #top_k = find_fagins_top_k(postingListsOrderedById,
-    #                          postingListsOrderedByScore, 3)
+    # Applying Top K Algorithm to mockData
+    # postingListsOrderedById, postingListsOrderedByScore = createMockData()
+    # c = find_fagins_ta(postingListsOrderedById, postingListsOrderedByScore, 3, aggregative_function_mean)
+    # print("Resulta c : {}".format(c))
+
+    currentWorkspace = './workspace/testfaginsta/'
+    filename = 'test1'
+    filemanag = fm.FileManager(filename, currentWorkspace)
+
+    tempVoc = SortedDict()
+
+    pathlist = Path("./tests/data/test4/").glob('**/la*')
+    for path in pathlist:
+        analysis.analyse_newspaper(path, tempVoc)
+    filemanag.save_vocabularyAndPL_file(tempVoc)
+
+    savedVoc = filemanag.read_vocabulary()
+    faginsta = apply_fagins_ta(['aa', 'bb'], savedVoc, filemanag, 5)
+    print("result faginsTA : {}".format(faginsta))
