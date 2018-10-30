@@ -210,6 +210,11 @@ def createMockData():
 
 
 if __name__ == "__main__":
+
+    # Applying Top K Algorithm to mockdata
+    # postingListsOrderedById, postingListsOrderedByScore = createMockData()
+    # top_k = find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, 3)
+    
     currentWorkspace = './workspace/testalex/'
     filename = 'test1'
     filemanag = fm.FileManager(filename, currentWorkspace)
@@ -221,19 +226,16 @@ if __name__ == "__main__":
         analysis.analyse_newspaper(path, tempVoc)
     filemanag.save_vocabularyAndPL_file(tempVoc)
 
-    # Applying Top K Algorithm
-    postingListsOrderedById, postingListsOrderedByScore = createMockData()
     start = time.time()
     savedVoc = filemanag.read_vocabulary()
     end = time.time()
+
     print("Red in {} s".format(end - start))
     print("savedDoc : {}".format(savedVoc))
 
     start = time.time()
-    print(query.get_posting_list(savedVoc, "aa", filemanag))
+    # print(query.get_posting_list(savedVoc, "aa", filemanag))
     topk = apply_top_k_algo(['aa', 'bb'], savedVoc, filemanag, 5)
     end = time.time()
     print('result: {} , done in {}'.format(topk, end - start))
 
-    # top_k = find_fagins_top_k(postingListsOrderedById,
-    #                           postingListsOrderedByScore, 3)
