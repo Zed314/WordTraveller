@@ -14,10 +14,11 @@ from sortedcontainers import SortedDict
 preprocessor = preprocessing.Preprocessor()
 
 
-def analyse_newspaper(path, voc, computeIDF = False):
+def analyse_newspaper(path, voc, computeIDF=False):
     analyse_newspaper_optimized(path, voc, computeIDF)
 
-def analyse_newspaper_naive(path, voc, computeIDF = False):
+
+def analyse_newspaper_naive(path, voc, computeIDF=False):
 
     raw = path.read_text()
     tree = etree.fromstring("<NEWSPAPER>" + raw + "</NEWSPAPER>")
@@ -32,7 +33,7 @@ def analyse_newspaper_naive(path, voc, computeIDF = False):
         voc_doc = {}
         id_doc = int(document.xpath("./DOCID")[0].text)
         terms = preprocessor.process(text)
-       
+
         terms.append("***NumberDifferentDocs***")
         for term in terms:
             if term in voc_doc:
@@ -49,13 +50,15 @@ def analyse_newspaper_naive(path, voc, computeIDF = False):
     if computeIDF:
         nbDiffDocs = len(voc["***NumberDifferentDocs***"])
         for term, pl in voc.items():
-            
+
             nbDocsWithWord = len(voc[term])
             for idfAndScore in pl.values():
 
-                idfAndScore[0]=(1+math.log(idfAndScore[1]))*math.log(nbDiffDocs/(1+nbDocsWithWord))
+                idfAndScore[0] = (1+math.log(idfAndScore[1])) * \
+                    math.log(nbDiffDocs/(1+nbDocsWithWord))
 
-def analyse_newspaper_optimized(path, voc, computeIDF = False):
+
+def analyse_newspaper_optimized(path, voc, computeIDF=False):
 
     file = open(path, "r")
     currDocId = 0
@@ -95,16 +98,16 @@ def analyse_newspaper_optimized(path, voc, computeIDF = False):
         elif line.startswith("<"):
             pass
         elif isInText and isInParagraph:
-            documentText += line             
+            documentText += line
 
     if computeIDF:
         nbDiffDocs = len(voc["***NumberDifferentDocs***"])
         for term, pl in voc.items():
             nbDocsWithWord = len(voc[term])
             for idfAndScore in pl.values():
-                idfAndScore[0]=(1+math.log(idfAndScore[1]))*math.log(nbDiffDocs/(1+nbDocsWithWord))
+                idfAndScore[0] = (1+math.log(idfAndScore[1])) * \
+                    math.log(nbDiffDocs/(1+nbDocsWithWord))
     file.close()
-
 
 
 if __name__ == "__main__":
@@ -115,18 +118,15 @@ if __name__ == "__main__":
     filemanager = fm.FileManager("test2")
     start = time.time()
 
-
-
     for i, newspaper_path in enumerate(pathlist):
-        if i<4:
-            analyse_newspaper(newspaper_path, vocabulary,True)
+        if i < 4:
+            analyse_newspaper(newspaper_path, vocabulary, True)
             filemanager.save_vocabularyAndPL_file(vocabulary, True)
             vocabulary = SortedDict()
             print('file %s finished!' % i)
     end = time.time()
-    print(end - start)
+    print("newspapers parsed in {} seconds".format(end - start))
     start = time.time()
     filemanager.mergePartialVocsAndPL()
     end = time.time()
-    print(end - start)
-
+    print("merged in {} seconds".format(end - start))
