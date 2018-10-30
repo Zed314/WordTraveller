@@ -42,7 +42,8 @@ def compute_mu(docId, postingListsOrderedById, aggregative_function):
         if docId in postingListsOrderedById[posting_list_id]:
             values[i] = postingListsOrderedById[posting_list_id][docId]
             i+=1
-    mu = aggregative_function_mean(values[0:i])
+    tmp = [l[0] for l in values[0:i]]
+    mu = aggregative_function_mean(tmp)
     return mu
 
 
@@ -74,7 +75,7 @@ def get_score_by_doc_id(doc_id, postingListsOrderedById, aggregation_function):
     return score
 
 
-def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k, aggregative_function):
+def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k, aggregative_function=aggregative_function_mean):
     global last_score_of_c
 
     iterators = dict()
@@ -93,27 +94,23 @@ def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k, ag
 
     c = dict()
     tau_i = dict()
-    tau = 11 #10 représant ici +l'infini.
-    muMin = 10 #10 représant ici +l'infini.
-    while muMin <= tau : ## TODO: Updat the conditaton
-        print('in while')
-        print("Current {}".format(currentScores)) # TODO: sup that
+    tau = 11 #10 représente ici +l'infini.
+    muMin = 10 #10 représente ici +l'infini.
+    while muMin <= tau : ## TODO: Update the condition
+
         #Item is the [Score;[[doc_id 1; pl_id 1];[doc_id 2; pl_id 2]]] where scores
-        #  is the best unreaded score
+        # is the best unreaded score
         item = currentScores.popitem()
         score = item[0]
         postingListId = item[1][0][1]
         docId = item[1][0][0]
         tau_i[postingListId]= score
         mu = compute_mu(docId, postingListsOrderedById, aggregative_function)
-        print("item {}".format(item) )
-        print("c b {}".format(c) )
-        print("muMin b {}".format(muMin) )
-        print("tau b {}".format(tau) )
-        print("mu {}".format(mu) )
         if len(c)<(k) :
             c[docId] = mu
-            muMin = min(muMin,mu )
+           # muMin = min(muMin,mu )
+            # Not sure that it changes anything tho
+            muMin = min(c.values())
         elif muMin < mu and docId not in c:
             #Remove the document with the smallest score from C
             for docIdInC in c:
@@ -122,23 +119,15 @@ def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k, ag
                     break
             c[docId] = mu
             muMin = min(c.values())
+
         if len(tau_i) == len(postingListsOrderedById):
             tau = aggregative_function(tau_i.values())
-        print("c a {}".format(c) )
-        print("muMin a {}".format(muMin) )
-        print("tau a {}".format(tau) )
 
 
+        ## TODO: check the following not sure it works with faginsTA.
 
 
-
-
-
-
-        ## TODO: cheack the following not sur it work with faginsTA.
-
-
-        #if ther is an other document in currentScores withe the same score that the curent one
+        #if there is an other document in currentScores with the same score that the curent one
         if(len(item[1]) > 1):
             for doc in item[1]:
                 used_docId = item[1][doc][0]
@@ -209,7 +198,7 @@ def createMockData():
 
 if __name__ == "__main__":
 
-    # Applying Top K Algorithme
+    # Applying Top K Algorithm
     postingListsOrderedById, postingListsOrderedByScore = createMockData()
     c= find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, 3, aggregative_function_mean)
     print(c)
