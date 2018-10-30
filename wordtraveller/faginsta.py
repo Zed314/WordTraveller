@@ -115,36 +115,33 @@ def find_fagins_ta(postingListsOrderedById, postingListsOrderedByScore, k, aggre
     tau_i = dict()
     tau = 11  # 10 représente ici +l'infini.
     muMin = 10  # 10 représente ici +l'infini.
-    while muMin <= tau:  # TODO: Update the condition
+    while muMin <= tau and len(currentScores) > 0:  # TODO: Update the condition
 
         # Item is the [Score;[[doc_id 1; pl_id 1];[doc_id 2; pl_id 2]]] where scores
         # is the best unreaded score
-        if(len(currentScores) > 0):
-            item = currentScores.popitem()
-            score = item[0]
-            postingListId = item[1][0][1]
-            docId = item[1][0][0]
-            tau_i[postingListId] = score
-            mu = compute_mu(docId, postingListsOrderedById,
-                            aggregative_function)
-            if len(c) < (k):
-                c[docId] = mu
-            # muMin = min(muMin,mu )
-                # Not sure that it changes anything tho
-                muMin = min(c.values())
-            elif muMin < mu and docId not in c:
-                # Remove the document with the smallest score from C
-                for docIdInC in c:
-                    if c[docIdInC] == muMin:
-                        c.pop(docIdInC)
-                        break
-                c[docId] = mu
-                muMin = min(c.values())
+        item = currentScores.popitem()
+        score = item[0]
+        postingListId = item[1][0][1]
+        docId = item[1][0][0]
+        tau_i[postingListId] = score
+        mu = compute_mu(docId, postingListsOrderedById,
+                        aggregative_function)
+        if len(c) < (k):
+            c[docId] = mu
+        # muMin = min(muMin,mu )
+            # Not sure that it changes anything tho
+            muMin = min(c.values())
+        elif muMin < mu and docId not in c:
+            # Remove the document with the smallest score from C
+            for docIdInC in c:
+                if c[docIdInC] == muMin:
+                    c.pop(docIdInC)
+                    break
+            c[docId] = mu
+            muMin = min(c.values())
 
-            if len(tau_i) == len(postingListsOrderedById):
-                tau = aggregative_function(tau_i.values())
-        else:
-            break
+        if len(tau_i) == len(postingListsOrderedById):
+            tau = aggregative_function(tau_i.values())
 
         # TODO: check the following not sure it works with faginsTA.
 

@@ -129,26 +129,23 @@ def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k):
 
     c = dict()
     m = dict()
-    while len(c) < k:
+    while len(c) < k and len(currentScores) > 0:
         print("Current {}".format(currentScores))
-        if(len(currentScores) > 0):
-            item = currentScores.popitem()
-            score = item[0]
-            postingListId = item[1][0][1]
-            docId = item[1][0][0]
-            push_to_m(m, c, docId, score, len(
-                postingListsOrderedByScore), aggregative_function_mean)
-            if(len(item[1]) > 1):
-                for doc in item[1]:
-                    used_docId = item[1][doc][0]
-                    pl_id = item[1][doc][1]
-                    if(not (docId == used_docId and pl_id == postingListId)):
-                        if score not in currentScores:
-                            currentScores[score] = dict()
-                        currentScores[score][len(currentScores[score])] = [
-                            used_docId, pl_id]
-        else:
-            break
+        item = currentScores.popitem()
+        score = item[0]
+        postingListId = item[1][0][1]
+        docId = item[1][0][0]
+        push_to_m(m, c, docId, score, len(
+            postingListsOrderedByScore), aggregative_function_mean)
+        if(len(item[1]) > 1):
+            for doc in item[1]:
+                used_docId = item[1][doc][0]
+                pl_id = item[1][doc][1]
+                if(not (docId == used_docId and pl_id == postingListId)):
+                    if score not in currentScores:
+                        currentScores[score] = dict()
+                    currentScores[score][len(currentScores[score])] = [
+                        used_docId, pl_id]
         # getting next new score and add it to currentScores
         try:
             newScore = next(iterators[postingListId])
