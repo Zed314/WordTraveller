@@ -13,6 +13,9 @@ from sortedcontainers import SortedDict
 
 preprocessor = preprocessing.Preprocessor()
 
+def setPreprocessor(preprocessorToSet):
+    preprocessor = preprocessorToSet
+
 
 def analyse_newspaper(path, voc, computeIDF = False):
     analyse_newspaper_optimized(path, voc, computeIDF)
@@ -106,27 +109,4 @@ def analyse_newspaper_optimized(path, voc, computeIDF = False):
     file.close()
 
 
-
-if __name__ == "__main__":
-
-    pathlist = Path("./data/latimesMini/").glob('**/la*')
-
-    vocabulary = SortedDict()
-    filemanager = fm.FileManager("test2")
-    start = time.time()
-
-
-
-    for i, newspaper_path in enumerate(pathlist):
-        if i<4:
-            analyse_newspaper(newspaper_path, vocabulary,True)
-            filemanager.save_vocabularyAndPL_file(vocabulary, True)
-            vocabulary = SortedDict()
-            print('file %s finished!' % i)
-    end = time.time()
-    print(end - start)
-    start = time.time()
-    filemanager.mergePartialVocsAndPL()
-    end = time.time()
-    print(end - start)
 

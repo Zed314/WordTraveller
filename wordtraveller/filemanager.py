@@ -68,6 +68,9 @@ class FileManager:
         #Get all the PLs and VOCs
         listPartialVocs = self.getListPartialVocs()
         listPartialPLs = self.getListPartialPLs()
+        if(self.getListPartialPLs() == []):
+            # nothing to do here, exiting
+            return
 
         nbLinesRedInVOCs = []
         totalNumberOfDocs = len (listPartialVocs)
