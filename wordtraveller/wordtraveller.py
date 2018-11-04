@@ -4,7 +4,7 @@ import argparse
 def analysis_parameters():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("-f", type=str,
+    parser.add_argument("-d", type=str,
                         help="dossier avec les fichier VOC et PL résultat de l'indexation")
     parser.add_argument("-q", type=str,
                         help="requête des termes separés par un virgule. Ex: voiture,maison ")
