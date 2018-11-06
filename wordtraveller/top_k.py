@@ -56,7 +56,7 @@ if __name__ == "__main__" :
 
     pathlist = Path("./tests/data/test1/").glob('**/la*')
     for path in pathlist:
-        analysis.analyse_newspaper(path, voc)
+        analysis.analyse_newspaper(path, voc,True)
 
     analysis.save_vocabulary(voc, filename, currentWorkspace)
 

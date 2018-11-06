@@ -1,7 +1,7 @@
 from . import filemanager
 from sortedcontainers import SortedDict
 
-def get_posting_list(voc, word, fileManager):
+def get_posting_list(voc, word, fileManager, returnPostingListOrderedByScore = False):
     if word in voc:
         index = voc.index(word)
         if index == 0:
@@ -10,7 +10,7 @@ def get_posting_list(voc, word, fileManager):
         else:
             offset = voc.peekitem(voc.index(word)-1)[1]
             length = voc.get(word) - offset
-        return fileManager.read_postList(offset, length)
+        return fileManager.read_postList(offset, length, returnPostingListOrderedByScore=returnPostingListOrderedByScore)
     else:
         return SortedDict()
 
