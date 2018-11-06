@@ -3,3 +3,4 @@ pathlib == 1.0.1
 lxml == 4.2.5
 sortedcontainers == 2.0.5
 send2trash == 1.5.0
+simple-benchmark == 0.0.7

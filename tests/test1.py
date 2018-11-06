@@ -95,7 +95,7 @@ class TestAnalysis(unittest.TestCase):
         
         filemanager.mergePartialVocsAndPL(False)
 
-        # TODO: changer quand on a une function directe
+        # TODO: changer quand on a   une function directe
         savedVoc = filemanager.read_vocabulary()
         mot = query.get_posting_list(savedVoc,"aa", filemanager)
         print(mot)
