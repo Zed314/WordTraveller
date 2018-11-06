@@ -108,6 +108,6 @@ if __name__ == "__main__" :
     # filemanager.mergePartialVocsAndPL()
     savedVoc = filemanager.read_vocabulary()
     words = ["manipul", 'maniscalco', 'manischewitz']
-    result = naive_top_k_algo(words, savedVoc, filemanager, 10, conjuctive_queries)
+    result = naive_top_k_algo(words, savedVoc, filemanager, 10, disjuctive_queries)
     print("Result: {}".format(result))
 

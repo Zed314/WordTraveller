@@ -19,6 +19,7 @@ def analysis_parameters():
 
     args = parser.parse_args()
     print(args)
+    print("Cest uqou {} {}".format(args.f,args.d))
     filemanager = fm.FileManager(args.f, args.d)
     savedVoc = filemanager.read_vocabulary()
     words = args.q.split(",")
