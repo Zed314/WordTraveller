@@ -104,12 +104,12 @@ if __name__ == "__main__" :
     for i, newspaper_path in enumerate(pathlist):
         if i < 2:
             analysis.analyse_newspaper(newspaper_path, vocabulary, True)
-            filemanager.save_vocabularyAndPL_file(vocabulary, False)
+            filemanager.save_vocabularyAndPL_file(vocabulary, True)
             vocabulary = SortedDict()
             print('file %s finished!' % i)
-    #filemanager.mergePartialVocsAndPL()
+    filemanager.mergePartialVocsAndPL()
     savedVoc = filemanager.read_vocabulary()
-    words = ["bb", "cc"]
+    words = ["cc"]
     naive_top_k_algo(words, savedVoc, filemanager, 3, conjuctive_queries)
     print("**************")
 

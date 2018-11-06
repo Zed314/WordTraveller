@@ -9,11 +9,11 @@ from sortedcontainers import SortedDict
 def analysis_parameters():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("-f", type=str,
+    parser.add_argument("-d", type=str,
                         help="dossier avec les document", required=True)
-    parser.add_argument("-o", type=str,
+    parser.add_argument("-f", type=str,
                         help="nom de fichier pour enregistrer les fichier après l'indexation ", required=True)
-    parser.add_argument("-w", type=str,
+    parser.add_argument("-o", type=str,
                         help="dossier pour enregistrer les fichier après l'indexation ", required=True)
     parser.add_argument("--zip", type=str,
                         help="compression à faire à la fin ")
@@ -22,10 +22,10 @@ def analysis_parameters():
 
     args = parser.parse_args()
     print(args)
-    pathlist = Path(args.f).glob('**/la*')
+    pathlist = Path(args.d).glob('**/la*')
 
     vocabulary = SortedDict()
-    filemanager = fm.FileManager(args.o, args.w)
+    filemanager = fm.FileManager(args.f, args.o)
     for i, newspaper_path in enumerate(pathlist):
         if i < 2:
             analysis.analyse_newspaper(newspaper_path, vocabulary, True)
