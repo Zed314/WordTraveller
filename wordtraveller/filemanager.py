@@ -63,6 +63,12 @@ class FileManager:
             listPartialPLs.append(self.getPathPLScorePartial(i))
         return listPartialPLs
 
+    def getListPartialPLs(self):
+        listPartialPLs = []
+        for i in range(0, self.numberPartialFiles):
+            listPartialPLs.append(self.getPathPLPartial(i))
+        return listPartialPLs
+
     def getListPartialVocs(self):
         listPartialVocs = []
         for i in range(0, self.numberPartialFiles):
