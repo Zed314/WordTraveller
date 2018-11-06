@@ -68,9 +68,10 @@ def aggregate_scores(posting_lists, docs, aggregative_function):
 
 
 def aggregative_function_sum(scores):
+    """ We agregatet the idf score and not the number of occurences"""
     res = 0
     for score in scores:
-        res += score[1]
+        res += score[0]
     return res
 
 
@@ -91,25 +92,25 @@ def aggregative_function_min(scores):
 def find_top_k(aggregated_posting_list, k):
     sorted_list = sorted(aggregated_posting_list.items(), key=operator.itemgetter(1), reverse=True)
     first_k_doc = [x[0] for x in sorted_list[:k] if x[1] != 0]
-    print(first_k_doc)
+    print("Res :"+str(first_k_doc))
     return first_k_doc
 
 if __name__ == "__main__" :
 
 
-    pathlist = Path("./tests/data/test1/").glob('**/la*')
+    pathlist = Path("./tests/data/test4/").glob('**/la*')
 
     vocabulary = SortedDict()
-    filemanager = filemanager.FileManager("test1", "./tests/workspace/test1/")
+    filemanager = filemanager.FileManager("test4", "./workspace/testalex/")
     for i, newspaper_path in enumerate(pathlist):
-        if i < 2:
+        if i < 3:
             analysis.analyse_newspaper(newspaper_path, vocabulary, True)
             filemanager.save_vocabularyAndPL_file(vocabulary, True)
             vocabulary = SortedDict()
             print('file %s finished!' % i)
     filemanager.mergePartialVocsAndPL()
     savedVoc = filemanager.read_vocabulary()
-    words = ["cc"]
-    naive_top_k_algo(words, savedVoc, filemanager, 3, conjuctive_queries)
+
+    naive_top_k_algo(['aa', 'bb'], savedVoc, filemanager, 5, conjuctive_queries)
     print("**************")
 

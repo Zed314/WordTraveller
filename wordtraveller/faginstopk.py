@@ -174,7 +174,7 @@ def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k):
                     break
             c[doc_id] = score
             last_score_of_c = score
-    print('final top {} : {}'.format(k, c))
+    print('final top before resort {} : {}'.format(k, c))
     return c
 
 

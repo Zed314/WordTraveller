@@ -5,6 +5,7 @@ from wordtraveller import faginsta as faginstatopk
 from sortedcontainers import SortedDict
 from wordtraveller import filemanager as fileman
 from wordtraveller import analysis
+from wordtraveller import naivetopk
 from pathlib import Path
 
 class TestFaginsTATopK(unittest.TestCase):
@@ -141,7 +142,8 @@ class TestFaginsTATopK(unittest.TestCase):
         filemanager.mergePartialVocsAndPL()
         savedVoc = filemanager.read_vocabulary()
 
-        naive_top_k_algo(['aa', 'bb'], savedVoc, filemanager, 5, conjuctive_queries)
+        res =naivetopk.naive_top_k_algo(['aa', 'bb'], savedVoc, filemanager, 5, naivetopk.conjuctive_queries)
+        print(res)
         print("**************")
         
 if __name__ == '__main__':
