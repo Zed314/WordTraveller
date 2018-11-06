@@ -19,3 +19,4 @@ The project is built and tested on Python 3.6
 ## Executing tests
 - `python3 -m tests.test[number] -v` (-v parameter for higher verbosity)
 - `python3 -m unittest -v` (to execute all tests)
+
