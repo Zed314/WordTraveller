@@ -48,13 +48,19 @@ class FileManager:
     def getPathPL(self):
         return self.workspace + self.postingListsFileName + self.extensionPL
 
+    def getPathPLScore(self):
+        return self.workspace + self.postingListsFileName + ".score." +self.extensionPL
+
     def getPathPLPartial(self, number):
         return self.workspace + self.postingListsFileName + "." + str(number) + ".temp" + self.extensionPL
 
-    def getListPartialPLs(self):
+    def getPathPLScorePartial(self, number):
+        return self.workspace + self.postingListsFileName + "." + str(number) + ".score.temp" + self.extensionPL
+
+    def getListPartialPLsScore(self):
         listPartialPLs = []
         for i in range(0, self.numberPartialFiles):
-            listPartialPLs.append(self.getPathPLPartial(i))
+            listPartialPLs.append(self.getPathPLScorePartial(i))
         return listPartialPLs
 
     def getListPartialVocs(self):
