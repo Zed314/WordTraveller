@@ -48,13 +48,19 @@ class FileManager:
     def getPathPL(self):
         return self.workspace + self.postingListsFileName + self.extensionPL
 
+    def getPathPLScore(self):
+        return self.workspace + self.postingListsFileName + ".score." +self.extensionPL
+
     def getPathPLPartial(self, number):
         return self.workspace + self.postingListsFileName + "." + str(number) + ".temp" + self.extensionPL
 
-    def getListPartialPLs(self):
+    def getPathPLScorePartial(self, number):
+        return self.workspace + self.postingListsFileName + "." + str(number) + ".score.temp" + self.extensionPL
+
+    def getListPartialPLsScore(self):
         listPartialPLs = []
         for i in range(0, self.numberPartialFiles):
-            listPartialPLs.append(self.getPathPLPartial(i))
+            listPartialPLs.append(self.getPathPLScorePartial(i))
         return listPartialPLs
 
     def getListPartialVocs(self):
@@ -68,6 +74,9 @@ class FileManager:
         #Get all the PLs and VOCs
         listPartialVocs = self.getListPartialVocs()
         listPartialPLs = self.getListPartialPLs()
+        if(self.getListPartialPLs() == []):
+            # nothing to do here, exiting
+            return
 
         nbLinesRedInVOCs = []
         totalNumberOfDocs = len (listPartialVocs)
@@ -274,13 +283,14 @@ class FileManager:
         file.close()
         return voc
 
-    def read_postList(self, offset, length, isPartial=False, number=0):
+    def read_postList(self, offset, length, isPartial=False, number=0, returnPostingListOrderedByScore = False):
         """
         Precondtions:
             offet: is the numbers of paires <Doc Id, Scores> alredy witten in the binary doc
             length: is the number of paires <Doc Id, Scores> to be read
         Postcondtions:
             return a posting list: a dictionary of Doc Id and Scores red between offet and length.
+            return also a posting list sorted by scores : an array of   
         """
         # File to read
         filename = ""
@@ -291,6 +301,7 @@ class FileManager:
 
         file = open(filename, "rb")
         postingList = SortedDict()
+        postingListByScore = SortedDict()
         try:
 
             file.seek(self.CONST_SIZE_ON_DISK*offset)
@@ -302,8 +313,15 @@ class FileManager:
                 score = filed[1]
                 nbOccurenciesInDoc = filed[2]
                 postingList[idDoc] = [score,nbOccurenciesInDoc]
-            return postingList
-            # Do stuff with record
+                if (returnPostingListOrderedByScore):
+                    if score in postingListByScore:
+                        postingListByScore[score].append(idDoc)
+                    else:
+                        postingListByScore[score] = [idDoc]
+            if returnPostingListOrderedByScore :
+                return postingList, postingListByScore
+            else :
+                return postingList
 
         except IOError:
                 # Your error handling here
