@@ -4,7 +4,7 @@ from sortedcontainers import SortedDict
 from pathlib import Path
 
 
-def conjuctive_queries(words, voc, filemanager):
+def conjunctive_queries(words, voc, filemanager):
     posting_lists = [query.get_posting_list(voc, word, filemanager) for word in words]
     # print("**********************posting_lists: {}".format(posting_lists))
     smallest_pl_length = len(posting_lists[0])
@@ -13,6 +13,7 @@ def conjuctive_queries(words, voc, filemanager):
         if len(posting_list) < smallest_pl_length:
             smallest_pl_length = len(posting_list)
             smallest_pl = posting_list
+    
     docs = set()
 
     for doc in smallest_pl:
@@ -31,7 +32,7 @@ def conjuctive_queries(words, voc, filemanager):
     return docs
 
 
-def disjuctive_queries(words, voc, filemanager):
+def disjunctive_queries(words, voc, filemanager):
     posting_lists = [query.get_posting_list(voc, word, filemanager) for word in words]
     # print("pl: {}".format(posting_lists))
     docs = set()
@@ -43,11 +44,13 @@ def disjuctive_queries(words, voc, filemanager):
     return docs
 
 
-#get_docs_func can be conjuctive_queries or disjuctive_queries
+#get_docs_func can be conjunctive_queries or disjunctive_queries
 def naive_top_k_algo(words, voc, filemanager, k, get_docs_func):
     posting_lists = [query.get_posting_list(voc, word, filemanager) for word in words]
+    if not posting_lists[0] : 
+        return []
     docs = get_docs_func(words, voc, filemanager)
-    aggregated_posting_list = aggregate_scores(posting_lists, docs, aggregative_function_sum)
+    aggregated_posting_list = aggregate_scores(posting_lists, docs, aggregative_function_mean)
     return find_top_k(aggregated_posting_list, k)
 
 
@@ -76,7 +79,7 @@ def aggregative_function_sum(scores):
 def aggregative_function_mean(scores):
     res = 0
     for score in scores:
-        res += score
+        res += score[0]
     return res/len(scores)
 
 
@@ -109,6 +112,6 @@ if __name__ == "__main__" :
     # filemanager.mergePartialVocsAndPL()
     savedVoc = filemanager.read_vocabulary()
     words = ["manipul", 'maniscalco', 'manischewitz']
-    result = naive_top_k_algo(words, savedVoc, filemanager, 10, disjuctive_queries)
+    result = naive_top_k_algo(words, savedVoc, filemanager, 10, disjunctive_queries)
     print("Result: {}".format(result))
 

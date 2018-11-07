@@ -106,6 +106,8 @@ def analyse_newspaper_optimized(path, voc, computeIDF=False):
     if computeIDF:
         nbDiffDocs = len(voc["***NumberDifferentDocs***"])
         for term, pl in voc.items():
+            if term == "***NumberDifferentDocs***":
+                continue
             nbDocsWithWord = len(voc[term])
             for idfAndScore in pl.values():
                 idfAndScore[0] = (1+math.log(idfAndScore[1])) * \

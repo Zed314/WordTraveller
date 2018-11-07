@@ -1,10 +1,41 @@
 import unittest
 import os
 import send2trash
-from wordtraveller import faginstopk
+from wordtraveller import faginstopk, filemanager, analysis
 from sortedcontainers import SortedDict
+from pathlib import Path
+import math
 
 class TestFaginsTopK(unittest.TestCase):
+
+    def checkResultApproximative(self, toTest, ref):
+        self.assertEqual(len(toTest),len(ref),"Are the reference and the result to test equal in size ?")
+        for i, refUnit in enumerate(ref):
+            self.assertEqual(toTest[i][0],refUnit[0],"Is document "+str(refUnit[0])+" in position "+str(i)+" ?")
+            self.assertAlmostEqual(toTest[i][1], refUnit[1], places=7, msg="Are the score roughly equals ?")
+
+    def test_topk_trivial_file(self):
+
+        pathlist = Path("./tests/data/testtrivialtopk/").glob('**/la*')
+
+        filemana = filemanager.FileManager("TestFaginsTopK","./tests/workspace/testsfaginstopk")
+        tempVoc = SortedDict()
+        for path in pathlist:
+            analysis.analyse_newspaper(path, tempVoc, True)
+        filemana.save_vocabularyAndPL_file(tempVoc)
+        
+
+        # Extraction of the saved Voc
+        savedVoc = filemana.read_vocabulary()        
+
+        topk = faginstopk.apply_top_k_algo(['aa', 'bb'], savedVoc, filemana, 5)
+        self.checkResultApproximative(topk,[(2,(math.log(3/4)+math.log(3/2))/2)])
+
+        topk = faginstopk.apply_top_k_algo(['bb'], savedVoc, filemana, 5)
+        self.checkResultApproximative(topk,[(2,math.log(3/2))])
+
+        topk = faginstopk.apply_top_k_algo(['cc'], savedVoc, filemana, 5)
+        self.checkResultApproximative(topk,[])
 
     def test_topk_trivial(self):
         pl1_score = SortedDict()

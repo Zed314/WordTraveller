@@ -9,22 +9,14 @@ last_score_of_c = 0
 
 
 def apply_fagins_ta(words, voc, filemanager, k):
-    posting_lists_ordered_by_id = {word: query.get_posting_list(
-        voc, word, filemanager) for word in words}
-    # print("EEL: {}".format(posting_lists_ordered_by_id))
-    pl_aa = SortedDict()
-    pl_aa[3] = [1]
-    pl_aa[2] = [2]
-    pl_aa[1] = [3]
-    pl_bb = SortedDict()
-    pl_bb[1] = [1, 2]
-    pl_cc = SortedDict()
-    pl_cc[1] = [3]
-
-    posting_lists_ordered_by_score = dict()
-    posting_lists_ordered_by_score['aa'] = pl_aa
-    posting_lists_ordered_by_score['bb'] = pl_bb
-    posting_lists_ordered_by_score['cc'] = pl_cc
+    posting_lists_ordered_by_id = SortedDict()
+    posting_lists_ordered_by_score = SortedDict()
+    for word in words:
+        orderedById, orderedByScore = query.get_posting_list(
+        voc, word, filemanager, returnPostingListOrderedByScore = True)
+        if orderedById and orderedByScore:
+            posting_lists_ordered_by_score[word] = orderedByScore
+            posting_lists_ordered_by_id[word] = orderedById
     return find_fagins_ta(posting_lists_ordered_by_id,
                           posting_lists_ordered_by_score, k)
 

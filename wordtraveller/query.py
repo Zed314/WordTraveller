@@ -12,7 +12,10 @@ def get_posting_list(voc, word, fileManager, returnPostingListOrderedByScore = F
             length = voc.get(word) - offset
         return fileManager.read_postList(offset, length, returnPostingListOrderedByScore=returnPostingListOrderedByScore)
     else:
-        return SortedDict()
+        if(returnPostingListOrderedByScore):
+            return SortedDict(), SortedDict()
+        else:
+            return SortedDict()
 
 
 
