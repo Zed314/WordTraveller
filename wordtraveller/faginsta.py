@@ -2,7 +2,7 @@ from . import query, analysis
 from . import filemanager as fm
 from sortedcontainers import SortedDict
 from pathlib import Path
-
+import operator
 # Vu que les int ne peuvent pas se modifier par reference, j'ai du creer une variable global
 # Cette variable me sers pour apres savoir si les scores qui restent dans m sont plus grandes que celles déjà existantes
 last_score_of_c = 0
@@ -163,7 +163,8 @@ def find_fagins_ta(postingListsOrderedById, postingListsOrderedByScore, k, aggre
             add_next_score(newScore, idsDoc, postingListId, currentScores)
         except StopIteration:
             print("No more values in postingLists")
-    return c
+
+    return sorted(c.items(),key=operator.itemgetter(1),reverse=True)
 
 
 def createMockData():
@@ -227,9 +228,9 @@ if __name__ == "__main__":
 
     pathlist = Path("./tests/data/test4/").glob('**/la*')
     for path in pathlist:
-        analysis.analyse_newspaper(path, tempVoc)
+        analysis.analyse_newspaper(path, tempVoc, True)
     filemanag.save_vocabularyAndPL_file(tempVoc)
 
     savedVoc = filemanag.read_vocabulary()
-    faginsta = apply_fagins_ta(['aa', 'bb'], savedVoc, filemanag, 5)
+    faginsta = apply_fagins_ta(['aa', 'bb'], savedVoc, filemanag, 2)
     print("result faginsTA : {}".format(faginsta))

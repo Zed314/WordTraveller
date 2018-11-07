@@ -3,6 +3,7 @@ from . import filemanager as fm
 from sortedcontainers import SortedDict
 from pathlib import Path
 import time
+import operator
 
 # Vu que les int ne peuvent pas se modifier par reference, j'ai du creer une variable globale
 # Cette variable me sert pour apres savoir si les scores qui restent dans m sont plus grands que ceux déjà existants
@@ -122,7 +123,8 @@ def get_score_by_doc_id(doc_id, postingListsOrderedById, aggregation_function):
 
 def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k):
     global last_score_of_c
-
+    """ Returns the top k element in an array of tuples, where the first member
+    of a tuple is the doc id and the second is the score """
     iterators = dict()
     currentScores = SortedDict()
     # posting_list_id sera le terme de la posting_list
@@ -174,7 +176,8 @@ def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k):
                     break
             c[doc_id] = score
             last_score_of_c = score
-    print('final top before resort {} : {}'.format(k, c))
+    # We sort depending on the score, in the descending order
+    c = sorted(c.items(),key=operator.itemgetter(1),reverse=True)
     return c
 
 
