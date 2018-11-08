@@ -23,7 +23,7 @@ def analysis_parameters():
     filemanager = fm.FileManager(args.f, args.d)
     savedVoc = filemanager.read_vocabulary()
     words = args.q.split(",")
-    result = naivetopk.naive_top_k_algo(words, savedVoc, filemanager, 3, naivetopk.conjuctive_queries)
+    result = naivetopk.naive_top_k_algo(words, savedVoc, filemanager, 3, naivetopk.conjunctive_queries)
     print("query result: {}".format(result))
 
 
