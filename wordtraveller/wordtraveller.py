@@ -31,7 +31,7 @@ def analysis_parameters():
     "faginsTA": faginsta.apply_fagins_ta}
     algoFunct = switchAlgo[args.algo]
     words = args.q.split(",")
-    result = algoFunct(words, savedVoc, filemanager, n)
+    result = algoFunct(words, savedVoc, filemanager, args.n)
     print("query result: {}".format(result))
 
 

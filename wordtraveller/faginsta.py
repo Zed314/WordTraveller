@@ -21,21 +21,22 @@ def apply_fagins_ta(words, voc, filemanager, k):
                           posting_lists_ordered_by_score, k)
 
 
-def aggregative_function_mean(values):
+def aggregative_function_mean(values, nb_of_PL):
     """
     Preconditions:
         values: array of values (int or float).
+        nb_of_PL: the number of postingList
     Postconditions:
         Returns the mean of this values.
     """
     sumValues = sum(values)
-    if(len(values) == 0):
+    if(nb_of_PL == 0):
         return 0
     else:
-        return sumValues/len(values)
+        return sumValues/nb_of_PL
 
 
-def compute_mu(docId, postingListsOrderedById, aggregative_function):
+def compute_mu(docId, postingListsOrderedById, nb_of_PL, aggregative_function):
     """
     Preconditions:
         docId: Id of a document,
@@ -55,7 +56,7 @@ def compute_mu(docId, postingListsOrderedById, aggregative_function):
             values[i] = postingListsOrderedById[posting_list_id][docId]
             i += 1
     tmp = [l[0] for l in values[0:i]]
-    mu = aggregative_function_mean(tmp)
+    mu = aggregative_function(tmp, nb_of_PL)
     return mu
 
 
@@ -77,6 +78,7 @@ def add_next_score(score, idsDoc, pl_id, current_scores):
         current_scores[score][len(current_scores[score])] = [idDoc, pl_id]
 
 
+# n'as pas l'aire d'étre utiliser ailleur
 def get_score_by_doc_id(doc_id, postingListsOrderedById, aggregation_function):
     score = 0
     all_scores = []
@@ -107,7 +109,8 @@ def find_fagins_ta(postingListsOrderedById, postingListsOrderedByScore, k, aggre
     tau_i = dict()
     tau = 11  # 10 représente ici +l'infini.
     muMin = 10  # 10 représente ici +l'infini.
-    while muMin <= tau and len(currentScores) > 0:  # TODO: Update the condition
+    nb_of_PL = len(postingListsOrderedById)
+    while muMin <= tau and len(currentScores) > 0:  
 
         # Item is the [Score;[[doc_id 1; pl_id 1];[doc_id 2; pl_id 2]]] where scores
         # is the best unreaded score
@@ -116,7 +119,7 @@ def find_fagins_ta(postingListsOrderedById, postingListsOrderedByScore, k, aggre
         postingListId = item[1][0][1]
         docId = item[1][0][0]
         tau_i[postingListId] = score
-        mu = compute_mu(docId, postingListsOrderedById,
+        mu = compute_mu(docId, postingListsOrderedById, nb_of_PL,
                         aggregative_function)
         if len(c) < (k):
             c[docId] = mu
@@ -133,9 +136,8 @@ def find_fagins_ta(postingListsOrderedById, postingListsOrderedByScore, k, aggre
             muMin = min(c.values())
 
         if len(tau_i) == len(postingListsOrderedById):
-            tau = aggregative_function(tau_i.values())
+            tau = aggregative_function(tau_i.values(),nb_of_PL)
 
-        # TODO: check the following not sure it works with faginsTA.
 
         # if there is an other document in currentScores with the same score that the curent one
         if(len(item[1]) > 1):
