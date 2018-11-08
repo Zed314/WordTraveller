@@ -3,6 +3,8 @@ from . import filemanager as fm
 from . import naivetopk
 from . import faginsta
 from . import faginstopk
+from . import view
+
 
 def analysis_parameters():
     parser = argparse.ArgumentParser()
@@ -19,6 +21,10 @@ def analysis_parameters():
                         help="nombre de résultats souhaité de documents ")
     parser.add_argument("--algo", type=str,default="naive",
                         help="algorithme souhaité pour l'indexation ")
+    parser.add_argument("--view", type=str,default="simple",
+                        help="type de visulasation simple ou fullText ")
+    parser.add_argument("--vpath", type=str,default="./data/latimesMini/",
+                        help="path des fichier sources pour --view fullText")
 
     args = parser.parse_args()
     print(args)
@@ -32,7 +38,11 @@ def analysis_parameters():
     algoFunct = switchAlgo[args.algo]
     words = args.q.split(",")
     result = algoFunct(words, savedVoc, filemanager, args.n)
-    print("query result: {}".format(result))
+
+    switchView = {"simple": view.displayResults,
+    "fullText": view.displayResultsText}
+    viewFunct = switchView[args.view]
+    viewFunct(result, args.vpath)
 
 
 if __name__ == "__main__":
