@@ -24,7 +24,7 @@ def apply_top_k_algo(words, voc, filemanager, k):
                       posting_lists_ordered_by_score, k)
 
 
-def aggregative_function_mean(values):
+def aggregative_function_mean(values, nb_of_PL):
     """
     Preconditions:
         values: array of values (int or float).
@@ -32,10 +32,10 @@ def aggregative_function_mean(values):
         Returns the mean of this values.
     """
     sumValues = sum(values)
-    if(len(values) == 0):
+    if(nb_of_PL == 0):
         return 0
     else:
-        return sumValues/len(values)
+        return sumValues/nb_of_PL
 
 
 def push_to_m(m, c, docId, score, nb_of_PL, aggregative_function):
@@ -48,7 +48,7 @@ def push_to_m(m, c, docId, score, nb_of_PL, aggregative_function):
         nb_of_PL: number of posting lists used in the algorithm.
     Postconditions:
         The function save the tuple [docId,score] to m.
-        If the tuple has been already seen by all the posting list apply 
+        If the tuple has been already seen by all the posting list apply
         aggregation function to and save the result to c.
     """
     global last_score_of_c
@@ -56,7 +56,7 @@ def push_to_m(m, c, docId, score, nb_of_PL, aggregative_function):
         # print('[{}],[{}],[{}],[{}]'.format(m[docId],nb_of_PL,len(m[docId]),docId))
         m[docId] += [score]
         if(len(m[docId]) == nb_of_PL):
-            mean_score = aggregative_function(m[docId])
+            mean_score = aggregative_function(m[docId],nb_of_PL)
             # print('calculMean: {}|{}|{}'.format(docId,m[docId],mean_score))
             c[docId] = mean_score
             last_score_of_c = mean_score
@@ -64,7 +64,7 @@ def push_to_m(m, c, docId, score, nb_of_PL, aggregative_function):
     elif nb_of_PL == 1:
         m[docId] = [score]
         if(len(m[docId]) == nb_of_PL):
-            mean_score = aggregative_function(m[docId])
+            mean_score = aggregative_function(m[docId],nb_of_PL)
             c[docId] = mean_score
             last_score_of_c = mean_score
             del m[docId]
@@ -91,7 +91,7 @@ def add_next_score(score, idsDoc, pl_id, current_scores):
         current_scores[score][len(current_scores[score])] = [idDoc, pl_id]
 
 
-def get_score_by_doc_id(doc_id, postingListsOrderedById, aggregation_function):
+def get_score_by_doc_id(doc_id, postingListsOrderedById, nb_of_PL, aggregation_function):
     score = 0
     all_scores = []
     for posting_list in postingListsOrderedById:
@@ -101,7 +101,7 @@ def get_score_by_doc_id(doc_id, postingListsOrderedById, aggregation_function):
             all_scores.append(score_doc_id[0])#1 ou 0 ?
             # Pour mockData()
             # all_scores.append(score_doc_id)
-    score = aggregation_function(all_scores)
+    score = aggregation_function(all_scores, nb_of_PL)
     return score
 
 
@@ -123,14 +123,14 @@ def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k):
 
     c = dict()
     m = dict()
+    nb_of_PL = len(postingListsOrderedById)
     while len(c) < k and len(currentScores) > 0:
         print("Current {}".format(currentScores))
         item = currentScores.popitem()
         score = item[0]
         postingListId = item[1][0][1]
         docId = item[1][0][0]
-        push_to_m(m, c, docId, score, len(
-            postingListsOrderedByScore), aggregative_function_mean)
+        push_to_m(m, c, docId, score, nb_of_PL, aggregative_function_mean)
         if(len(item[1]) > 1):
             for doc in item[1]:
                 used_docId = item[1][doc][0]
@@ -151,7 +151,7 @@ def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k):
     # Verify if there is a better score in the values seen (m)
     for doc_id in m:
         score = get_score_by_doc_id(
-            doc_id, postingListsOrderedById, aggregative_function_mean)
+            doc_id, postingListsOrderedById, nb_of_PL, aggregative_function_mean)
         if(score > last_score_of_c):
             # TODO: regarder s'il y a moyen de ne pas faire for loop
             for c_value in c:
@@ -208,7 +208,7 @@ if __name__ == "__main__":
     # Applying Top K Algorithm to mockdata
     # postingListsOrderedById, postingListsOrderedByScore = createMockData()
     # top_k = find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, 3)
-    
+
     currentWorkspace = './workspace/testalex/'
     filename = 'test1'
     filemanag = fm.FileManager(filename, currentWorkspace)
@@ -232,4 +232,3 @@ if __name__ == "__main__":
     topk = apply_top_k_algo(['aa', 'bb'], savedVoc, filemanag, 5)
     end = time.time()
     print('result: {} , done in {}'.format(topk, end - start))
-
