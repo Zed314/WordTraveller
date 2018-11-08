@@ -20,6 +20,7 @@ def apply_top_k_algo(words, voc, filemanager, k):
         if orderedById and orderedByScore:
             posting_lists_ordered_by_score[word] = orderedByScore
             posting_lists_ordered_by_id[word] = orderedById
+    print(posting_lists_ordered_by_score)
     return find_fagins_top_k(posting_lists_ordered_by_id,
                       posting_lists_ordered_by_score, k)
 
@@ -70,7 +71,7 @@ def push_to_m(m, c, docId, score, nb_of_PL, aggregative_function):
             del m[docId]
     else:
         m[docId] = [score]
-    print('c: {} || m: {}'.format(c, m))
+    #print('c: {} || m: {}'.format(c, m))
 
 
 def add_next_score(score, idsDoc, pl_id, current_scores):
@@ -125,7 +126,7 @@ def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k):
     m = dict()
     nb_of_PL = len(postingListsOrderedById)
     while len(c) < k and len(currentScores) > 0:
-        print("Current {}".format(currentScores))
+        #print("Current {}".format(currentScores))
         item = currentScores.popitem()
         score = item[0]
         postingListId = item[1][0][1]
@@ -198,8 +199,8 @@ def createMockData():
     postingListsOrderedById = dict()
     postingListsOrderedById['aaa'] = pl1_id
     postingListsOrderedById['bbb'] = pl2_id
-    print('postingListsOrderedById : {}'.format(postingListsOrderedById))
-    print('postingListsOrderedByScore : {}'.format(postingListsOrderedByScore))
+    #print('postingListsOrderedById : {}'.format(postingListsOrderedById))
+    #print('postingListsOrderedByScore : {}'.format(postingListsOrderedByScore))
     return postingListsOrderedById, postingListsOrderedByScore
 
 
