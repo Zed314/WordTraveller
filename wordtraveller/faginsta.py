@@ -156,7 +156,8 @@ def find_fagins_ta(postingListsOrderedById, postingListsOrderedByScore, k, aggre
             idsDoc = postingListsOrderedByScore[postingListId][newScore]
             add_next_score(newScore, idsDoc, postingListId, currentScores)
         except StopIteration:
-            print("No more values in postingLists")
+            pass
+            # print("No more values in postingLists")
 
     return sorted(c.items(),key=operator.itemgetter(1),reverse=True)
 

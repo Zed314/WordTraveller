@@ -6,7 +6,7 @@ def displayResults(results, path):
         for i, result in enumerate(results):
             id = result[0]
             score = result[1]
-            print('{} . DocID[{}] - Score({})'.format(i+1, id, score))
+            print('{}. DocID[{}] - Score({})'.format(i+1, id, score))
             # print ("postion: {}".format(i+1))
             # print ("score: {}".format(score))
             # print ("doc id: {}".format(id))

@@ -11,15 +11,20 @@ last_score_of_c = 0
 
 
 def apply_top_k_algo(words, voc, filemanager, k):
-
+    print("WORDS: {}".format(words))
     posting_lists_ordered_by_id = SortedDict()
     posting_lists_ordered_by_score = SortedDict()
     for word in words:
+        print("WORDK: {}".format(word))
         orderedById, orderedByScore = query.get_posting_list(
         voc, word, filemanager, returnPostingListOrderedByScore = True)
+        # print("RETURNED: {}||| {}".format(orderedById, orderedByScore))
         if orderedById and orderedByScore:
             posting_lists_ordered_by_score[word] = orderedByScore
             posting_lists_ordered_by_id[word] = orderedById
+            print("EEEO")
+    print('Result findla {},{}'.format(posting_lists_ordered_by_id,
+                      posting_lists_ordered_by_score))
     return find_fagins_top_k(posting_lists_ordered_by_id,
                       posting_lists_ordered_by_score, k)
 
@@ -70,7 +75,7 @@ def push_to_m(m, c, docId, score, nb_of_PL, aggregative_function):
             del m[docId]
     else:
         m[docId] = [score]
-    print('c: {} || m: {}'.format(c, m))
+    # print('c: {} || m: {}'.format(c, m))
 
 
 def add_next_score(score, idsDoc, pl_id, current_scores):
@@ -125,7 +130,7 @@ def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k):
     m = dict()
     nb_of_PL = len(postingListsOrderedById)
     while len(c) < k and len(currentScores) > 0:
-        print("Current {}".format(currentScores))
+        # print("Current {}".format(currentScores))
         item = currentScores.popitem()
         score = item[0]
         postingListId = item[1][0][1]
@@ -146,7 +151,8 @@ def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k):
             idsDoc = postingListsOrderedByScore[postingListId][newScore]
             add_next_score(newScore, idsDoc, postingListId, currentScores)
         except StopIteration:
-            print("No more values in postingLists")
+            pass
+            # print("No more values in postingLists")
 
     # Verify if there is a better score in the values seen (m)
     for doc_id in m:
