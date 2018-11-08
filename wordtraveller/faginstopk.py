@@ -11,20 +11,19 @@ last_score_of_c = 0
 
 
 def apply_top_k_algo(words, voc, filemanager, k):
-    print("WORDS: {}".format(words))
+    # print("WORDS: {}".format(words))
     posting_lists_ordered_by_id = SortedDict()
     posting_lists_ordered_by_score = SortedDict()
     for word in words:
-        print("WORDK: {}".format(word))
+        # print("WORDK: {}".format(word))
         orderedById, orderedByScore = query.get_posting_list(
         voc, word, filemanager, returnPostingListOrderedByScore = True)
         # print("RETURNED: {}||| {}".format(orderedById, orderedByScore))
         if orderedById and orderedByScore:
             posting_lists_ordered_by_score[word] = orderedByScore
             posting_lists_ordered_by_id[word] = orderedById
-            print("EEEO")
-    print('Result findla {},{}'.format(posting_lists_ordered_by_id,
-                      posting_lists_ordered_by_score))
+            # print("EEEO")
+    # print('Result findla {},{}'.format(posting_lists_ordered_by_id,posting_lists_ordered_by_score))
     return find_fagins_top_k(posting_lists_ordered_by_id,
                       posting_lists_ordered_by_score, k)
 
@@ -36,6 +35,7 @@ def aggregative_function_mean(values, nb_of_PL):
     Postconditions:
         Returns the mean of this values.
     """
+    # print("Agregative: {} @ {}".format(values,nb_of_PL))
     sumValues = sum(values)
     if(nb_of_PL == 0):
         return 0
@@ -160,10 +160,14 @@ def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k):
             doc_id, postingListsOrderedById, nb_of_PL, aggregative_function_mean)
         if(score > last_score_of_c):
             # TODO: regarder s'il y a moyen de ne pas faire for loop
-            for c_value in c:
-                if(c[c_value] == last_score_of_c):
-                    del c[c_value]
-                    break
+            if(len(c) == k):
+                for c_value in c:
+                    if(c[c_value] == last_score_of_c):
+                        del c[c_value]
+                        break
+            c[doc_id] = score
+            last_score_of_c = score
+        elif(len(c) < k):
             c[doc_id] = score
             last_score_of_c = score
     # We sort depending on the score, in the descending order
