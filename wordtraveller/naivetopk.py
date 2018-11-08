@@ -45,7 +45,7 @@ def disjunctive_queries(words, voc, filemanager):
 
 
 #get_docs_func can be conjunctive_queries or disjunctive_queries
-def naive_top_k_algo(words, voc, filemanager, k, get_docs_func):
+def naive_top_k_algo(words, voc, filemanager, k, get_docs_func=conjunctive_queries):
     posting_lists = [query.get_posting_list(voc, word, filemanager) for word in words]
     if not posting_lists[0] : 
         return []
