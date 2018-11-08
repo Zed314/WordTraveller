@@ -27,7 +27,6 @@ def analysis_parameters():
     vocabulary = SortedDict()
     filemanager = fm.FileManager(args.f, args.o)
     for i, newspaper_path in enumerate(pathlist):
-        if i < 2:
             analysis.analyse_newspaper(newspaper_path, vocabulary, True)
             filemanager.save_vocabularyAndPL_file(vocabulary, True)
             vocabulary = SortedDict()

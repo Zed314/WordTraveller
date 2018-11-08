@@ -204,8 +204,8 @@ def createMockData():
     postingListsOrderedById = dict()
     postingListsOrderedById['aaa'] = pl1_id
     postingListsOrderedById['bbb'] = pl2_id
-    print('postingListsOrderedById : {}'.format(postingListsOrderedById))
-    print('postingListsOrderedByScore : {}'.format(postingListsOrderedByScore))
+    #print('postingListsOrderedById : {}'.format(postingListsOrderedById))
+    #print('postingListsOrderedByScore : {}'.format(postingListsOrderedByScore))
     return postingListsOrderedById, postingListsOrderedByScore
 
 
