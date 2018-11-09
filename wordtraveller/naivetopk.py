@@ -47,7 +47,7 @@ def disjunctive_queries(words, voc, filemanager):
 #get_docs_func can be conjunctive_queries or disjunctive_queries
 def naive_top_k_algo(words, voc, filemanager, epsilon, k, get_docs_func=disjunctive_queries):
     posting_lists = [query.get_posting_list(voc, word, filemanager) for word in words]
-    if not posting_lists[0] :
+    if all((not posting_list) for posting_list in posting_lists):
         return []
     docs = get_docs_func(words, voc, filemanager)
     aggregated_posting_list = aggregate_scores(posting_lists, docs, aggregative_function_mean)

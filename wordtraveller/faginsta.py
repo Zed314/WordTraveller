@@ -3,6 +3,7 @@ from . import filemanager as fm
 from sortedcontainers import SortedDict
 from pathlib import Path
 import operator
+
 # Vu que les int ne peuvent pas se modifier par reference, j'ai du creer une variable global
 # Cette variable me sers pour apres savoir si les scores qui restent dans m sont plus grandes que celles déjà existantes
 last_score_of_c = 0
@@ -96,7 +97,10 @@ def find_fagins_ta(postingListsOrderedById, postingListsOrderedByScore, epsilon,
     currentScores = SortedDict()
     # posting_list_id sera le terme de la posting_list
     for posting_list_id in postingListsOrderedByScore:
+<<<<<<< HEAD
+=======
         print("posting_list_id {}".format(posting_list_id))
+>>>>>>> 1cdb305ea472c9e3c7df28a08c222ddb561fea27
         iterators[posting_list_id] = reversed(
             postingListsOrderedByScore[posting_list_id])
         # next donne la clé
