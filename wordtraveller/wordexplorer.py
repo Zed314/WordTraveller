@@ -6,7 +6,7 @@ import wordtraveller.faginstopk as faginstopk
 import wordtraveller.view as view
 import wordtraveller.preprocessing as preprocessing
 
-preprocessor = preprocessing.Preprocessor()
+preprocessor = preprocessing.Preprocessor(True)
 
 def analysis_parameters():
     parser = argparse.ArgumentParser()
