@@ -4,7 +4,9 @@ from . import naivetopk
 from . import faginsta
 from . import faginstopk
 from . import view
+from . import preprocessing
 
+preprocessor = preprocessing.Preprocessor()
 
 def analysis_parameters():
     parser = argparse.ArgumentParser()
@@ -38,7 +40,7 @@ def analysis_parameters():
                   "faginsTA": faginsta.apply_fagins_ta}
 
     algoFunct = switchAlgo[args.algo]
-    words = args.q.split(",")
+    words = preprocessor.process(args.q)
     result = algoFunct(words, savedVoc, filemanager, epsilon, args.n)
 
     switchView = {"simple": view.displayResults,
