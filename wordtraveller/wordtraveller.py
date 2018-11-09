@@ -31,13 +31,15 @@ def analysis_parameters():
     filemanager = fm.FileManager(args.f, args.d)
     savedVoc = filemanager.read_vocabulary()
 
+    epsilon = 1
+
     switchAlgo = {"naive": naivetopk.naive_top_k_algo,
                   "fagins": faginstopk.apply_top_k_algo,
                   "faginsTA": faginsta.apply_fagins_ta}
 
     algoFunct = switchAlgo[args.algo]
     words = args.q.split(",")
-    result = algoFunct(words, savedVoc, filemanager, args.n)
+    result = algoFunct(words, savedVoc, filemanager, epsilon, args.n)
 
     switchView = {"simple": view.displayResults,
                   "fullText": view.displayResultsText}

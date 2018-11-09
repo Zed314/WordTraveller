@@ -8,7 +8,7 @@ import operator
 last_score_of_c = 0
 
 
-def apply_fagins_ta(words, voc, filemanager, k):
+def apply_fagins_ta(words, voc, filemanager, epsilon, k):
     posting_lists_ordered_by_id = SortedDict()
     posting_lists_ordered_by_score = SortedDict()
     for word in words:
@@ -18,7 +18,7 @@ def apply_fagins_ta(words, voc, filemanager, k):
             posting_lists_ordered_by_score[word] = orderedByScore
             posting_lists_ordered_by_id[word] = orderedById
     return find_fagins_ta(posting_lists_ordered_by_id,
-                          posting_lists_ordered_by_score, k)
+                          posting_lists_ordered_by_score, epsilon, k)
 
 
 def aggregative_function_mean(values, nb_of_PL):
@@ -89,7 +89,7 @@ def get_score_by_doc_id(doc_id, postingListsOrderedById, aggregation_function):
     return score
 
 
-def find_fagins_ta(postingListsOrderedById, postingListsOrderedByScore, k, aggregative_function=aggregative_function_mean):
+def find_fagins_ta(postingListsOrderedById, postingListsOrderedByScore, epsilon, k, aggregative_function=aggregative_function_mean):
     global last_score_of_c
 
     iterators = dict()
@@ -107,10 +107,10 @@ def find_fagins_ta(postingListsOrderedById, postingListsOrderedByScore, k, aggre
 
     c = dict()
     tau_i = dict()
-    tau = 11  # 10 représente ici +l'infini.
-    muMin = 10  # 10 représente ici +l'infini.
+    tau = 101  # 100 représente ici +l'infini.
+    muMin = 100  # 10 représente ici +l'infini.
     nb_of_PL = len(postingListsOrderedById)
-    while muMin <= tau and len(currentScores) > 0:
+    while (muMin <= tau/(1 + epsilon) or len(c) < (k))and len(currentScores) > 0 :
 
         # Item is the [Score;[[doc_id 1; pl_id 1];[doc_id 2; pl_id 2]]] where scores
         # is the best unreaded score
