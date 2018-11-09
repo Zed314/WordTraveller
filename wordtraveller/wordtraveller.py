@@ -37,6 +37,7 @@ def analysis_parameters():
 
     algoFunct = switchAlgo[args.algo]
     words = args.q.split(",")
+    
     result = algoFunct(words, savedVoc, filemanager, args.n)
 
     switchView = {"simple": view.displayResults,
