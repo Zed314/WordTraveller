@@ -10,7 +10,7 @@ import operator
 last_score_of_c = 0
 
 
-def apply_top_k_algo(words, voc, filemanager, k):
+def apply_top_k_algo(words, voc, filemanager, epsilon, k):
     # print("WORDS: {}".format(words))
     posting_lists_ordered_by_id = SortedDict()
     posting_lists_ordered_by_score = SortedDict()
