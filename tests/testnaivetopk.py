@@ -46,13 +46,13 @@ class TestNaiveTopK(unittest.TestCase):
         self.checkResultApproximative(topk,[])
     
         topk = naivetopk.naive_top_k_algo(['bb'], savedVoc, filemana, 5, naivetopk.disjunctive_queries)
-        self.checkResultApproximative(topk,[(2,math.log(3/2))])
+        self.checkResultApproximative(topk,[(2, math.log(3/2))])
 
-        topk = naivetopk.naive_top_k_algo(['aa', 'bb'], savedVoc, filemana, 1 , naivetopk.disjunctive_queries)
-        self.checkResultApproximative(topk,[(2,(math.log(3/4)+math.log(3/2))/2)])
+        topk = naivetopk.naive_top_k_algo(['aa', 'bb'], savedVoc, filemana, 1, naivetopk.disjunctive_queries)
+        self.checkResultApproximative(topk,[(2, (math.log(3/4)+math.log(3/2))/2)])
 
-        topk = naivetopk.naive_top_k_algo(['aa', 'bb','cc'], savedVoc, filemana,1 , naivetopk.disjunctive_queries)
-        self.checkResultApproximative(topk,[(2,(math.log(3/4)+math.log(3/2))/3)])
+        topk = naivetopk.naive_top_k_algo(['aa', 'bb','cc'], savedVoc, filemana, 1, naivetopk.disjunctive_queries)
+        self.checkResultApproximative(topk,[(2, (math.log(3/4)+math.log(3/2))/3)])
 
     def test_topk_trivial(self):
         

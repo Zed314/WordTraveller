@@ -10,19 +10,23 @@ def analysis_parameters():
     parser = argparse.ArgumentParser()
 
     parser.add_argument("-d", type=str,
-                        help="dossier avec les document", required=True)
+                        help="dossier avec les documents", required=True)
     parser.add_argument("-f", type=str,
-                        help="nom de fichier pour enregistrer les fichier après l'indexation ", required=True)
+                        help="nom de fichier pour enregistrer les fichiers après l'indexation ", required=True)
     parser.add_argument("-o", type=str, default='./workspace/',
-                        help="dossier pour enregistrer les fichier après l'indexation ")
+                        help="dossier pour enregistrer les fichiers après l'indexation ")
     parser.add_argument("--zip", type=str,
                         help="compression à faire à la fin ")
     parser.add_argument("--algo", type=str,
                         help="algorithme souhaité pour l'indexation ")
 
     args = parser.parse_args()
-    # print(args)
+
+    if not args.d.endswith("/"):
+        path = args.d + "/"
+
     pathlist = Path(args.d).glob('**/la*')
+
 
     vocabulary = SortedDict()
     filemanager = fm.FileManager(args.f, args.o)
