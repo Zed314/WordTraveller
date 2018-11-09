@@ -96,7 +96,7 @@ def find_fagins_ta(postingListsOrderedById, postingListsOrderedByScore, epsilon,
     currentScores = SortedDict()
     # posting_list_id sera le terme de la posting_list
     for posting_list_id in postingListsOrderedByScore:
-#        print("posting_list_id {}".format(posting_list_id))
+        print("posting_list_id {}".format(posting_list_id))
         iterators[posting_list_id] = reversed(
             postingListsOrderedByScore[posting_list_id])
         # next donne la clé
@@ -110,7 +110,6 @@ def find_fagins_ta(postingListsOrderedById, postingListsOrderedByScore, epsilon,
     tau = 101  # 100 représente ici +l'infini.
     muMin = 100  # 10 représente ici +l'infini.
     nb_of_PL = len(postingListsOrderedById)
-    print (len(c) < (k))
     while (muMin <= tau/(1 + epsilon) or len(c) < (k))and len(currentScores) > 0 :
 
         # Item is the [Score;[[doc_id 1; pl_id 1];[doc_id 2; pl_id 2]]] where scores
@@ -158,7 +157,7 @@ def find_fagins_ta(postingListsOrderedById, postingListsOrderedByScore, epsilon,
             add_next_score(newScore, idsDoc, postingListId, currentScores)
         except StopIteration:
             pass
-            """ No more values in postingLists """
+            # print("No more values in postingLists")
 
     return sorted(c.items(),key=operator.itemgetter(1),reverse=True)
 
