@@ -4,6 +4,7 @@ import wordtraveller.naivetopk as naivetopk
 import wordtraveller.faginsta as faginsta
 import wordtraveller.faginstopk as faginstopk
 import wordtraveller.view as view
+import wordtraveller.preprocessing as preprocessing
 
 preprocessor = preprocessing.Preprocessor()
 
