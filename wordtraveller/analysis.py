@@ -14,6 +14,7 @@ from sortedcontainers import SortedDict
 preprocessor = preprocessing.Preprocessor()
 
 def setPreprocessor(preprocessorToSet):
+    global preprocessor
     preprocessor = preprocessorToSet
 
 

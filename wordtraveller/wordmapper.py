@@ -1,9 +1,9 @@
 import wordtraveller.filemanager as fm
 import wordtraveller.analysis as analysis
+import wordtraveller.preprocessing as preprocessing
 import argparse
 from pathlib import Path
 from sortedcontainers import SortedDict
-
 
 
 def analysis_parameters():
@@ -18,7 +18,9 @@ def analysis_parameters():
     parser.add_argument("--zip", type=str,
                         help="compression à faire à la fin ")
     parser.add_argument("--partial", action='store_true',
-                        help='sum the integers (default: find the max)')
+                        help='enregistrer les fichiers de manière partiale')
+    parser.add_argument("--stemmer", action='store_true',
+                        help='activer stemmer')
     args = parser.parse_args()
 
     if not args.d.endswith("/"):
@@ -29,6 +31,8 @@ def analysis_parameters():
 
     vocabulary = SortedDict()
     filemanager = fm.FileManager(args.f, args.o)
+    if args.stemmer:
+        analysis.setPreprocessor(preprocessing.Preprocessor(True))
     for i, newspaper_path in enumerate(pathlist):
             analysis.analyse_newspaper(newspaper_path, vocabulary, True)
             if args.partial:

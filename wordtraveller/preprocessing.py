@@ -5,7 +5,7 @@ import tempfile
 
 class Preprocessor:
 
-    def __init__(self, activate_stemmer=True):
+    def __init__(self, activate_stemmer=False):
         nltk.download('stopwords', download_dir=tempfile.gettempdir())
         nltk.data.path.append(tempfile.gettempdir())
         self.regex_money = re.compile(r'(\$€¥)\d+((\.\d+)?(\s(million|billion))?)?')
