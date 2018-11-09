@@ -107,10 +107,11 @@ def find_fagins_ta(postingListsOrderedById, postingListsOrderedByScore, epsilon,
 
     c = dict()
     tau_i = dict()
-    tau = 100  # 10 représente ici +l'infini.
-    muMin = 10  # 10 représente ici +l'infini.
+    tau = 101  # 100 représente ici +l'infini.
+    muMin = 100  # 10 représente ici +l'infini.
     nb_of_PL = len(postingListsOrderedById)
-    while muMin <= tau/(1 + epsilon) and len(currentScores) > 0:
+    print (len(c) < (k))
+    while (muMin <= tau/(1 + epsilon) or len(c) < (k))and len(currentScores) > 0 :
 
         # Item is the [Score;[[doc_id 1; pl_id 1];[doc_id 2; pl_id 2]]] where scores
         # is the best unreaded score
