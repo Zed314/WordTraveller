@@ -5,12 +5,13 @@ import tempfile
 
 class Preprocessor:
 
-    def __init__(self, activateStemmer= True):
+    def __init__(self, activate_stemmer=True):
         nltk.download('stopwords', download_dir=tempfile.gettempdir())
         nltk.data.path.append(tempfile.gettempdir())
         self.regex_money = re.compile(r'(\$€¥)\d+((\.\d+)?(\s(million|billion))?)?')
         self.regex_number = re.compile(     r'\d+((\.\d+)?(\s(million|billion))?)?')
-        if(activateStemmer == True):
+        self.stemmer = None
+        if activate_stemmer:
             self.stemmer = nltk.stem.PorterStemmer()
         self.tokenizer = nltk.tokenize.RegexpTokenizer(r'([\w\-\<\>]+)')
         self.stopwords = set(nltk.corpus.stopwords.words('english'))
@@ -22,10 +23,8 @@ class Preprocessor:
         words = self.tokenizer.tokenize(text)
         for word in words:
             term = word.lower()
-            if(self.stemmer == False):
+            if self.stemmer is not None:
                 term = self.stemmer.stem(term)
             if term not in self.stopwords:
                 terms.append(term)
         return terms
-
-
