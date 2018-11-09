@@ -1,5 +1,5 @@
-from . import filemanager as fm
-from . import analysis
+import wordtraveller.filemanager as fm
+import wordtraveller.analysis as analysis
 import argparse
 from pathlib import Path
 from sortedcontainers import SortedDict

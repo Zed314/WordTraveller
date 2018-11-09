@@ -1,10 +1,9 @@
 import argparse
-from . import filemanager as fm
-from . import naivetopk
-from . import faginsta
-from . import faginstopk
-from . import view
-from . import preprocessing
+import wordtraveller.filemanager as fm
+import wordtraveller.naivetopk as naivetopk
+import wordtraveller.faginsta as faginsta
+import wordtraveller.faginstopk as faginstopk
+import wordtraveller.view as view
 
 preprocessor = preprocessing.Preprocessor()
 
