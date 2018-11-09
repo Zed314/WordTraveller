@@ -1,10 +1,12 @@
 import argparse
-from . import filemanager as fm
-from . import naivetopk
-from . import faginsta
-from . import faginstopk
-from . import view
+import wordtraveller.filemanager as fm
+import wordtraveller.naivetopk as naivetopk
+import wordtraveller.faginsta as faginsta
+import wordtraveller.faginstopk as faginstopk
+import wordtraveller.view as view
+import wordtraveller.preprocessing as preprocessing
 
+preprocessor = preprocessing.Preprocessor(True)
 
 def analysis_parameters():
     parser = argparse.ArgumentParser()
@@ -38,7 +40,7 @@ def analysis_parameters():
                   "faginsTA": faginsta.apply_fagins_ta}
 
     algoFunct = switchAlgo[args.algo]
-    words = args.q.split(",")
+    words = preprocessor.process(args.q)
     result = algoFunct(words, savedVoc, filemanager, epsilon, args.n)
 
     switchView = {"simple": view.displayResults,

@@ -1,8 +1,10 @@
-from . import query, analysis
-from . import filemanager as fm
+import wordtraveller.filemanager as fm
+import wordtraveller.query as query
+import wordtraveller.analysis as analysis
 from sortedcontainers import SortedDict
 from pathlib import Path
 import operator
+
 # Vu que les int ne peuvent pas se modifier par reference, j'ai du creer une variable global
 # Cette variable me sers pour apres savoir si les scores qui restent dans m sont plus grandes que celles déjà existantes
 last_score_of_c = 0
@@ -96,7 +98,7 @@ def find_fagins_ta(postingListsOrderedById, postingListsOrderedByScore, epsilon,
     currentScores = SortedDict()
     # posting_list_id sera le terme de la posting_list
     for posting_list_id in postingListsOrderedByScore:
-        print("posting_list_id {}".format(posting_list_id))
+        # print("posting_list_id {}".format(posting_list_id))
         iterators[posting_list_id] = reversed(
             postingListsOrderedByScore[posting_list_id])
         # next donne la clé
@@ -227,5 +229,5 @@ if __name__ == "__main__":
     filemanag.save_vocabularyAndPL_file(tempVoc)
 
     savedVoc = filemanag.read_vocabulary()
-    faginsta = apply_fagins_ta(['aa', 'bb'], savedVoc, filemanag, 2)
+    faginsta = apply_fagins_ta(['aa', 'bb'], savedVoc, filemanag,0.2, 2)
     print("result faginsTA : {}".format(faginsta))
