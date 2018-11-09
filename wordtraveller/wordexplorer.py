@@ -1,9 +1,9 @@
 import argparse
-from . import filemanager as fm
-from . import naivetopk
-from . import faginsta
-from . import faginstopk
-from . import view
+import wordtraveller.filemanager as fm
+import wordtraveller.naivetopk as naivetopk
+import wordtraveller.faginsta as faginsta
+import wordtraveller.faginstopk as faginstopk
+import wordtraveller.view as view
 
 
 def analysis_parameters():
@@ -39,12 +39,8 @@ def analysis_parameters():
 
     algoFunct = switchAlgo[args.algo]
     words = args.q.split(",")
-<<<<<<< HEAD
-    
-    result = algoFunct(words, savedVoc, filemanager, args.n)
-=======
+
     result = algoFunct(words, savedVoc, filemanager, epsilon, args.n)
->>>>>>> 1cdb305ea472c9e3c7df28a08c222ddb561fea27
 
     switchView = {"simple": view.displayResults,
                   "fullText": view.displayResultsText}

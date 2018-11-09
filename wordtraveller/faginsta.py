@@ -1,5 +1,6 @@
-from . import query, analysis
-from . import filemanager as fm
+import wordtraveller.filemanager as fm
+import wordtraveller.query as query
+import wordtraveller.analysis as analysis
 from sortedcontainers import SortedDict
 from pathlib import Path
 import operator
