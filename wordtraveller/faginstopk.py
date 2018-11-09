@@ -10,7 +10,7 @@ import operator
 last_score_of_c = 0
 
 
-def apply_top_k_algo(words, voc, filemanager, epsilon, k):
+def apply_top_k_algo(words, voc, filemanager, epsilon, k, typeRequest = 'disjunctive'):
     # print("WORDS: {}".format(words))
     posting_lists_ordered_by_id = SortedDict()
     posting_lists_ordered_by_score = SortedDict()
@@ -25,7 +25,7 @@ def apply_top_k_algo(words, voc, filemanager, epsilon, k):
             # print("EEEO")
     # print('Result findla {},{}'.format(posting_lists_ordered_by_id,posting_lists_ordered_by_score))
     return find_fagins_top_k(posting_lists_ordered_by_id,
-                      posting_lists_ordered_by_score, k)
+                      posting_lists_ordered_by_score, k, typeRequest)
 
 
 def aggregative_function_mean(values, nb_of_PL):
@@ -110,7 +110,7 @@ def get_score_by_doc_id(doc_id, postingListsOrderedById, nb_of_PL, aggregation_f
     return score
 
 
-def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k):
+def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k, typeRequest = 'disjunctive'):
     global last_score_of_c
     """ Returns the top k element in an array of tuples, where the first member
     of a tuple is the doc id and the second is the score """
@@ -167,7 +167,7 @@ def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k):
                         break
             c[doc_id] = score
             last_score_of_c = score
-        elif(len(c) < k):
+        elif(len(c) < k and typeRequest == 'disjunctive'):
             c[doc_id] = score
             last_score_of_c = score
     # We sort depending on the score, in the descending order
@@ -239,6 +239,6 @@ if __name__ == "__main__":
 
     start = time.time()
     # print(query.get_posting_list(savedVoc, "aa", filemanag))
-    topk = apply_top_k_algo(['aa', 'bb'], savedVoc, filemanag, 5)
+    topk = apply_top_k_algo(['aa', 'bb'], savedVoc, filemanag, 5, 'disjunctive')
     end = time.time()
     print('result: {} , done in {}'.format(topk, end - start))
