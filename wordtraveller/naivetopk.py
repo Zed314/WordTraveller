@@ -13,7 +13,7 @@ def conjunctive_queries(words, voc, filemanager):
         if len(posting_list) < smallest_pl_length:
             smallest_pl_length = len(posting_list)
             smallest_pl = posting_list
-    
+
     docs = set()
 
     for doc in smallest_pl:
@@ -45,9 +45,9 @@ def disjunctive_queries(words, voc, filemanager):
 
 
 #get_docs_func can be conjunctive_queries or disjunctive_queries
-def naive_top_k_algo(words, voc, filemanager, k, get_docs_func=disjunctive_queries):
+def naive_top_k_algo(words, voc, filemanager, epsilon, k, get_docs_func=disjunctive_queries):
     posting_lists = [query.get_posting_list(voc, word, filemanager) for word in words]
-    if not posting_lists[0] : 
+    if not posting_lists[0] :
         return []
     docs = get_docs_func(words, voc, filemanager)
     aggregated_posting_list = aggregate_scores(posting_lists, docs, aggregative_function_mean)
@@ -114,4 +114,3 @@ if __name__ == "__main__" :
     words = ["manipul", 'maniscalco', 'manischewitz']
     result = naive_top_k_algo(words, savedVoc, filemanager, 10, disjunctive_queries)
     print("Result: {}".format(result))
-
