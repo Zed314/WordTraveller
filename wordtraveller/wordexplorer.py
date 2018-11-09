@@ -5,6 +5,7 @@ import wordtraveller.faginsta as faginsta
 import wordtraveller.faginstopk as faginstopk
 import wordtraveller.view as view
 
+preprocessor = preprocessing.Preprocessor()
 
 def analysis_parameters():
     parser = argparse.ArgumentParser()
@@ -38,8 +39,7 @@ def analysis_parameters():
                   "faginsTA": faginsta.apply_fagins_ta}
 
     algoFunct = switchAlgo[args.algo]
-    words = args.q.split(",")
-
+    words = preprocessor.process(args.q)
     result = algoFunct(words, savedVoc, filemanager, epsilon, args.n)
 
     switchView = {"simple": view.displayResults,
