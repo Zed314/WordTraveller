@@ -28,15 +28,15 @@ class TestFaginsTopK(unittest.TestCase):
         # Extraction of the saved Voc
         savedVoc = filemana.read_vocabulary()        
 
-        topk = faginstopk.apply_top_k_algo(['aa', 'bb'], savedVoc, filemana, 5)
+        topk = faginstopk.apply_top_k_algo(['aa', 'bb'], savedVoc, filemana,0, 5)
         print("::::: {}".format(topk))
         # TODO: Disjunctive/conjonctive
         self.checkResultApproximative(topk,[(2,(math.log(3/4)+math.log(3/2))/2)])
 
-        topk = faginstopk.apply_top_k_algo(['bb'], savedVoc, filemana, 5)
+        topk = faginstopk.apply_top_k_algo(['bb'], savedVoc, filemana,0, 5)
         self.checkResultApproximative(topk,[(2,math.log(3/2))])
 
-        topk = faginstopk.apply_top_k_algo(['cc'], savedVoc, filemana, 5)
+        topk = faginstopk.apply_top_k_algo(['cc'], savedVoc, filemana,0, 5)
         self.checkResultApproximative(topk,[])
 
     def test_topk_trivial(self):

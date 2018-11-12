@@ -1,8 +1,8 @@
 
 import re
 import nltk
-from . import filemanager as fm
-from . import preprocessing
+import wordtraveller.filemanager as fm
+import wordtraveller.preprocessing as preprocessing
 import math
 import time
 
@@ -14,6 +14,7 @@ from sortedcontainers import SortedDict
 preprocessor = preprocessing.Preprocessor()
 
 def setPreprocessor(preprocessorToSet):
+    global preprocessor
     preprocessor = preprocessorToSet
 
 

@@ -1,4 +1,4 @@
-from . import filemanager
+import wordtraveller.filemanager as filemanager
 from sortedcontainers import SortedDict
 
 def get_posting_list(voc, word, fileManager, returnPostingListOrderedByScore = False):

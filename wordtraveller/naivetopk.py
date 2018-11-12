@@ -1,5 +1,7 @@
 import operator
-from . import query, filemanager, analysis
+import wordtraveller.query as query
+import wordtraveller.filemanager as filemanager
+import wordtraveller.analysis as analysis
 from sortedcontainers import SortedDict
 from pathlib import Path
 
@@ -69,7 +71,7 @@ def aggregate_scores(posting_lists, docs, aggregative_function):
 
 
 def aggregative_function_sum(scores):
-    """ We agregatet the idf score and not the number of occurences"""
+    """ We agregated the idf score and not the number of occurences"""
     res = 0
     for score in scores:
         res += score[0]

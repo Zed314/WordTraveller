@@ -1,9 +1,9 @@
-from . import filemanager as fm
-from . import analysis
+import wordtraveller.filemanager as fm
+import wordtraveller.analysis as analysis
+import wordtraveller.preprocessing as preprocessing
 import argparse
 from pathlib import Path
 from sortedcontainers import SortedDict
-
 
 
 def analysis_parameters():
@@ -17,9 +17,10 @@ def analysis_parameters():
                         help="dossier pour enregistrer les fichiers après l'indexation ")
     parser.add_argument("--zip", type=str,
                         help="compression à faire à la fin ")
-    parser.add_argument("--algo", type=str,
-                        help="algorithme souhaité pour l'indexation ")
-
+    parser.add_argument("--partial", action='store_true',
+                        help='enregistrer les fichiers de manière partiale')
+    parser.add_argument("--stemmer", action='store_true',
+                        help='activer stemmer')
     args = parser.parse_args()
 
     if not args.d.endswith("/"):
@@ -30,12 +31,18 @@ def analysis_parameters():
 
     vocabulary = SortedDict()
     filemanager = fm.FileManager(args.f, args.o)
+    if args.stemmer:
+        analysis.setPreprocessor(preprocessing.Preprocessor(True))
     for i, newspaper_path in enumerate(pathlist):
             analysis.analyse_newspaper(newspaper_path, vocabulary, True)
-            filemanager.save_vocabularyAndPL_file(vocabulary, True)
+            if args.partial:
+                filemanager.save_vocabularyAndPL_file(vocabulary, True)
+            else:
+                filemanager.save_vocabularyAndPL_file(vocabulary, False)
             vocabulary = SortedDict()
             print('file %s finished!' % i)
-    filemanager.mergePartialVocsAndPL()
+    if args.partial:
+        filemanager.mergePartialVocsAndPL()
     print("PL and VOC merged succesfully")
 
 if __name__ == "__main__" :
