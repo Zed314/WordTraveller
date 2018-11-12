@@ -97,10 +97,7 @@ def find_fagins_ta(postingListsOrderedById, postingListsOrderedByScore, epsilon,
     currentScores = SortedDict()
     # posting_list_id sera le terme de la posting_list
     for posting_list_id in postingListsOrderedByScore:
-<<<<<<< HEAD
-=======
         print("posting_list_id {}".format(posting_list_id))
->>>>>>> 1cdb305ea472c9e3c7df28a08c222ddb561fea27
         iterators[posting_list_id] = reversed(
             postingListsOrderedByScore[posting_list_id])
         # next donne la clé

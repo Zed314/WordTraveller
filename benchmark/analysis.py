@@ -8,12 +8,13 @@ from sortedcontainers import SortedDict
 import wordtraveller.filemanager as fm
 import wordtraveller.preprocessing as preprocessing
 import argparse
+from enum import Enum
 
 @profile
 def analyseProfile(nbNewspaper, path = "./latimes/", flushEvery = 1, analysisApproach = analysis.analyse_newspaper, mergeInTheEnd = True,  useStemmer=True):
   analyse(nbNewspaper, path, flushEvery, analysisApproach, mergeInTheEnd)
 
-def analyse(nbNewspaper, path = "./latimes/", flushEvery = 1, analysisApproach = analysis.analyse_newspaper, mergeInTheEnd = True,  useStemmer=True):
+def analyse(nbNewspaper, path = "./latimes/", flushEvery = 1, analysisApproach = analysis.analyse_newspaper, mergeInTheEnd = True,  useStemmer=True, sizeDocument = medium):
   """
   This benchmark will analyse documents, put the VOC and PL in memory
   and eventually flush it to the hardrive if requested. 
