@@ -34,15 +34,15 @@ def analysis_parameters():
     if args.stemmer:
         analysis.setPreprocessor(preprocessing.Preprocessor(True))
     for i, newspaper_path in enumerate(pathlist):
-            analysis.analyse_newspaper(newspaper_path, vocabulary, True)
-            if args.partial:
-                filemanager.save_vocabularyAndPL_file(vocabulary, True)
-            else:
-                filemanager.save_vocabularyAndPL_file(vocabulary, False)
+        analysis.analyse_newspaper(newspaper_path, vocabulary, True)
+        if args.partial:
+            filemanager.save_vocabularyAndPL_file(vocabulary, True)
             vocabulary = SortedDict()
-            print('file %s finished!' % i)
+        print('file %s finished!' % i)
     if args.partial:
         filemanager.mergePartialVocsAndPL()
+    else:
+        filemanager.save_vocabularyAndPL_file(vocabulary)
     print("PL and VOC merged succesfully")
 
 if __name__ == "__main__" :
