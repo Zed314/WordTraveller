@@ -8,7 +8,6 @@ from sortedcontainers import SortedDict
 import wordtraveller.filemanager as fm
 import wordtraveller.preprocessing as preprocessing
 import argparse
-from enum import Enum
 
 @profile
 def analyseProfile(nbNewspaper, path = "./latimes/", flushEvery = 1, analysisApproach = analysis.analyse_newspaper, mergeInTheEnd = True,  useStemmer=True):

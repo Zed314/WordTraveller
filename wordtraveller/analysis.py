@@ -18,11 +18,11 @@ def setPreprocessor(preprocessorToSet):
     preprocessor = preprocessorToSet
 
 
-def analyse_newspaper(path, voc, computeIDF=False):
-    analyse_newspaper_optimized(path, voc, computeIDF)
+def analyse_newspaper(path, voc, computeIDF=False, nbDocToStart = 0, nbDocToScan = -1):
+    return analyse_newspaper_optimized(path, voc, computeIDF, nbDocToStart, nbDocToScan)
 
 
-def analyse_newspaper_naive(path, voc, computeIDF=False):
+def analyse_newspaper_naive(path, voc, computeIDF=False, nbDocToStart = 0, nbDocToScan = -1):
 
     raw = path.read_text()
     tree = etree.fromstring("<NEWSPAPER>" + raw + "</NEWSPAPER>")
@@ -62,19 +62,27 @@ def analyse_newspaper_naive(path, voc, computeIDF=False):
                     math.log(nbDiffDocs/(1+nbDocsWithWord))
 
 
-def analyse_newspaper_optimized(path, voc, computeIDF=False):
+def analyse_newspaper_optimized(path, voc, computeIDF=False, nbDocToStart = 0, nbDocToScan = -1):
 
+    """ Returns the number of docs that were scanned """
     file = open(path, "r")
     currDocId = 0
     isInText = False
     isInParagraph = False
-
+    currDoc = 0
+    nbDocScanned = 0
     documentText = ""
     for line in file:
         if line.startswith("<DOCID>"):
             currDocId = int(line[len("<DOCID> "):-len(" </DOCID>\n")])
         elif line.startswith("</DOC>"):
             # We use the data we accumulate during the process
+            if nbDocToStart > currDoc:
+                voc_doc = {}
+                documentText = ""
+                currDoc += 1
+                continue
+            
             voc_doc = {}
             terms = preprocessor.process(documentText)
             terms.append("***NumberDifferentDocs***")
@@ -91,6 +99,10 @@ def analyse_newspaper_optimized(path, voc, computeIDF=False):
                     voc[term] = SortedDict()
                     voc[term][currDocId] = [0, occurrences]
             documentText = ""
+            currDoc += 1
+            nbDocScanned += 1
+            if nbDocScanned == nbDocToScan and nbDocToScan !=-1:
+                break
         elif line.startswith("<TEXT>"):
             isInText = True
         elif line.startswith("</TEXT>"):
@@ -102,6 +114,8 @@ def analyse_newspaper_optimized(path, voc, computeIDF=False):
         elif line.startswith("<"):
             pass
         elif isInText and isInParagraph:
+            if nbDocToStart > currDoc:
+                continue
             documentText += line
 
     if computeIDF:
@@ -114,5 +128,6 @@ def analyse_newspaper_optimized(path, voc, computeIDF=False):
                 idfAndScore[0] = (1+math.log(idfAndScore[1])) * \
                     math.log(nbDiffDocs/(1+nbDocsWithWord))
     file.close()
+    return nbDocScanned
 
 
