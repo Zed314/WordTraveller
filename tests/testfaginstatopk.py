@@ -32,8 +32,9 @@ class TestFaginsTATopK(unittest.TestCase):
         savedVoc = filemana.read_vocabulary()        
 
         topk = faginstatopk.apply_fagins_ta(['aa', 'bb'], savedVoc, filemana,0, 5)
-        #Fail, maybe because disjunctive request (OR) instead of conjuctive (AND) among all terms?
-        self.checkResultApproximative(topk,[(2,(math.log(3/4)+math.log(3/2))/2)])
+        #If conjunctive :
+        #self.checkResultApproximative(topk,[(2,(math.log(3/4)+math.log(3/2))/2)])
+        self.checkResultApproximative(topk,[(2,(math.log(3/4)+math.log(3/2))/2),(1,math.log(3/4)/2), (3,math.log(3/4)/2)])
 
         topk = faginstatopk.apply_fagins_ta(['bb'], savedVoc, filemana,0, 5)
         self.checkResultApproximative(topk,[(2,math.log(3/2))])

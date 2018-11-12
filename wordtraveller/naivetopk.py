@@ -95,7 +95,6 @@ def aggregative_function_min(scores):
 def find_top_k(aggregated_posting_list, k):
     sorted_list = sorted(aggregated_posting_list.items(), key=operator.itemgetter(1), reverse=True)
     first_k_doc = [x for x in sorted_list[:k] if x[1] != 0]
-    # print('Result first_k_doc: {}'.format(first_k_doc))
     return first_k_doc
 
 if __name__ == "__main__" :

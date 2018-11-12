@@ -82,7 +82,8 @@ def analyse_newspaper_optimized(path, voc, computeIDF=False, nbDocToStart = 0, n
                 documentText = ""
                 currDoc += 1
                 continue
-            
+            if nbDocToScan == currDoc:
+                break
             voc_doc = {}
             terms = preprocessor.process(documentText)
             terms.append("***NumberDifferentDocs***")

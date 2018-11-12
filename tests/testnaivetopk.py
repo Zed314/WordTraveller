@@ -30,28 +30,28 @@ class TestNaiveTopK(unittest.TestCase):
         # Extraction of the saved Voc
         savedVoc = filemana.read_vocabulary()        
 #naivetopk.naive_top_k_algo(['aa', 'bb'], savedVoc, filemanager, 5, 
-        topk = naivetopk.naive_top_k_algo(['aa', 'bb'], savedVoc, filemana,5 , naivetopk.conjunctive_queries)
-        self.checkResultApproximative(topk,[(2,(math.log(3/4)+math.log(3/2))/2)])
+      #  topk = naivetopk.naive_top_k_algo(['aa', 'bb'], savedVoc, filemana,5 , naivetopk.conjunctive_queries)
+     #   self.checkResultApproximative(topk,[(2,(math.log(3/4)+math.log(3/2))/2)])
 
-        topk = naivetopk.naive_top_k_algo(['bb'], savedVoc, filemana, 5, naivetopk.conjunctive_queries)
+        topk = naivetopk.naive_top_k_algo(['bb'], savedVoc, filemana,0, 5, naivetopk.conjunctive_queries)
         self.checkResultApproximative(topk,[(2,math.log(3/2))])
 
-        topk = naivetopk.naive_top_k_algo(['cc'], savedVoc, filemana, 5, naivetopk.conjunctive_queries)
+        topk = naivetopk.naive_top_k_algo(['cc'], savedVoc, filemana,0, 5, naivetopk.conjunctive_queries)
         self.checkResultApproximative(topk,[])
 
-        topk = naivetopk.naive_top_k_algo(['cc','dd'], savedVoc, filemana, 5, naivetopk.conjunctive_queries)
+        topk = naivetopk.naive_top_k_algo(['cc','dd'], savedVoc, filemana,0, 5, naivetopk.conjunctive_queries)
         self.checkResultApproximative(topk,[])
 
-        topk = naivetopk.naive_top_k_algo(['cc','dd'], savedVoc, filemana, 5, naivetopk.disjunctive_queries)
+        topk = naivetopk.naive_top_k_algo(['cc','dd'], savedVoc, filemana,0, 5, naivetopk.disjunctive_queries)
         self.checkResultApproximative(topk,[])
     
-        topk = naivetopk.naive_top_k_algo(['bb'], savedVoc, filemana, 5, naivetopk.disjunctive_queries)
+        topk = naivetopk.naive_top_k_algo(['bb'], savedVoc, filemana, 0 ,5, naivetopk.disjunctive_queries)
         self.checkResultApproximative(topk,[(2, math.log(3/2))])
 
-        topk = naivetopk.naive_top_k_algo(['aa', 'bb'], savedVoc, filemana, 1, naivetopk.disjunctive_queries)
+        topk = naivetopk.naive_top_k_algo(['aa', 'bb'], savedVoc, filemana, 0, 1, naivetopk.disjunctive_queries)
         self.checkResultApproximative(topk,[(2, (math.log(3/4)+math.log(3/2))/2)])
 
-        topk = naivetopk.naive_top_k_algo(['aa', 'bb','cc'], savedVoc, filemana, 1, naivetopk.disjunctive_queries)
+        topk = naivetopk.naive_top_k_algo(['aa', 'bb','cc'], savedVoc, filemana,0, 1, naivetopk.disjunctive_queries)
         self.checkResultApproximative(topk,[(2, (math.log(3/4)+math.log(3/2))/3)])
 
     def test_topk_trivial(self):

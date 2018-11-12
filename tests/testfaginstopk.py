@@ -31,7 +31,9 @@ class TestFaginsTopK(unittest.TestCase):
         topk = faginstopk.apply_top_k_algo(['aa', 'bb'], savedVoc, filemana,0, 5)
         print("::::: {}".format(topk))
         # TODO: Disjunctive/conjonctive
-        self.checkResultApproximative(topk,[(2,(math.log(3/4)+math.log(3/2))/2)])
+        # self.checkResultApproximative(topk,[(2,(math.log(3/4)+math.log(3/2))/2)])
+        self.checkResultApproximative(topk,[(2,(math.log(3/4)+math.log(3/2))/2),(1,math.log(3/4)/2), (3,math.log(3/4)/2)])
+
 
         topk = faginstopk.apply_top_k_algo(['bb'], savedVoc, filemana,0, 5)
         self.checkResultApproximative(topk,[(2,math.log(3/2))])
