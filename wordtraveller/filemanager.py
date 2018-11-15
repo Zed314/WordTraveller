@@ -63,6 +63,12 @@ class FileManager:
             listPartialPLs.append(self.getPathPLScorePartial(i))
         return listPartialPLs
 
+    def getListPartialPLs(self):
+        listPartialPLs = []
+        for i in range(0, self.numberPartialFiles):
+            listPartialPLs.append(self.getPathPLPartial(i))
+        return listPartialPLs
+
     def getListPartialVocs(self):
         listPartialVocs = []
         for i in range(0, self.numberPartialFiles):
@@ -125,7 +131,7 @@ class FileManager:
 
             #Select the best word
             word = currentWords.keys()[0]
-            mergingPLs = SortedDict()
+            mergingPLs = {}
             #For all the documents with this word
             for idDoc in currentWords[word]:
                 preLength = lengthsToReadInPLs[idDoc]
@@ -148,14 +154,14 @@ class FileManager:
                     idfAndScore[0]=(1+math.log(idfAndScore[1]))*math.log(nbTotalDocuments/(1+len(mergingPLs)))
             
             self.save_postList(mergingPLs)
-
+            self.save_postList_by_score(mergingPLs)
             currentWords.pop(word)
         # Close all files
         exitVoc.close()
         for fileVOC in vocsToRead:
             fileVOC.close()
 
-    def save_postLists_file(self, postingListsIndex, isPartial=False):
+    def save_postLists_from_complete_voc(self, postingListsIndex, isPartial=False):
         """
         Preconditions:
             postingListsIndex: is a SortedDict of  words and SortedDict Doc Id and Scores.
@@ -175,9 +181,11 @@ class FileManager:
         try:
             # Encode the record and write it to the dest file
             for word, postingList in postingListsIndex.items():
-                for idDoc, score in postingList.items():
-                    record = self.struct.pack(idDoc,score[0], score[1])
-                    file.write(record)
+                self.save_postList(postingList)
+                self.save_postList_by_score(postingList)
+              #  for idDoc, score in postingList.items():
+             #       record = self.struct.pack(idDoc,score[0], score[1])
+              #      file.write(record)
         except IOError:
             print("Error during the writing")
             pass
@@ -204,7 +212,7 @@ class FileManager:
             vocabulary[word] = current_offset
 
         # saving the plsting lists
-        self.save_postLists_file(voc, isPartial)
+        self.save_postLists_from_complete_voc(voc, isPartial)
         # save the vocabulary
         self.save_vocabulary(vocabulary, isPartial)
         if isPartial:
@@ -224,7 +232,30 @@ class FileManager:
         for word, offset in voc.items():
             file.write("{},{}\n".format(word, offset))
         file.close()
+    
+    def save_postList_by_score(self, postingList, offset = -1):
+        """ Save the postingList of A word after ordered it by score in
+        non ascending order """
+        # destination file for redin and wrting (r+)b
+        if(offset == -1):
+            # Append
+            file = open(self.getPathPL(),"a+b")
+            offset = 0
+        else:
+            file = open(self.getPathPL(), "w+b")
 
+        try:
+            if(offset!=0):
+                file.seek(self.CONST_SIZE_ON_DISK*offset)
+            # Encode the record and write it to the dest file
+            for idDoc, score in sorted(postingList.items(),reverse = True,  key = lambda s: s[0] ):
+                record = self.struct.pack(idDoc, score[0], score[1])
+                file.write(record)
+
+        except IOError:
+            pass
+        finally:
+            file.close()
     def save_postList(self, postingList, offset=-1):
         """
         Preconditions:
@@ -236,6 +267,7 @@ class FileManager:
         """
         # destination file for redin and wrting (r+)b
         if(offset == -1):
+            # Append
             file = open(self.getPathPL(),"a+b")
             offset = 0
         else:
@@ -245,7 +277,7 @@ class FileManager:
             if(offset!=0):
                 file.seek(self.CONST_SIZE_ON_DISK*offset)
             # Encode the record and write it to the dest file
-            for idDoc, score in postingList.items():
+            for idDoc, score in sorted(postingList.items()):
                 record = self.struct.pack(idDoc, score[0], score[1])
                 file.write(record)
 
