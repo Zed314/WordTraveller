@@ -162,6 +162,13 @@ class FileManager:
             currentWords.pop(word)
         # Close voc file
         exitVoc.close()
+        for pathVoc in listPartialVocs:
+            os.remove(pathVoc)
+        for pathPL in listPartialPLs:
+            os.remove(pathPL)
+
+
+
 
     def save_postLists_from_complete_voc(self, postingListsIndex, isPartial=False, numberPart=-1):
         """

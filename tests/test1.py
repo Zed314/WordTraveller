@@ -72,7 +72,7 @@ class TestAnalysis(unittest.TestCase):
         savedVoc = filemanager.read_vocabulary()
         print(savedVoc)
         mot = query.get_posting_list(savedVoc,"aa", filemanager)
-        print("Red:"+ str(mot))
+        # print("Red:"+ str(mot))
         self.assertEqual(mot, {1:[0,3], 2:[0,2], 3:[0,1], 4:[0,3], 5:[0,2], 6:[0,1]})
         mot = query.get_posting_list(savedVoc,"bb", filemanager)
         self.assertEqual(mot, {1:[0,1], 2:[0,1], 4:[0,1], 5:[0,1]})
