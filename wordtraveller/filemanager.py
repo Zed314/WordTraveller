@@ -49,7 +49,7 @@ class FileManager:
         return self.workspace + self.postingListsFileName + self.extensionPL
 
     def getPathPLScore(self):
-        return self.workspace + self.postingListsFileName + ".score." +self.extensionPL
+        return self.workspace + self.postingListsFileName + ".score" +self.extensionPL
 
     def getPathPLPartial(self, number):
         return self.workspace + self.postingListsFileName + "." + str(number) + ".temp" + self.extensionPL
@@ -163,36 +163,21 @@ class FileManager:
         # Close voc file
         exitVoc.close()
 
-    def save_postLists_from_complete_voc(self, postingListsIndex, isPartial=False):
+    def save_postLists_from_complete_voc(self, postingListsIndex, isPartial=False, numberPart=-1):
         """
         Preconditions:
             postingListsIndex: is a SortedDict of  words and SortedDict Doc Id and Scores.
-            prefix: is a string
         Postconditions:
-            The fonction save the pls in a file "prefix+self.postingListsFileName".
+            The fonction save the pls in a partial or full pl file.
+            If not partial, the posting list is also stored by score
         """
-        # destination file for wrting (w)b
-        path = ""
-        if isPartial:
-            path = self.getPathPLPartial(self.numberPartialFiles)
-        else:
-            path = self.getPathPL()
-
-        file = open(path, "w+b")
-
-        try:
-            # Encode the record and write it to the dest file
-            for word, postingList in postingListsIndex.items():
-                self.save_postList(postingList)
-                self.save_postList_by_score(postingList)
-              #  for idDoc, score in postingList.items():
-             #       record = self.struct.pack(idDoc,score[0], score[1])
-              #      file.write(record)
-        except IOError:
-            print("Error during the writing")
-            pass
-        finally:
-            file.close()
+        if numberPart == -1:
+            numberPart = self.numberPartialFiles
+        for word in postingListsIndex:
+            #TODO enable is partial there
+            self.save_postList(postingListsIndex[word],isPartial=isPartial, numberPart = numberPart)
+            if not isPartial:
+                self.save_postList_by_score(postingListsIndex[word])
 
     # Save vocabulary that contains both voc and pls
     def save_vocabularyAndPL_file(self, voc, isPartial=False):
@@ -241,10 +226,10 @@ class FileManager:
         # destination file for redin and wrting (r+)b
         if(offset == -1):
             # Append
-            file = open(self.getPathPL(),"a+b")
+            file = open(self.getPathPLScore(),"a+b")
             offset = 0
         else:
-            file = open(self.getPathPL(), "w+b")
+            file = open(self.getPathPLScore(), "w+b")
 
         try:
             if(offset!=0):
@@ -258,7 +243,7 @@ class FileManager:
             pass
         finally:
             file.close()
-    def save_postList(self, postingList, offset=-1):
+    def save_postList(self, postingList, offset=-1, isPartial = False, numberPart = 0):
         """
         Preconditions:
             postingList: is a dictionary of Doc Id and Scores.
@@ -268,15 +253,18 @@ class FileManager:
             The fonction update the file postingLites.data withe the new postingList after "offet" pairs <Doc Id, Scores>,
         """
         # destination file for redin and wrting (r+)b
-        if(offset == -1):
+        if(offset == -1) and not isPartial:
             # Append
             file = open(self.getPathPL(),"a+b")
             offset = 0
-        else:
+        elif not isPartial:
             file = open(self.getPathPL(), "w+b")
+        elif isPartial : # we do not append to partial files
+            file = open(self.getPathPLPartial(numberPart),"a+b")
+            
 
         try:
-            if(offset!=0):
+            if(offset>0):
                 file.seek(self.CONST_SIZE_ON_DISK*offset)
             # Encode the record and write it to the dest file
             for idDoc, score in sorted(postingList.items()):
@@ -290,7 +278,7 @@ class FileManager:
 
     # Save vocabulary that contains number of occurencies
     # The voc and pl are saved to filename+"."+number+"."+extension+".temp"
-    def savePartialVocabulary(self, voc):
+    def savePartialVocabularyAndPL(self, voc):
         """
         Preconditions:
             voc: is a SortedDict of  words and SortedDict Doc Id and Scores.
