@@ -12,19 +12,23 @@ last_score_of_c = 0
 
 
 def apply_top_k_algo(words, voc, filemanager, epsilon, k, typeRequest = 'disjunctive'):
-    # print("WORDS: {}".format(words))
-    posting_lists_ordered_by_id = SortedDict()
-    posting_lists_ordered_by_score = SortedDict()
+    posting_lists_ordered_by_id = dict()
+    posting_lists_ordered_by_score = dict()
+
     for word in words:
-        # print("WORDK: {}".format(word))
-        orderedById, orderedByScore = query.get_posting_list(
-        voc, word, filemanager, returnPostingListOrderedByScore = True)
-        # print("RETURNED: {}||| {}".format(orderedById, orderedByScore))
+        orderedById = query.get_posting_list(voc, word, filemanager)
+        # print("ORderedId: {}".format(orderedById))
+        orderedByScore = [0] * len(orderedById)
+        for i, id in enumerate(orderedById):
+            orderedByScore[i] = (orderedById[id][0],id)
+        # print("ORderedscore: {}".format(orderedByScore))
+
+        orderedByScore.sort(key=operator.itemgetter(1), reverse=True)
+        orderedByScore.sort(key=operator.itemgetter(0))
+
         if orderedById and orderedByScore:
             posting_lists_ordered_by_score[word] = orderedByScore
             posting_lists_ordered_by_id[word] = orderedById
-            # print("EEEO")
-    # print('Result findla {},{}'.format(posting_lists_ordered_by_id,posting_lists_ordered_by_score))
     return find_fagins_top_k(posting_lists_ordered_by_id,
                       posting_lists_ordered_by_score, k, typeRequest)
 
@@ -79,25 +83,25 @@ def push_to_m(m, c, docId, score, nb_of_PL, aggregative_function):
     # print('c: {} || m: {}'.format(c, m))
 
 
-def add_next_score(score, idsDoc, pl_id, current_scores):
-    """
-    Preconditions:
-        score: is a score to be added to the current_scores.
-        idsDoc: an array of document-ids having the score.
-        pl_id: posting list id, usually the term.
-        current_scores: SortedDict with the scores we are working on.
-    Postconditions:
-        The fonction save add the tuple [docId, pl_id] to the array current_scores.
-        We use this function to add a new value to the scores' array we are working on.
-    """
-    print("IDS: {}".format(idsDoc))
-    for idDoc in idsDoc:
-        if(score not in current_scores):
-            current_scores[score] = dict()
-        # on met en dernier [idDoc, idPostingList]
-        current_scores[score][len(current_scores[score])] = [idDoc, pl_id]
+# def add_next_score(score, idsDoc, pl_id, current_scores):
+#     """
+#     Preconditions:
+#         score: is a score to be added to the current_scores.
+#         idsDoc: an array of document-ids having the score.
+#         pl_id: posting list id, usually the term.
+#         current_scores: SortedDict with the scores we are working on.
+#     Postconditions:
+#         The fonction save add the tuple [docId, pl_id] to the array current_scores.
+#         We use this function to add a new value to the scores' array we are working on.
+#     """
+#     print("IDS: {}".format(idsDoc))
+#     for idDoc in idsDoc:
+#         if(score not in current_scores):
+#             current_scores[score] = dict()
+#         # on met en dernier [idDoc, idPostingList]
+#         current_scores[score][len(current_scores[score])] = [idDoc, pl_id]
 
-
+# TODO: la uso para verificar que hay cosas que puedo 
 def get_score_by_doc_id(doc_id, postingListsOrderedById, nb_of_PL, aggregation_function):
     score = 0
     all_scores = []
@@ -122,25 +126,25 @@ def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k, ty
     for posting_list_id in postingListsOrderedByScore:
         iterators[posting_list_id] = reversed(
             postingListsOrderedByScore[posting_list_id])
-        # next donne la clé
-        score = next(iterators[posting_list_id])
-        idsDoc = postingListsOrderedByScore[posting_list_id][score]
+        # next donne la tuple <score,idDocument>
+        score,idDoc = next(iterators[posting_list_id])
+        # idsDoc = postingListsOrderedByScore[posting_list_id][score]
         # On initialise la structure de donnees du score
-        add_next_score(score, idsDoc, posting_list_id, currentScores)
+        currentScores.add((score, (idDoc,posting_list_id)))
+        # print("EOEOEOOE: {}".format(currentScores))
+        # add_next_score(score, idsDoc, posting_list_id, currentScores)
 
     c = dict()
     m = dict()
     nb_of_PL = len(postingListsOrderedById)
-    # print("QUE ES {},{}, {}".format(type(len(c)), type(k),currentScores))
     while len(c) < k and len(currentScores) > 0:
-        # print("Current {}".format(currentScores))
-        item = currentScores.pop()
-        score = item[0]
-        postingListId = item[1][0][1]
-        docId = item[1][0][0]
+        # Item is the [Score;[[doc_id 1; pl_id 1];[doc_id 2; pl_id 2]]] where scores
+        # is the best unreaded score
+        score, tuple_docId_postingListId = currentScores.pop()
+        docId, postingListId = tuple_docId_postingListId
         push_to_m(m, c, docId, score, nb_of_PL, aggregative_function_mean)
-        if(len(item[1]) > 1):
-            print("Tengo mas de uno!")
+        # if(len(item[1]) > 1):
+        #     print("Tengo mas de uno!")
             # for doc in item[1]:
             #     used_docId = item[1][doc][0]
             #     pl_id = item[1][doc][1]
@@ -151,9 +155,11 @@ def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k, ty
             #             used_docId, pl_id]
         # getting next new score and add it to currentScores
         try:
-            newScore = next(iterators[postingListId])
-            idsDoc = postingListsOrderedByScore[postingListId][newScore]
-            add_next_score(newScore, idsDoc, postingListId, currentScores)
+            newScore, newIdDoc = next(iterators[postingListId])
+            currentScores.add((newScore,(newIdDoc,postingListId)))
+            # newScore = next(iterators[postingListId])
+            # idsDoc = postingListsOrderedByScore[postingListId][newScore]
+            # add_next_score(newScore, idsDoc, postingListId, currentScores)
         except StopIteration:
             pass
             # print("No more values in postingLists")
@@ -236,7 +242,7 @@ if __name__ == "__main__":
 
     savedVoc = filemanag.read_vocabulary()
 
-    print("savedDoc : {}".format(savedVoc))
+    # print("savedDoc : {}".format(savedVoc))
 
     # print(query.get_posting_list(savedVoc, "aa", filemanag))
     topk = apply_top_k_algo(['aa', 'bb'], savedVoc, filemanag, 0.2 ,3, 'disjunctive')

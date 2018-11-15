@@ -16,8 +16,7 @@ def apply_fagins_ta(words, voc, filemanager, epsilon, k):
     posting_lists_ordered_by_id = dict()
     posting_lists_ordered_by_score = dict()
     for word in words:
-        orderedById = query.get_posting_list(
-        voc, word, filemanager)
+        orderedById = query.get_posting_list(voc, word, filemanager)
         orderedByScore = [0]* len(orderedById)
         for i, id in enumerate(orderedById):
             orderedByScore[i] = (orderedById[id][0], id)
@@ -71,33 +70,33 @@ def compute_mu(docId, postingListsOrderedById, nb_of_PL, aggregative_function):
     return mu
 
 
-def add_next_score(score, idDoc, pl_id, current_scores):
-    """
-    Preconditions:
-        score: is a score to be added to the current_scores.
-        idsDoc: an array of document-ids having the score.
-        pl_id: posting list id, usually the term.
-        current_scores: SortedDict with the scores we are working on.
-    Postconditions:
-        The fonction save add the tuple [docId, pl_id] to the array current_scores.
-        We use this function to add a new value to the scores' array we are working on.
-    """
+# def add_next_score(score, idDoc, pl_id, current_scores):
+#     """
+#     Preconditions:
+#         score: is a score to be added to the current_scores.
+#         idsDoc: an array of document-ids having the score.
+#         pl_id: posting list id, usually the term.
+#         current_scores: SortedDict with the scores we are working on.
+#     Postconditions:
+#         The fonction save add the tuple [docId, pl_id] to the array current_scores.
+#         We use this function to add a new value to the scores' array we are working on.
+#     """
 
-    if(score not in current_scores):
-        current_scores[score] = dict()
-    # on met en dernier [idDoc, idPostingList]
-    current_scores[score][len(current_scores[score])] = [idDoc, pl_id]
+#     if(score not in current_scores):
+#         current_scores[score] = dict()
+#     # on met en dernier [idDoc, idPostingList]
+#     current_scores[score][len(current_scores[score])] = [idDoc, pl_id]
 
 
 # n'as pas l'aire d'étre utiliser ailleur
-def get_score_by_doc_id(doc_id, postingListsOrderedById, aggregation_function):
-    score = 0
-    all_scores = []
-    for posting_list in postingListsOrderedById:
-        score_doc_id = postingListsOrderedById[posting_list][doc_id]
-        all_scores.append(score_doc_id)
-    score = aggregation_function(all_scores)
-    return score
+# def get_score_by_doc_id(doc_id, postingListsOrderedById, aggregation_function):
+#     score = 0
+#     all_scores = []
+#     for posting_list in postingListsOrderedById:
+#         score_doc_id = postingListsOrderedById[posting_list][doc_id]
+#         all_scores.append(score_doc_id)
+#     score = aggregation_function(all_scores)
+#     return score
 
 
 def find_fagins_ta(postingListsOrderedById, postingListsOrderedByScore, epsilon, k, aggregative_function=aggregative_function_mean):
