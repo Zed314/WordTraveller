@@ -81,7 +81,6 @@ def push_to_m(m, c, docId, score, nb_of_PL, aggregative_function):
     # print('c: {} || m: {}'.format(c, m))
 
 
-# TODO: la uso para verificar que hay cosas que puedo 
 def get_score_by_doc_id(doc_id, postingListsOrderedById, nb_of_PL, aggregation_function):
     score = 0
     all_scores = []

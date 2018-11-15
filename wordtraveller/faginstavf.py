@@ -88,17 +88,6 @@ def compute_mu(docId, postingListsOrderedById, nb_of_PL, aggregative_function):
 #     current_scores[score][len(current_scores[score])] = [idDoc, pl_id]
 
 
-# n'as pas l'aire d'étre utiliser ailleur
-# def get_score_by_doc_id(doc_id, postingListsOrderedById, aggregation_function):
-#     score = 0
-#     all_scores = []
-#     for posting_list in postingListsOrderedById:
-#         score_doc_id = postingListsOrderedById[posting_list][doc_id]
-#         all_scores.append(score_doc_id)
-#     score = aggregation_function(all_scores)
-#     return score
-
-
 def find_fagins_ta(postingListsOrderedById, postingListsOrderedByScore, epsilon, k, aggregative_function=aggregative_function_mean):
     global last_score_of_c
 
