@@ -1,7 +1,8 @@
 import unittest
 import os
 import send2trash
-from wordtraveller import faginstopk, filemanager, analysis
+from wordtraveller import faginstopkvf as faginstopk
+from wordtraveller import filemanager, analysis
 from sortedcontainers import SortedDict
 from pathlib import Path
 import math
@@ -29,7 +30,7 @@ class TestFaginsTopK(unittest.TestCase):
         savedVoc = filemana.read_vocabulary()        
 
         topk = faginstopk.apply_top_k_algo(['aa', 'bb'], savedVoc, filemana,0, 5)
-        print("::::: {}".format(topk))
+        # print("::::: {}".format(topk))
         # TODO: Disjunctive/conjonctive
         # self.checkResultApproximative(topk,[(2,(math.log(3/4)+math.log(3/2))/2)])
         self.checkResultApproximative(topk,[(2,(math.log(3/4)+math.log(3/2))/2),(1,math.log(3/4)/2), (3,math.log(3/4)/2)])
