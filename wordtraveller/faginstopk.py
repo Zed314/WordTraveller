@@ -1,56 +1,47 @@
-import operator
-from . import query, analysis
-from . import filemanager as fm
+import wordtraveller.filemanager as fm
+import wordtraveller.query as query
+import wordtraveller.analysis as analysis
 from sortedcontainers import SortedDict
 from pathlib import Path
+import time
+import operator
 
 # Vu que les int ne peuvent pas se modifier par reference, j'ai du creer une variable globale
 # Cette variable me sert pour apres savoir si les scores qui restent dans m sont plus grands que ceux déjà existants
 last_score_of_c = 0
 
 
-def apply_top_k_algo(words, voc, filemanager, k):
-
+def apply_top_k_algo(words, voc, filemanager, epsilon, k, typeRequest = 'disjunctive'):
+    # print("WORDS: {}".format(words))
     posting_lists_ordered_by_id = SortedDict()
     posting_lists_ordered_by_score = SortedDict()
     for word in words:
-        posting_lists_ordered_by_id[word], posting_lists_ordered_by_score[word] = query.get_posting_list(
+        # print("WORDK: {}".format(word))
+        orderedById, orderedByScore = query.get_posting_list(
         voc, word, filemanager, returnPostingListOrderedByScore = True)
-    
-    print('ww: {}'.format(posting_lists_ordered_by_id))
-#    posting_lists_ordered_by_score = SortedDict()
-    print('ww: {}'.format(posting_lists_ordered_by_score))
-
-    # pl_aa = SortedDict()
-    # pl_aa[3] = [1]
-    # pl_aa[2] = [2]
-    # pl_aa[1] = [3]
-    # pl_bb = SortedDict()
-    # pl_bb[1] = [1, 2]
-    # pl_cc = SortedDict()
-    # pl_cc[1] = [3]
-
-    # posting_lists_ordered_by_score = dict()
-    # posting_lists_ordered_by_score['aa'] = pl_aa
-    # posting_lists_ordered_by_score['bb'] = pl_bb
-    # posting_lists_ordered_by_score['cc'] = pl_cc
-
-    find_fagins_top_k(posting_lists_ordered_by_id,
-                      posting_lists_ordered_by_score, k)
+        # print("RETURNED: {}||| {}".format(orderedById, orderedByScore))
+        if orderedById and orderedByScore:
+            posting_lists_ordered_by_score[word] = orderedByScore
+            posting_lists_ordered_by_id[word] = orderedById
+            # print("EEEO")
+    # print('Result findla {},{}'.format(posting_lists_ordered_by_id,posting_lists_ordered_by_score))
+    return find_fagins_top_k(posting_lists_ordered_by_id,
+                      posting_lists_ordered_by_score, k, typeRequest)
 
 
-def aggregative_function_mean(values):
+def aggregative_function_mean(values, nb_of_PL):
     """
     Preconditions:
         values: array of values (int or float).
     Postconditions:
         Returns the mean of this values.
     """
+    # print("Agregative: {} @ {}".format(values,nb_of_PL))
     sumValues = sum(values)
-    if(len(values) == 0):
+    if(nb_of_PL == 0):
         return 0
     else:
-        return sumValues/len(values)
+        return sumValues/nb_of_PL
 
 
 def push_to_m(m, c, docId, score, nb_of_PL, aggregative_function):
@@ -63,7 +54,7 @@ def push_to_m(m, c, docId, score, nb_of_PL, aggregative_function):
         nb_of_PL: number of posting lists used in the algorithm.
     Postconditions:
         The function save the tuple [docId,score] to m.
-        If the tuple has been already seen by all the posting list apply 
+        If the tuple has been already seen by all the posting list apply
         aggregation function to and save the result to c.
     """
     global last_score_of_c
@@ -71,7 +62,7 @@ def push_to_m(m, c, docId, score, nb_of_PL, aggregative_function):
         # print('[{}],[{}],[{}],[{}]'.format(m[docId],nb_of_PL,len(m[docId]),docId))
         m[docId] += [score]
         if(len(m[docId]) == nb_of_PL):
-            mean_score = aggregative_function(m[docId])
+            mean_score = aggregative_function(m[docId],nb_of_PL)
             # print('calculMean: {}|{}|{}'.format(docId,m[docId],mean_score))
             c[docId] = mean_score
             last_score_of_c = mean_score
@@ -79,13 +70,13 @@ def push_to_m(m, c, docId, score, nb_of_PL, aggregative_function):
     elif nb_of_PL == 1:
         m[docId] = [score]
         if(len(m[docId]) == nb_of_PL):
-            mean_score = aggregative_function(m[docId])
+            mean_score = aggregative_function(m[docId],nb_of_PL)
             c[docId] = mean_score
             last_score_of_c = mean_score
             del m[docId]
     else:
         m[docId] = [score]
-    print('c: {} || m: {}'.format(c, m))
+    # print('c: {} || m: {}'.format(c, m))
 
 
 def add_next_score(score, idsDoc, pl_id, current_scores):
@@ -106,23 +97,24 @@ def add_next_score(score, idsDoc, pl_id, current_scores):
         current_scores[score][len(current_scores[score])] = [idDoc, pl_id]
 
 
-def get_score_by_doc_id(doc_id, postingListsOrderedById, aggregation_function):
+def get_score_by_doc_id(doc_id, postingListsOrderedById, nb_of_PL, aggregation_function):
     score = 0
     all_scores = []
     for posting_list in postingListsOrderedById:
         if(doc_id in postingListsOrderedById[posting_list]):
             score_doc_id = postingListsOrderedById[posting_list][doc_id]
-            # TODO: score_doc_id[0] = score, score_doc_id[1] = term frequency
+            # score_doc_id[0] = score, score_doc_id[1] = term frequency
             all_scores.append(score_doc_id[0])#1 ou 0 ?
             # Pour mockData()
             # all_scores.append(score_doc_id)
-    score = aggregation_function(all_scores)
+    score = aggregation_function(all_scores, nb_of_PL)
     return score
 
 
-def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k):
+def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k, typeRequest = 'disjunctive'):
     global last_score_of_c
-
+    """ Returns the top k element in an array of tuples, where the first member
+    of a tuple is the doc id and the second is the score """
     iterators = dict()
     currentScores = SortedDict()
     # posting_list_id sera le terme de la posting_list
@@ -137,47 +129,50 @@ def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k):
 
     c = dict()
     m = dict()
-    while len(c) < k:
-        print("Current {}".format(currentScores))
-        if(len(currentScores) > 0):
-            item = currentScores.popitem()
-            score = item[0]
-            postingListId = item[1][0][1]
-            docId = item[1][0][0]
-            push_to_m(m, c, docId, score, len(
-                postingListsOrderedByScore), aggregative_function_mean)
-            if(len(item[1]) > 1):
-                for doc in item[1]:
-                    used_docId = item[1][doc][0]
-                    pl_id = item[1][doc][1]
-                    if(not (docId == used_docId and pl_id == postingListId)):
-                        if score not in currentScores:
-                            currentScores[score] = dict()
-                        currentScores[score][len(currentScores[score])] = [
-                            used_docId, pl_id]
-        else:
-            break
+    nb_of_PL = len(postingListsOrderedById)
+    while len(c) < k and len(currentScores) > 0:
+        # print("Current {}".format(currentScores))
+        item = currentScores.popitem()
+        score = item[0]
+        postingListId = item[1][0][1]
+        docId = item[1][0][0]
+        push_to_m(m, c, docId, score, nb_of_PL, aggregative_function_mean)
+        if(len(item[1]) > 1):
+            for doc in item[1]:
+                used_docId = item[1][doc][0]
+                pl_id = item[1][doc][1]
+                if(not (docId == used_docId and pl_id == postingListId)):
+                    if score not in currentScores:
+                        currentScores[score] = dict()
+                    currentScores[score][len(currentScores[score])] = [
+                        used_docId, pl_id]
         # getting next new score and add it to currentScores
         try:
             newScore = next(iterators[postingListId])
             idsDoc = postingListsOrderedByScore[postingListId][newScore]
             add_next_score(newScore, idsDoc, postingListId, currentScores)
         except StopIteration:
-            print("No more values in postingLists")
+            pass
+            # print("No more values in postingLists")
 
     # Verify if there is a better score in the values seen (m)
     for doc_id in m:
         score = get_score_by_doc_id(
-            doc_id, postingListsOrderedById, aggregative_function_mean)
+            doc_id, postingListsOrderedById, nb_of_PL, aggregative_function_mean)
         if(score > last_score_of_c):
             # TODO: regarder s'il y a moyen de ne pas faire for loop
-            for c_value in c:
-                if(c[c_value] == last_score_of_c):
-                    del c[c_value]
-                    break
+            if(len(c) == k):
+                for c_value in c:
+                    if(c[c_value] == last_score_of_c):
+                        del c[c_value]
+                        break
             c[doc_id] = score
             last_score_of_c = score
-    print('final top {} : {}'.format(k, c))
+        elif(len(c) < k and typeRequest == 'disjunctive'):
+            c[doc_id] = score
+            last_score_of_c = score
+    # We sort depending on the score, in the descending order
+    c = sorted(c.items(),key=operator.itemgetter(1),reverse=True)
     return c
 
 
@@ -204,23 +199,28 @@ def createMockData():
     postingListsOrderedByScore['bbb'] = pl2_score
 
     pl1_id = dict()
-    pl1_id[3] = 0.40
-    pl1_id[1] = 0.50
+    pl1_id[3] = [0.40,5] # query.get_posting_list nous donne [score,tf]
+    pl1_id[1] = [0.50,6]
 
     pl2_id = dict()
-    pl2_id[3] = 0.85
-    pl2_id[1] = 0.74
+    pl2_id[3] = [0.85,5]
+    pl2_id[1] = [0.74,4]
 
     postingListsOrderedById = dict()
     postingListsOrderedById['aaa'] = pl1_id
     postingListsOrderedById['bbb'] = pl2_id
-    print('postingListsOrderedById : {}'.format(postingListsOrderedById))
-    print('postingListsOrderedByScore : {}'.format(postingListsOrderedByScore))
+    #print('postingListsOrderedById : {}'.format(postingListsOrderedById))
+    #print('postingListsOrderedByScore : {}'.format(postingListsOrderedByScore))
     return postingListsOrderedById, postingListsOrderedByScore
 
 
 if __name__ == "__main__":
-    currentWorkspace = './workspace/'
+
+    # Applying Top K Algorithm to mockdata
+    # postingListsOrderedById, postingListsOrderedByScore = createMockData()
+    # top_k = find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, 3)
+
+    currentWorkspace = './workspace/testalex/'
     filename = 'test1'
     filemanag = fm.FileManager(filename, currentWorkspace)
 
@@ -231,15 +231,15 @@ if __name__ == "__main__":
         analysis.analyse_newspaper(path, tempVoc, True)
     filemanag.save_vocabularyAndPL_file(tempVoc)
 
-    # Applying Top K Algorithm
-    postingListsOrderedById, postingListsOrderedByScore = createMockData()
-
+    start = time.time()
     savedVoc = filemanag.read_vocabulary()
+    end = time.time()
 
+    print("Red in {} s".format(end - start))
     print("savedDoc : {}".format(savedVoc))
 
-    print(query.get_posting_list(savedVoc, "aa", filemanag))
-    apply_top_k_algo(['aa', 'bb'], savedVoc, filemanag, 5)
-
-    # top_k = find_fagins_top_k(postingListsOrderedById,
-    #                           postingListsOrderedByScore, 3)
+    start = time.time()
+    # print(query.get_posting_list(savedVoc, "aa", filemanag))
+    topk = apply_top_k_algo(['aa', 'bb'], savedVoc, filemanag, 5, 'disjunctive')
+    end = time.time()
+    print('result: {} , done in {}'.format(topk, end - start))

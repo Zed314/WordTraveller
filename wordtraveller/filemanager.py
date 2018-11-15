@@ -94,10 +94,11 @@ class FileManager:
         offsetVoc = 0
         voc = []
         idDocsToRead = []
-        vocsToRead = []
+        extractedVocs = []
         for numberDoc in range(totalNumberOfDocs):
             idDocsToRead.append(True)
-            vocsToRead.append(open(listPartialVocs[numberDoc], "r"))
+            extractedVocs.append(iter((self.read_vocabulary(True, numberDoc)).items()))
+       
         for nbVoc, pathVoc in enumerate(listPartialVocs):
             offsetsInPLs.append(0)
             nbLinesRedInVOCs.append(0)
@@ -106,15 +107,18 @@ class FileManager:
             offsetPreWord.append(0)
         currentWords = SortedDict()
         exitVoc = open(self.getPathVoc(), "w+")
+        
         while True :
             i = 0
             for numberDoc in range(totalNumberOfDocs):
                 if idDocsToRead[numberDoc] == False:
                     continue
-                file = vocsToRead[numberDoc]
-                line = file.readline()
-                data = line.rstrip('\n\r').split(",")
-                word = data[0]
+                data = []
+                try :
+                    data = next(extractedVocs[numberDoc])
+                    word = data[0]
+                except StopIteration:
+                    word = "" 
                 if word == "": # If document is over.
                     pass
                 else: 
@@ -156,10 +160,8 @@ class FileManager:
             self.save_postList(mergingPLs)
             self.save_postList_by_score(mergingPLs)
             currentWords.pop(word)
-        # Close all files
+        # Close voc file
         exitVoc.close()
-        for fileVOC in vocsToRead:
-            fileVOC.close()
 
     def save_postLists_from_complete_voc(self, postingListsIndex, isPartial=False):
         """
@@ -297,14 +299,19 @@ class FileManager:
         self.save_vocabularyAndPL_file(voc, True)
         pass
 
-    def read_vocabulary(self):
+    def read_vocabulary(self, isPartial=False, number=0):
         """
         Precondtions:
             a dictionary is saved in vocabulary.vo
         Postcondition:
             return voc: the a dictionary of words and offset that was saved.
         """
-        file = open(self.getPathVoc(), "r")
+        filename = ""
+        if isPartial:
+            filename = self.getPathVocPartial(number) 
+        else:
+            filename = self.getPathVoc()
+        file = open(filename, "r")
         voc = SortedDict()
         for ligne in file:
             donnees = ligne.rstrip('\n\r').split(",")
