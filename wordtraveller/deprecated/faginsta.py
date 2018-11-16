@@ -80,7 +80,7 @@ def add_next_score(score, idsDoc, pl_id, current_scores):
         current_scores[score][len(current_scores[score])] = [idDoc, pl_id]
 
 
-# n'as pas l'aire d'étre utiliser ailleur
+# n'as pas l'air d'étre utilisé ailleurs
 def get_score_by_doc_id(doc_id, postingListsOrderedById, aggregation_function):
     score = 0
     all_scores = []

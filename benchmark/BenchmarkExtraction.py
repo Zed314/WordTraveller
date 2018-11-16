@@ -56,7 +56,7 @@ import wordtraveller.preprocessing as preprocessing
 import matplotlib.pyplot as plt 
 import os, shutil
 
-arrayScalesMini = range(1,1001,100)
+arrayScalesMini = range(1000,100000,5000)
 path = ""
 print("analyse_newspaper, no stemmer")
 print("Merging involved, flush frequency : Every document.")
