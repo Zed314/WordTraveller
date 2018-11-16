@@ -29,7 +29,7 @@ def analysis_parameters():
     pathlist = Path(args.d).glob('**/la*')
 
 
-    vocabulary = SortedDict()
+    vocabulary = dict()
     filemanager = fm.FileManager(args.f, args.o)
     if args.stemmer:
         analysis.setPreprocessor(preprocessing.Preprocessor(True))
@@ -37,7 +37,7 @@ def analysis_parameters():
         analysis.analyse_newspaper(newspaper_path, vocabulary, True)
         if args.partial:
             filemanager.save_vocabularyAndPL_file(vocabulary, True)
-            vocabulary = SortedDict()
+            vocabulary = dict()
         print('file %s finished!' % i)
     if args.partial:
         filemanager.mergePartialVocsAndPL()

@@ -193,20 +193,24 @@ class FileManager:
         Preconditions:
             voc: is a SortedDict of  words and SortedDict Doc Id and Scores.
         Postconditions:
-            The fonction save the vocs in a file named self.postingListsFileName 
+            The function saves the vocs in a file named self.postingListsFileName 
             pls in a file "self.postingListsFileName".
         """
         # map vocabulary offset
-        vocabulary = SortedDict()
+        vocabulary = []
         current_offset = 0
         # save all the posting lists
-        # TODO make a better call to the consturctore "filemanager.FileManager(..,..) seems a bit wirde
 
+        # we sort voc
+        arrayOfVocAndPLs = sorted(voc)
+
+        # we sort the PLs inside voc in the functions save_postLists_from_complete_voc
+        
         for word, pl in voc.items():
             current_offset += len(pl)
-            vocabulary[word] = current_offset
+            vocabulary.append((word, current_offset))
 
-        # saving the plsting lists
+        # saving the posting lists
         self.save_postLists_from_complete_voc(voc, isPartial)
         # save the vocabulary
         self.save_vocabulary(vocabulary, isPartial)
@@ -216,7 +220,7 @@ class FileManager:
     def save_vocabulary(self, voc, isPartial=False):
         """
         Preconditions:
-            voc: is a dictionary of words and offset.
+            voc: is an array of words and offset.
         postconditions:
             the dictionary is saved in vocabulary.vo
         """
@@ -224,7 +228,7 @@ class FileManager:
             file = open(self.getPathVocPartial(self.numberPartialFiles), "w")
         else:
             file = open(self.getPathVoc(), "w")
-        for word, offset in voc.items():
+        for word, offset in voc:
             file.write("{},{}\n".format(word, offset))
         file.close()
     

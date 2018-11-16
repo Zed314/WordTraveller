@@ -64,7 +64,9 @@ def analyse_newspaper_naive(path, voc, computeIDF=False, nbDocToStart = 0, nbDoc
 
 def analyse_newspaper_optimized(path, voc, computeIDF=False, nbDocToStart = 0, nbDocToScan = -1):
 
-    """ Returns the number of docs that were scanned """
+    """ Voc is a dictionnary of word and pl (that are also dictionnaries)
+    
+    Returns the number of docs that were scanned."""
     file = open(path, "r")
     currDocId = 0
     isInText = False
@@ -72,6 +74,10 @@ def analyse_newspaper_optimized(path, voc, computeIDF=False, nbDocToStart = 0, n
     currDoc = 0
     nbDocScanned = 0
     documentText = ""
+    if type(voc) is dict:
+        print ("voc is a dict")
+    else:
+        print("voc is NOT a dict !")
     for line in file:
         if line.startswith("<DOCID>"):
             currDocId = int(line[len("<DOCID> "):-len(" </DOCID>\n")])
@@ -97,7 +103,7 @@ def analyse_newspaper_optimized(path, voc, computeIDF=False, nbDocToStart = 0, n
                 if term in voc:
                     voc[term][currDocId] = [0, occurrences]
                 else:
-                    voc[term] = SortedDict()
+                    voc[term] = dict()
                     voc[term][currDocId] = [0, occurrences]
             documentText = ""
             currDoc += 1
@@ -129,6 +135,7 @@ def analyse_newspaper_optimized(path, voc, computeIDF=False, nbDocToStart = 0, n
                 idfAndScore[0] = (1+math.log(idfAndScore[1])) * \
                     math.log(nbDiffDocs/(1+nbDocsWithWord))
     file.close()
+
     return nbDocScanned
 
 
