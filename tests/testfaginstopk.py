@@ -166,6 +166,14 @@ class TestFaginsTopK(unittest.TestCase):
         top_k = faginstopk.find_fagins_top_k(postingListsIndexedById,
                               postingListsOrderedByScore, 0)
         self.assertEqual(top_k, [], "Topk simple, k = 0")
+
+    @classmethod
+    def tearDownClass(cls):
+        for folderName, subfolders, filenames in os.walk('./tests/workspace/'):
+            for filename in filenames:
+                if (filename.endswith('.vo') or filename.endswith('.pl')):
+                    print('Deleting from folder ' + folderName + ': ' + filename)
+                    send2trash.send2trash(folderName + '/' + filename)
        
         
 if __name__ == '__main__':
