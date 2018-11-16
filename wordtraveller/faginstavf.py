@@ -10,18 +10,13 @@ import operator
 last_score_of_c = 0
 
 def test():
-    return "adrien"
+    return "adrien" # TODO : ?
 def apply_fagins_ta(words, voc, filemanager, epsilon, k):
 
     posting_lists_ordered_by_id = dict()
     posting_lists_ordered_by_score = dict()
     for word in words:
-        orderedById = query.get_posting_list(voc, word, filemanager)
-        orderedByScore = [0]* len(orderedById)
-        for i, id in enumerate(orderedById):
-            orderedByScore[i] = (orderedById[id][0], id)
-        orderedByScore.sort(key=operator.itemgetter(1), reverse=True)
-        orderedByScore.sort(key=operator.itemgetter(0))
+        orderedById, orderedByScore = query.get_posting_list(voc, word, filemanager, True)
 
         if orderedById and orderedByScore:
             posting_lists_ordered_by_score[word] = orderedByScore
@@ -96,7 +91,7 @@ def find_fagins_ta(postingListsOrderedById, postingListsOrderedByScore, epsilon,
     # posting_list_id sera le terme de la posting_list
     for posting_list_id in postingListsOrderedByScore:
         # print("posting_list_id {}".format(posting_list_id))
-        iterators[posting_list_id] = reversed(
+        iterators[posting_list_id] = iter(
             postingListsOrderedByScore[posting_list_id])
         score,idDoc = next(iterators[posting_list_id])
         #idsDoc = postingListsOrderedByScore[posting_list_id][score]

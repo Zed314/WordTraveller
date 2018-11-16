@@ -77,6 +77,7 @@ class FileManager:
 
     # Merge all the partial vocs and pl created during analysis
     def mergePartialVocsAndPL(self, recomputeIDF = True):
+
         #Get all the PLs and VOCs
         listPartialVocs = self.getListPartialVocs()
         listPartialPLs = self.getListPartialPLs()
@@ -242,7 +243,7 @@ class FileManager:
             if(offset!=0):
                 file.seek(self.CONST_SIZE_ON_DISK*offset)
             # Encode the record and write it to the dest file
-            for idDoc, score in sorted(postingList.items(),reverse = True,  key = lambda s: s[0] ):
+            for idDoc, score in sorted(postingList.items(),  key = lambda s: (-s[1][0],s[0]) ):
                 record = self.struct.pack(idDoc, score[0], score[1])
                 file.write(record)
 
@@ -250,6 +251,7 @@ class FileManager:
             pass
         finally:
             file.close()
+            
     def save_postList(self, postingList, offset=-1, isPartial = False, numberPart = 0):
         """
         Preconditions:
@@ -301,7 +303,7 @@ class FileManager:
         Postcondition:
             return voc: the a dictionary of words and offset that was saved.
         """
-        filename = ""
+
         if isPartial:
             filename = self.getPathVocPartial(number) 
         else:
@@ -327,19 +329,20 @@ class FileManager:
             return also a posting list sorted by scores : an array of   
         """
         # File to read
-        filename = ""
         if isPartial:
             filename = self.getPathPLPartial(number) 
         else:
             filename = self.getPathPL()
-
         file = open(filename, "rb")
+        if returnPostingListOrderedByScore:
+            filePLScore = open(self.getPathPLScore(), "rb")
         postingList = SortedDict()
-        postingListByScore = SortedDict()
+        postingListByScore = []
         try:
 
             file.seek(self.CONST_SIZE_ON_DISK*offset)
-
+            if (returnPostingListOrderedByScore):
+                filePLScore.seek(self.CONST_SIZE_ON_DISK*offset)
             for x in range(0, length):
                 record = file.read(self.CONST_SIZE_ON_DISK)
                 filed = self.struct.unpack(record)
@@ -348,10 +351,20 @@ class FileManager:
                 nbOccurenciesInDoc = filed[2]
                 postingList[idDoc] = [score,nbOccurenciesInDoc]
                 if (returnPostingListOrderedByScore):
-                    if score in postingListByScore:
-                        postingListByScore[score].append(idDoc)
-                    else:
-                        postingListByScore[score] = [idDoc]
+                    record = filePLScore.read(self.CONST_SIZE_ON_DISK)
+                    filed = self.struct.unpack(record)
+                    idDoc = filed[0]
+                    score = filed[1]
+                    nbOccurenciesInDoc = filed[2]
+                    #todo replace all over the code
+                    # if len(postingListByScore) == 0:
+                    #     postingListByScore.append((score,[idDoc]))
+                    # elif score == postingListByScore[-1][0]:
+                    #     postingListByScore[-1][1].append(idDoc)
+                    # else:
+                    #     postingListByScore.append((score,[idDoc]))
+                    postingListByScore.append((score,idDoc))
+
             if returnPostingListOrderedByScore :
                 return postingList, postingListByScore
             else :

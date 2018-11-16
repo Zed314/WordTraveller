@@ -53,8 +53,8 @@ class TestFaginsTATopK(unittest.TestCase):
         pl1_score[1] = ((0.70,3))
         pl1_score[2] = ((0.80,2))
 
-        pl1_score.sort(key=operator.itemgetter(1), reverse=True)
-        pl1_score.sort(key=operator.itemgetter(0))
+        pl1_score.sort(key=operator.itemgetter(1), reverse=False)
+        pl1_score.sort(key=operator.itemgetter(0), reverse=True)
 
 
         pl2_score = [0]*3
@@ -62,8 +62,8 @@ class TestFaginsTATopK(unittest.TestCase):
         pl2_score[1] = ((0.75,3))
         pl2_score[2] = ((0.85,1))
         
-        pl2_score.sort(key=operator.itemgetter(1), reverse=True)
-        pl2_score.sort(key=operator.itemgetter(0))
+        pl2_score.sort(key=operator.itemgetter(1), reverse=False)
+        pl2_score.sort(key=operator.itemgetter(0), reverse = True)
 
         postingListsOrderedByScore = dict()
         postingListsOrderedByScore['aaa'] = pl1_score
@@ -130,18 +130,11 @@ class TestFaginsTATopK(unittest.TestCase):
         pl1_score[1] = ((0.90,2))
         pl1_score[2] = ((0.90,3))
 
-        pl1_score.sort(key=operator.itemgetter(1), reverse=True)
-        pl1_score.sort(key=operator.itemgetter(0))
-
-
         pl2_score = [0]*3
         pl2_score[0] = ((0.85,1))
         pl2_score[1] = ((0.80,2))
         pl2_score[2] = ((0.75,3))
         
-        pl2_score.sort(key=operator.itemgetter(1), reverse=True)
-        pl2_score.sort(key=operator.itemgetter(0))
-
         postingListsOrderedByScore = dict()
         postingListsOrderedByScore['aaa'] = pl1_score
         postingListsOrderedByScore['bbb'] = pl2_score

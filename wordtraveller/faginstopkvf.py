@@ -16,14 +16,8 @@ def apply_top_k_algo(words, voc, filemanager, epsilon, k, typeRequest = 'disjunc
     posting_lists_ordered_by_score = dict()
 
     for word in words:
-        orderedById = query.get_posting_list(voc, word, filemanager)
-        orderedByScore = [0] * len(orderedById)
 
-        for i, id in enumerate(orderedById):
-            orderedByScore[i] = (orderedById[id][0],id)
-
-        orderedByScore.sort(key=operator.itemgetter(1), reverse=True)
-        orderedByScore.sort(key=operator.itemgetter(0))
+        orderedById, orderedByScore = query.get_posting_list(voc, word, filemanager, True)
 
         if orderedById and orderedByScore:
             posting_lists_ordered_by_score[word] = orderedByScore
@@ -103,7 +97,8 @@ def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k, ty
     currentScores = SortedList()
     # posting_list_id sera le terme de la posting_list
     for posting_list_id in postingListsOrderedByScore:
-        iterators[posting_list_id] = reversed(postingListsOrderedByScore[posting_list_id])
+        # TODO : Remove obligation to reverse
+        iterators[posting_list_id] = iter(postingListsOrderedByScore[posting_list_id])
         # next donne la tuple <score,idDocument>
         score,idDoc = next(iterators[posting_list_id])
 
