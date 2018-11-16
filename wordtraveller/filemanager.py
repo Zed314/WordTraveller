@@ -49,7 +49,7 @@ class FileManager:
         return self.workspace + self.postingListsFileName + self.extensionPL
 
     def getPathPLScore(self):
-        return self.workspace + self.postingListsFileName + ".score." +self.extensionPL
+        return self.workspace + self.postingListsFileName + ".score" +self.extensionPL
 
     def getPathPLPartial(self, number):
         return self.workspace + self.postingListsFileName + "." + str(number) + ".temp" + self.extensionPL
@@ -77,6 +77,7 @@ class FileManager:
 
     # Merge all the partial vocs and pl created during analysis
     def mergePartialVocsAndPL(self, recomputeIDF = True):
+
         #Get all the PLs and VOCs
         listPartialVocs = self.getListPartialVocs()
         listPartialPLs = self.getListPartialPLs()
@@ -135,7 +136,7 @@ class FileManager:
 
             #Select the best word
             word = currentWords.keys()[0]
-            mergingPLs = SortedDict()
+            mergingPLs = {}
             #For all the documents with this word
             for idDoc in currentWords[word]:
                 preLength = lengthsToReadInPLs[idDoc]
@@ -158,39 +159,33 @@ class FileManager:
                     idfAndScore[0]=(1+math.log(idfAndScore[1]))*math.log(nbTotalDocuments/(1+len(mergingPLs)))
             
             self.save_postList(mergingPLs)
-
+            self.save_postList_by_score(mergingPLs)
             currentWords.pop(word)
         # Close voc file
         exitVoc.close()
+        for pathVoc in listPartialVocs:
+            os.remove(pathVoc)
+        for pathPL in listPartialPLs:
+            os.remove(pathPL)
 
-    def save_postLists_file(self, postingListsIndex, isPartial=False):
+
+
+
+    def save_postLists_from_complete_voc(self, postingListsIndex, isPartial=False, numberPart=-1):
         """
         Preconditions:
             postingListsIndex: is a SortedDict of  words and SortedDict Doc Id and Scores.
-            prefix: is a string
         Postconditions:
-            The fonction save the pls in a file "prefix+self.postingListsFileName".
+            The fonction save the pls in a partial or full pl file.
+            If not partial, the posting list is also stored by score
         """
-        # destination file for wrting (w)b
-        path = ""
-        if isPartial:
-            path = self.getPathPLPartial(self.numberPartialFiles)
-        else:
-            path = self.getPathPL()
-
-        file = open(path, "w+b")
-
-        try:
-            # Encode the record and write it to the dest file
-            for word, postingList in postingListsIndex.items():
-                for idDoc, score in postingList.items():
-                    record = self.struct.pack(idDoc,score[0], score[1])
-                    file.write(record)
-        except IOError:
-            print("Error during the writing")
-            pass
-        finally:
-            file.close()
+        if numberPart == -1:
+            numberPart = self.numberPartialFiles
+        for word in postingListsIndex:
+            #TODO enable is partial there
+            self.save_postList(postingListsIndex[word],isPartial=isPartial, numberPart = numberPart)
+            if not isPartial:
+                self.save_postList_by_score(postingListsIndex[word])
 
     # Save vocabulary that contains both voc and pls
     def save_vocabularyAndPL_file(self, voc, isPartial=False):
@@ -212,7 +207,7 @@ class FileManager:
             vocabulary[word] = current_offset
 
         # saving the plsting lists
-        self.save_postLists_file(voc, isPartial)
+        self.save_postLists_from_complete_voc(voc, isPartial)
         # save the vocabulary
         self.save_vocabulary(vocabulary, isPartial)
         if isPartial:
@@ -232,8 +227,32 @@ class FileManager:
         for word, offset in voc.items():
             file.write("{},{}\n".format(word, offset))
         file.close()
+    
+    def save_postList_by_score(self, postingList, offset = -1):
+        """ Save the postingList of A word after ordered it by score in
+        non ascending order """
+        # destination file for redin and wrting (r+)b
+        if(offset == -1):
+            # Append
+            file = open(self.getPathPLScore(),"a+b")
+            offset = 0
+        else:
+            file = open(self.getPathPLScore(), "w+b")
 
-    def save_postList(self, postingList, offset=-1):
+        try:
+            if(offset!=0):
+                file.seek(self.CONST_SIZE_ON_DISK*offset)
+            # Encode the record and write it to the dest file
+            for idDoc, score in sorted(postingList.items(),  key = lambda s: (-s[1][0],s[0]) ):
+                record = self.struct.pack(idDoc, score[0], score[1])
+                file.write(record)
+
+        except IOError:
+            pass
+        finally:
+            file.close()
+            
+    def save_postList(self, postingList, offset=-1, isPartial = False, numberPart = 0):
         """
         Preconditions:
             postingList: is a dictionary of Doc Id and Scores.
@@ -243,17 +262,21 @@ class FileManager:
             The fonction update the file postingLites.data withe the new postingList after "offet" pairs <Doc Id, Scores>,
         """
         # destination file for redin and wrting (r+)b
-        if(offset == -1):
+        if(offset == -1) and not isPartial:
+            # Append
             file = open(self.getPathPL(),"a+b")
             offset = 0
-        else:
+        elif not isPartial:
             file = open(self.getPathPL(), "w+b")
+        elif isPartial : # we do not append to partial files
+            file = open(self.getPathPLPartial(numberPart),"a+b")
+            
 
         try:
-            if(offset!=0):
+            if(offset>0):
                 file.seek(self.CONST_SIZE_ON_DISK*offset)
             # Encode the record and write it to the dest file
-            for idDoc, score in postingList.items():
+            for idDoc, score in sorted(postingList.items()):
                 record = self.struct.pack(idDoc, score[0], score[1])
                 file.write(record)
 
@@ -264,7 +287,7 @@ class FileManager:
 
     # Save vocabulary that contains number of occurencies
     # The voc and pl are saved to filename+"."+number+"."+extension+".temp"
-    def savePartialVocabulary(self, voc):
+    def savePartialVocabularyAndPL(self, voc):
         """
         Preconditions:
             voc: is a SortedDict of  words and SortedDict Doc Id and Scores.
@@ -280,7 +303,7 @@ class FileManager:
         Postcondition:
             return voc: the a dictionary of words and offset that was saved.
         """
-        filename = ""
+
         if isPartial:
             filename = self.getPathVocPartial(number) 
         else:
@@ -306,19 +329,20 @@ class FileManager:
             return also a posting list sorted by scores : an array of   
         """
         # File to read
-        filename = ""
         if isPartial:
             filename = self.getPathPLPartial(number) 
         else:
             filename = self.getPathPL()
-
         file = open(filename, "rb")
+        if returnPostingListOrderedByScore:
+            filePLScore = open(self.getPathPLScore(), "rb")
         postingList = SortedDict()
-        postingListByScore = SortedDict()
+        postingListByScore = []
         try:
 
             file.seek(self.CONST_SIZE_ON_DISK*offset)
-
+            if (returnPostingListOrderedByScore):
+                filePLScore.seek(self.CONST_SIZE_ON_DISK*offset)
             for x in range(0, length):
                 record = file.read(self.CONST_SIZE_ON_DISK)
                 filed = self.struct.unpack(record)
@@ -327,10 +351,20 @@ class FileManager:
                 nbOccurenciesInDoc = filed[2]
                 postingList[idDoc] = [score,nbOccurenciesInDoc]
                 if (returnPostingListOrderedByScore):
-                    if score in postingListByScore:
-                        postingListByScore[score].append(idDoc)
-                    else:
-                        postingListByScore[score] = [idDoc]
+                    record = filePLScore.read(self.CONST_SIZE_ON_DISK)
+                    filed = self.struct.unpack(record)
+                    idDoc = filed[0]
+                    score = filed[1]
+                    nbOccurenciesInDoc = filed[2]
+                    #todo replace all over the code
+                    # if len(postingListByScore) == 0:
+                    #     postingListByScore.append((score,[idDoc]))
+                    # elif score == postingListByScore[-1][0]:
+                    #     postingListByScore[-1][1].append(idDoc)
+                    # else:
+                    #     postingListByScore.append((score,[idDoc]))
+                    postingListByScore.append((score,idDoc))
+
             if returnPostingListOrderedByScore :
                 return postingList, postingListByScore
             else :

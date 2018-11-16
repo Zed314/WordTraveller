@@ -1,12 +1,13 @@
 import unittest
 import os
 import send2trash
-from wordtraveller import faginsta as faginstatopk
+from wordtraveller import faginstavf as faginstatopk
 from sortedcontainers import SortedDict
 from wordtraveller import filemanager
 from wordtraveller import analysis
 from pathlib import Path
 import math
+import operator
 
 class TestFaginsTATopK(unittest.TestCase):
 
@@ -47,16 +48,22 @@ class TestFaginsTATopK(unittest.TestCase):
 
 
     def test_topk_trivial(self):
-        pl1_score = SortedDict()
-        pl1_score[0.90] = [1]
-        pl1_score[0.70] = [3]
-        pl1_score[0.80] = [2]
+        pl1_score = [0]*3
+        pl1_score[0] = ((0.90,1))
+        pl1_score[1] = ((0.70,3))
+        pl1_score[2] = ((0.80,2))
 
-        pl2_score = SortedDict()
-        pl2_score[0.80] = [2]
-        pl2_score[0.75] = [3]
-        pl2_score[0.85] = [1]
+        pl1_score.sort(key=operator.itemgetter(1), reverse=False)
+        pl1_score.sort(key=operator.itemgetter(0), reverse=True)
 
+
+        pl2_score = [0]*3
+        pl2_score[0] = ((0.80,2))
+        pl2_score[1] = ((0.75,3))
+        pl2_score[2] = ((0.85,1))
+        
+        pl2_score.sort(key=operator.itemgetter(1), reverse=False)
+        pl2_score.sort(key=operator.itemgetter(0), reverse = True)
 
         postingListsOrderedByScore = dict()
         postingListsOrderedByScore['aaa'] = pl1_score
@@ -117,17 +124,17 @@ class TestFaginsTATopK(unittest.TestCase):
         self.assertEqual(top_k, [], "Topk single, k = 0")
 
     def test_topk_twoidenticalscores(self):
-        pl1_score = SortedDict()
-        pl1_score[0.90] = [1]
-        pl1_score[0.90] += [2]
-        pl1_score[0.90] += [3]
 
-        pl2_score = SortedDict()
-        pl2_score[0.85] = [1]
-        pl2_score[0.80] = [2]
-        pl2_score[0.75] = [3]
+        pl1_score = [0]*3
+        pl1_score[0] = ((0.90,1))
+        pl1_score[1] = ((0.90,2))
+        pl1_score[2] = ((0.90,3))
 
-
+        pl2_score = [0]*3
+        pl2_score[0] = ((0.85,1))
+        pl2_score[1] = ((0.80,2))
+        pl2_score[2] = ((0.75,3))
+        
         postingListsOrderedByScore = dict()
         postingListsOrderedByScore['aaa'] = pl1_score
         postingListsOrderedByScore['bbb'] = pl2_score
