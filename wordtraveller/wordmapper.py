@@ -15,7 +15,7 @@ def analysis_parameters():
                         help="nom de fichier pour enregistrer les fichiers après l'indexation ", required=True)
     parser.add_argument("-o", type=str, default='./workspace/',
                         help="dossier pour enregistrer les fichiers après l'indexation ")
-    parser.add_argument("--zip", type=str,
+    parser.add_argument("--zip", type=str, default = 'zip',
                         help="compression à faire à la fin ")
     parser.add_argument("--partial", action='store_true',
                         help='enregistrer les fichiers de manière partiale')
@@ -40,10 +40,22 @@ def analysis_parameters():
             vocabulary = SortedDict()
         print('file %s finished!' % i)
     if args.partial:
+ #       if args.zip:
+ #           if args.zip == "zip":
+#            pass
+  #      else :
+   #         print("Operation non supportée.")
         filemanager.mergePartialVocsAndPL()
     else:
+        #if args.zip:
+       #     if args.zip == "zip":
+      #          pass
+     #       else :
+    #            print("Operation non supportée.")
         filemanager.save_vocabularyAndPL_file(vocabulary)
     print("PL and VOC merged succesfully")
+
+    
 
 if __name__ == "__main__" :
     analysis_parameters()
