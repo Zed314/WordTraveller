@@ -1,6 +1,7 @@
 import wordtraveller.filemanager as fm
 import wordtraveller.analysis as analysis
 import wordtraveller.preprocessing as preprocessing
+import wordtraveller.randomIndexing as ri
 import argparse
 from pathlib import Path
 from sortedcontainers import SortedDict
@@ -21,6 +22,8 @@ def analysis_parameters():
                         help='enregistrer les fichiers de manière partiale')
     parser.add_argument("--stemmer", action='store_true',
                         help='activer stemmer')
+    parser.add_argument("--randomindexing", action='store_true',
+                        help='activer random indexing')
     args = parser.parse_args()
 
     if not args.d.endswith("/"):
@@ -28,13 +31,18 @@ def analysis_parameters():
 
     pathlist = Path(args.d).glob('**/la*')
 
+    TERM_DIMENSION = 15
 
     vocabulary = dict()
     filemanager = fm.FileManager(args.f, args.o)
+    randomIndexing = None
+    if args.randomindexing:
+        randomIndexing = ri.RandomIndexing(term_dimension=TERM_DIMENSION, start=3, end=8)
+
     if args.stemmer:
         analysis.setPreprocessor(preprocessing.Preprocessor(True))
     for i, newspaper_path in enumerate(pathlist):
-        analysis.analyse_newspaper(newspaper_path, vocabulary, True)
+        analysis.analyse_newspaper(newspaper_path, vocabulary, randomIndexing, True)
         if args.partial:
             filemanager.save_vocabularyAndPL_file(vocabulary, True)
             vocabulary = dict()
@@ -43,7 +51,16 @@ def analysis_parameters():
         filemanager.mergePartialVocsAndPL()
     else:
         filemanager.save_vocabularyAndPL_file(vocabulary)
+    # print("VOC: {}".format(vocabulary))
     print("PL and VOC merged succesfully")
+    if args.randomindexing:
+        filemanager.save_random_indexing(randomIndexing.getTermsVectors(),randomIndexing.getTermDimension())
+        print("Random indexing created")
+    # print("randomIndexing.getTermsVectors() {}".format(randomIndexing.getTermsVectors()))
+    ri_voc = filemanager.read_random_indexing(TERM_DIMENSION)
+    for i,ri1 in enumerate(ri_voc):
+        if i<10:
+            print("EO: {} | {}".format(ri1,ri_voc[ri1]))
 
 if __name__ == "__main__" :
     analysis_parameters()

@@ -1,6 +1,7 @@
 import struct
 import os
 import math
+import numpy as np
 
 from sortedcontainers import SortedDict
 from os import walk
@@ -48,6 +49,9 @@ class FileManager:
     def getPathPL(self):
         return self.workspace + self.postingListsFileName + self.extensionPL
 
+    def getPathRandomIndexing(self):
+        return self.workspace + self.vocabularyFileName + '.ri'
+
     def getPathPLScore(self):
         return self.workspace + self.postingListsFileName + ".score" +self.extensionPL
 
@@ -93,7 +97,7 @@ class FileManager:
         offsetNextWord = []
         offsetPreWord = []
         offsetVoc = 0
-        voc = []
+        voc = [] #TODO: pas utilisé?
         idDocsToRead = []
         extractedVocs = []
         for numberDoc in range(totalNumberOfDocs):
@@ -182,7 +186,7 @@ class FileManager:
         if numberPart == -1:
             numberPart = self.numberPartialFiles
         for word in postingListsIndex:
-            #TODO enable is partial there
+            #TODO: enable is partial there
             self.save_postList(postingListsIndex[word],isPartial=isPartial, numberPart = numberPart)
             if not isPartial:
                 self.save_postList_by_score(postingListsIndex[word])
@@ -201,7 +205,7 @@ class FileManager:
         current_offset = 0
         # save all the posting lists
 
-        # we sort voc
+        # we sort voc #TODO: pas utilisé?
         arrayOfVocAndPLs = sorted(voc)
 
         # we sort the PLs inside voc in the functions save_postLists_from_complete_voc
@@ -299,6 +303,30 @@ class FileManager:
         self.numberPartialFiles += 1
         self.save_vocabularyAndPL_file(voc, True)
         pass
+
+    def save_random_indexing(self, terms, term_dimension):
+        self.randomStruct = struct.Struct(str(term_dimension) + 'i')
+        vocabulary = self.read_vocabulary()        
+        file = open(self.getPathRandomIndexing(), "wb")
+        
+        for vo in vocabulary:
+            if(vo != '***NumberDifferentDocs***'):
+                binaryBuff = self.randomStruct.pack(*terms[vo])
+                file.write(binaryBuff)
+
+    def read_random_indexing(self, term_dimension):
+        self.randomStruct = struct.Struct(str(term_dimension) + 'i')
+        file = open(self.getPathRandomIndexing(), "rb")
+        vocabulary = self.read_vocabulary()
+        ri_voc = {}
+        for vo in vocabulary:
+            if(vo != '***NumberDifferentDocs***'):
+                record = file.read(4*term_dimension)
+                decoded = self.randomStruct.unpack(record)
+                ri_voc[vo] = np.array(decoded)
+                # print("EOO: {}:{}\n\r".format(vo,decoded))
+        return ri_voc
+
 
     def read_vocabulary(self, isPartial=False, number=0):
         """

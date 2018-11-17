@@ -18,11 +18,11 @@ def setPreprocessor(preprocessorToSet):
     preprocessor = preprocessorToSet
 
 
-def analyse_newspaper(path, voc, computeIDF=False, nbDocToStart = 0, nbDocToScan = -1):
-    return analyse_newspaper_optimized(path, voc, computeIDF, nbDocToStart, nbDocToScan)
+def analyse_newspaper(path, voc, randomIndexing, computeIDF=False, nbDocToStart = 0, nbDocToScan = -1):
+    return analyse_newspaper_optimized(path, voc, randomIndexing, computeIDF, nbDocToStart, nbDocToScan)
 
 
-def analyse_newspaper_naive(path, voc, computeIDF=False, nbDocToStart = 0, nbDocToScan = -1):
+def analyse_newspaper_naive(path, voc, randIndexing, computeIDF=False, nbDocToStart = 0, nbDocToScan = -1):
 
     raw = path.read_text()
     tree = etree.fromstring("<NEWSPAPER>" + raw + "</NEWSPAPER>")
@@ -39,11 +39,18 @@ def analyse_newspaper_naive(path, voc, computeIDF=False, nbDocToStart = 0, nbDoc
         terms = preprocessor.process(text)
 
         terms.append("***NumberDifferentDocs***")
+
+        # Random Indexing
+        if randIndexing is not None:
+            randIndexing.setDocumentVector(id_doc)
+
         for term in terms:
             if term in voc_doc:
                 voc_doc[term] = voc_doc[term] + 1
             else:
                 voc_doc[term] = 1
+            if randIndexing is not None:
+                randIndexing.addTermVector(term, id_doc)
 
         for term, occurrences in voc_doc.items():
             if term in voc:
@@ -62,7 +69,7 @@ def analyse_newspaper_naive(path, voc, computeIDF=False, nbDocToStart = 0, nbDoc
                     math.log(nbDiffDocs/(1+nbDocsWithWord))
 
 
-def analyse_newspaper_optimized(path, voc, computeIDF=False, nbDocToStart = 0, nbDocToScan = -1):
+def analyse_newspaper_optimized(path, voc, randIndexing, computeIDF=False, nbDocToStart = 0, nbDocToScan = -1):
 
     """ Voc is a dictionnary of word and pl (that are also dictionnaries)
     
@@ -93,11 +100,16 @@ def analyse_newspaper_optimized(path, voc, computeIDF=False, nbDocToStart = 0, n
             voc_doc = {}
             terms = preprocessor.process(documentText)
             terms.append("***NumberDifferentDocs***")
+
+            if randIndexing is not None:
+                randIndexing.setDocumentVector(currDocId)
             for term in terms:
                 if term in voc_doc:
                     voc_doc[term] = voc_doc[term] + 1
                 else:
                     voc_doc[term] = 1
+                if randIndexing is not None:
+                    randIndexing.addTermVector(term, currDocId)
 
             for term, occurrences in voc_doc.items():
                 if term in voc:
