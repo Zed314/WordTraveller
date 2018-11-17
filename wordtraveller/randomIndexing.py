@@ -7,7 +7,7 @@ class RandomIndexing:
     NON_ZEROS_START = 3
     NON_ZEROS_END = 8
 
-    def __init__(self, term_dimension=10, start=3, end=8):
+    def __init__(self, term_dimension=100, start=2, end=20):
         self.documents = {}
         self.voc_doc = {}
         self.TERM_DIMENSION = term_dimension

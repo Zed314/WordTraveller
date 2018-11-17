@@ -31,13 +31,11 @@ def analysis_parameters():
 
     pathlist = Path(args.d).glob('**/la*')
 
-    TERM_DIMENSION = 15
-
     vocabulary = dict()
     filemanager = fm.FileManager(args.f, args.o)
     randomIndexing = None
     if args.randomindexing:
-        randomIndexing = ri.RandomIndexing(term_dimension=TERM_DIMENSION, start=3, end=8)
+        randomIndexing = ri.RandomIndexing()
 
     if args.stemmer:
         analysis.setPreprocessor(preprocessing.Preprocessor(True))
@@ -56,11 +54,6 @@ def analysis_parameters():
     if args.randomindexing:
         filemanager.save_random_indexing(randomIndexing.getTermsVectors(),randomIndexing.getTermDimension())
         print("Random indexing created")
-    # print("randomIndexing.getTermsVectors() {}".format(randomIndexing.getTermsVectors()))
-    ri_voc = filemanager.read_random_indexing(TERM_DIMENSION)
-    for i,ri1 in enumerate(ri_voc):
-        if i<10:
-            print("EO: {} | {}".format(ri1,ri_voc[ri1]))
 
 if __name__ == "__main__" :
     analysis_parameters()

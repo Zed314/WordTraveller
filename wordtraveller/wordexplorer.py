@@ -5,6 +5,7 @@ import wordtraveller.faginstavf as faginsta
 import wordtraveller.faginstopkvf as faginstopk
 import wordtraveller.view as view
 import wordtraveller.preprocessing as preprocessing
+import wordtraveller.randomIndexing as ri
 
 preprocessor = preprocessing.Preprocessor(True)
 
@@ -27,11 +28,18 @@ def analysis_parameters():
                         help="type de visulasation simple ou fullText ")
     parser.add_argument("--vpath", type=str, default="./data/latimesMini/",
                         help="path des fichier sources pour --view fullText")
+    parser.add_argument("--randomindexing", action='store_true',
+                        help='activer query random indexing')
+
 
     args = parser.parse_args()
     # print('Args : {}'.format(args))
     filemanager = fm.FileManager(args.f, args.d)
     savedVoc = filemanager.read_vocabulary()
+    
+    random_indexing = None
+    if args.randomindexing:
+        random_indexing = ri.RandomIndexing()
 
     epsilon = 1
 
@@ -41,6 +49,14 @@ def analysis_parameters():
 
     algoFunct = switchAlgo[args.algo]
     words = preprocessor.process(args.q)
+
+    # TODO: random indexing: voir comment l'appliquer
+    if args.randomindexing:
+        ri_voc = filemanager.read_random_indexing(random_indexing.getTermDimension())
+        for i,ri1 in enumerate(ri_voc):
+            if i<20:
+                print("{} : {}".format(ri1,ri_voc[ri1]))
+
     result = algoFunct(words, savedVoc, filemanager, epsilon, args.n)
 
     switchView = {"simple": view.displayResults,
