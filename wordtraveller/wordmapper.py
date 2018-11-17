@@ -5,6 +5,7 @@ import wordtraveller.randomIndexing as ri
 import argparse
 from pathlib import Path
 from sortedcontainers import SortedDict
+from tqdm import tqdm
 
 
 def analysis_parameters():
@@ -39,16 +40,18 @@ def analysis_parameters():
 
     if args.stemmer:
         analysis.setPreprocessor(preprocessing.Preprocessor(True))
-    for i, newspaper_path in enumerate(pathlist):
+
+    for newspaper_path in tqdm(list(pathlist)):
         analysis.analyse_newspaper(newspaper_path, vocabulary, randomIndexing, True)
         if args.partial:
             filemanager.save_vocabularyAndPL_file(vocabulary, True)
             vocabulary = dict()
-        print('file %s finished!' % i)
+
     if args.partial:
         filemanager.mergePartialVocsAndPL()
     else:
         filemanager.save_vocabularyAndPL_file(vocabulary)
+        
     # print("VOC: {}".format(vocabulary))
     print("PL and VOC merged succesfully")
     if args.randomindexing:

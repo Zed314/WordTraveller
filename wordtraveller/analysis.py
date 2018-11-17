@@ -82,7 +82,8 @@ def analyse_newspaper_optimized(path, voc, randIndexing, computeIDF=False, nbDoc
     nbDocScanned = 0
     documentText = ""
     if type(voc) is dict:
-        print ("voc is a dict")
+        # print ("voc is a dict")
+        pass
     else:
         print("voc is NOT a dict !")
     for line in file:
