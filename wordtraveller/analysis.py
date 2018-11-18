@@ -18,11 +18,11 @@ def setPreprocessor(preprocessorToSet):
     preprocessor = preprocessorToSet
 
 
-def analyse_newspaper(path, voc, randomIndexing, computeIDF=False, nbDocToStart = 0, nbDocToScan = -1):
+def analyse_newspaper(path, voc, randomIndexing=None, computeIDF=False, nbDocToStart = 0, nbDocToScan = -1):
     return analyse_newspaper_optimized(path, voc, randomIndexing, computeIDF, nbDocToStart, nbDocToScan)
 
 
-def analyse_newspaper_naive(path, voc, randIndexing, computeIDF=False, nbDocToStart = 0, nbDocToScan = -1):
+def analyse_newspaper_naive(path, voc, randIndexing=None, computeIDF=False, nbDocToStart = 0, nbDocToScan = -1):
 
     raw = path.read_text()
     tree = etree.fromstring("<NEWSPAPER>" + raw + "</NEWSPAPER>")
@@ -69,7 +69,7 @@ def analyse_newspaper_naive(path, voc, randIndexing, computeIDF=False, nbDocToSt
                     math.log(nbDiffDocs/(1+nbDocsWithWord))
 
 
-def analyse_newspaper_optimized(path, voc, randIndexing, computeIDF=False, nbDocToStart = 0, nbDocToScan = -1):
+def analyse_newspaper_optimized(path, voc, randIndexing= None, computeIDF=False, nbDocToStart = 0, nbDocToScan = -1):
 
     """ Voc is a dictionnary of word and pl (that are also dictionnaries)
     

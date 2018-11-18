@@ -22,7 +22,7 @@ class TestFaginsTopK(unittest.TestCase):
         filemana = filemanager.FileManager("TestFaginsTopK","./tests/workspace/testsfaginstopk")
         tempVoc = dict()
         for path in pathlist:
-            analysis.analyse_newspaper(path, tempVoc, True)
+            analysis.analyse_newspaper(path, tempVoc, computeIDF=True)
         filemana.save_vocabularyAndPL_file(tempVoc)
         
 
