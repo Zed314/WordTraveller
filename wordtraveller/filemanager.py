@@ -171,21 +171,21 @@ class FileManager:
 
 
 
-    def save_postLists_from_complete_voc(self, postingListsIndex, isPartial=False, numberPart=-1):
+    def save_postLists_from_complete_voc(self, completeVoc, isPartial=False, numberPart=-1):
         """
         Preconditions:
-            postingListsIndex: is a SortedDict of  words and SortedDict Doc Id and Scores.
+            postingListsIndex: is an sorted array of  words and unsorted dict of Doc Id and Scores.
         Postconditions:
             The fonction save the pls in a partial or full pl file.
             If not partial, the posting list is also stored by score
         """
         if numberPart == -1:
             numberPart = self.numberPartialFiles
-        for word in postingListsIndex:
+        for word, unsortedPL in completeVoc:
             #TODO enable is partial there
-            self.save_postList(postingListsIndex[word],isPartial=isPartial, numberPart = numberPart)
+            self.save_postList(unsortedPL,isPartial=isPartial, numberPart = numberPart)
             if not isPartial:
-                self.save_postList_by_score(postingListsIndex[word])
+                self.save_postList_by_score(unsortedPL)
 
     # Save vocabulary that contains both voc and pls
     def save_vocabularyAndPL_file(self, voc, isPartial=False):
@@ -201,17 +201,17 @@ class FileManager:
         current_offset = 0
         # save all the posting lists
 
-        # we sort voc
-        arrayOfVocAndPLs = sorted(voc)
+        # we sort voc, returns only the keys !
+        sortedArrayOfVoc = sorted(voc.items())
 
         # we sort the PLs inside voc in the functions save_postLists_from_complete_voc
         
-        for word, pl in voc.items():
-            current_offset += len(pl)
+        for word, unsortedPl in sortedArrayOfVoc:
+            current_offset += len(unsortedPl)
             vocabulary.append((word, current_offset))
 
         # saving the posting lists
-        self.save_postLists_from_complete_voc(voc, isPartial)
+        self.save_postLists_from_complete_voc(sortedArrayOfVoc, isPartial)
         # save the vocabulary
         self.save_vocabulary(vocabulary, isPartial)
         if isPartial:
@@ -220,7 +220,7 @@ class FileManager:
     def save_vocabulary(self, voc, isPartial=False):
         """
         Preconditions:
-            voc: is an array of words and offset.
+            voc: is a sorted array of words and offset.
         postconditions:
             the dictionary is saved in vocabulary.vo
         """
@@ -294,7 +294,7 @@ class FileManager:
     def savePartialVocabularyAndPL(self, voc):
         """
         Preconditions:
-            voc: is a SortedDict of  words and SortedDict Doc Id and Scores.
+            voc: is a arraay of  words and SortedDict Doc Id and Scores.
         """
         self.numberPartialFiles += 1
         self.save_vocabularyAndPL_file(voc, True)

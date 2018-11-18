@@ -1,7 +1,6 @@
 import unittest
 import os
 import send2trash
-from sortedcontainers import SortedDict
 from wordtraveller import filemanager
 from wordtraveller import analysis
 from wordtraveller import naivetopk
@@ -21,7 +20,7 @@ class TestNaiveTopK(unittest.TestCase):
         pathlist = Path("./tests/data/testtrivialtopk/").glob('**/la*')
 
         filemana = filemanager.FileManager("TestFaginsTopK","./tests/workspace/testsfaginstopk")
-        tempVoc = SortedDict()
+        tempVoc = dict()
         for path in pathlist:
             analysis.analyse_newspaper(path, tempVoc, True)
         filemana.save_vocabularyAndPL_file(tempVoc)
