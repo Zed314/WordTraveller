@@ -3,7 +3,6 @@ import os
 import send2trash
 from wordtraveller import faginstopkvf as faginstopk
 from wordtraveller import filemanager, analysis
-from sortedcontainers import SortedDict
 from pathlib import Path
 import math
 import operator
@@ -21,7 +20,7 @@ class TestFaginsTopK(unittest.TestCase):
         pathlist = Path("./tests/data/testtrivialtopk/").glob('**/la*')
 
         filemana = filemanager.FileManager("TestFaginsTopK","./tests/workspace/testsfaginstopk")
-        tempVoc = SortedDict()
+        tempVoc = dict()
         for path in pathlist:
             analysis.analyse_newspaper(path, tempVoc, True)
         filemana.save_vocabularyAndPL_file(tempVoc)
