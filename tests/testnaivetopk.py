@@ -1,7 +1,6 @@
 import unittest
 import os
 import send2trash
-from sortedcontainers import SortedDict
 from wordtraveller import filemanager
 from wordtraveller import analysis
 from wordtraveller import naivetopk
@@ -21,9 +20,9 @@ class TestNaiveTopK(unittest.TestCase):
         pathlist = Path("./tests/data/testtrivialtopk/").glob('**/la*')
 
         filemana = filemanager.FileManager("TestFaginsTopK","./tests/workspace/testsfaginstopk")
-        tempVoc = SortedDict()
+        tempVoc = dict()
         for path in pathlist:
-            analysis.analyse_newspaper(path, tempVoc, True)
+            analysis.analyse_newspaper(path, tempVoc, computeIDF=True)
         filemana.save_vocabularyAndPL_file(tempVoc)
         
 
@@ -126,6 +125,14 @@ class TestNaiveTopK(unittest.TestCase):
         self.assertEqual(top_k, [(1,0.875)], "Topk simple, k = 1")
         top_k = naivetopk.find_top_k(pl_id, 0)
         self.assertEqual(top_k, [], "Topk simple, k = 0")
+
+    @classmethod
+    def tearDownClass(cls):
+        for folderName, subfolders, filenames in os.walk('./tests/workspace/'):
+            for filename in filenames:
+                if (filename.endswith('.vo') or filename.endswith('.pl')):
+                    print('Deleting from folder ' + folderName + ': ' + filename)
+                    send2trash.send2trash(folderName + '/' + filename)
        
        
     # def test_topk_test4(self):
