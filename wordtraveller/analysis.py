@@ -41,13 +41,14 @@ def setPreprocessor(preprocessorToSet):
 
 
 def analyse_newspaper(path, voc, randomIndexing=None, computeIDF=False, nbDocToStart = 0, nbDocToScan = -1):
-    if randomIndexing is not None :
-        return analyse_newspaper_optimized(path, voc, randomIndexing, computeIDF, nbDocToStart, nbDocToScan)    
+    analyse_newspaper_optimized(path, voc, randomIndexing, computeIDF, nbDocToStart, nbDocToScan) 
+    # if randomIndexing is not None :
+    #     return analyse_newspaper_optimized(path, voc, randomIndexing, computeIDF, nbDocToStart, nbDocToScan)    
     
-    if isinstance(path, list):
-        return analyse_newspaper_multithread(path, voc, randomIndexing, computeIDF, nbDocToStart, nbDocToScan)    
-    else :
-        return analyse_newspaper_multithread([path], voc, randomIndexing, computeIDF, nbDocToStart, nbDocToScan)
+    # if isinstance(path, list):
+    #     return analyse_newspaper_multithread(path, voc, randomIndexing, computeIDF, nbDocToStart, nbDocToScan)    
+    # else :
+    #     return analyse_newspaper_multithread([path], voc, randomIndexing, computeIDF, nbDocToStart, nbDocToScan)
 
 def chunks(l, n):
     # For item i in a range that is a length of l,
