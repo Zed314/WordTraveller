@@ -10,7 +10,7 @@ def get_posting_list(voc, word, fileManager, returnPostingListOrderedByScore = F
         else:
             offset = voc.peekitem(voc.index(word)-1)[1]
             length = voc.get(word) - offset
-        return fileManager.read_postList(offset, length, returnPostingListOrderedByScore=returnPostingListOrderedByScore)
+        return fileManager.read_postList(offset, length, returnPostingListOrderedByScore=returnPostingListOrderedByScore,sorted=False)
     else:
         if(returnPostingListOrderedByScore):
             return SortedDict(), SortedDict()

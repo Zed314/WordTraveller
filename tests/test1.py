@@ -149,7 +149,7 @@ class TestAnalysis(unittest.TestCase):
         filemanager = fm.FileManager(filename, currentWorkspace)
 
         for path in pathlist:
-            analysis.analyse_newspaper(path, voc, True)
+            analysis.analyse_newspaper(path, voc, computeIDF=True)
             filemanager.save_vocabularyAndPL_file(voc, True)
             voc = dict()
 
