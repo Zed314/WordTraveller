@@ -7,6 +7,8 @@ class RandomIndexing:
     NON_ZEROS_START = 3
     NON_ZEROS_END = 8
 
+    terms_done = dict()
+
     def __init__(self, term_dimension=100, start=2, end=20):
         self.documents = {}
         self.voc_doc = {}
@@ -40,7 +42,10 @@ class RandomIndexing:
             if term not in self.voc_doc:
                 self.voc_doc[term] = np.zeros(
                     (self.TERM_DIMENSION,), dtype=int)
-            self.voc_doc[term] = self.voc_doc[term] + self.documents[docId]
+                self.terms_done[term] = []
+            if docId not in self.terms_done[term]:
+                self.terms_done[term].append(docId)
+                self.voc_doc[term] = self.voc_doc[term] + self.documents[docId]
 
     def getTermsVectors(self):
         return self.voc_doc

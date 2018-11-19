@@ -344,14 +344,16 @@ class FileManager:
         self.randomStruct = struct.Struct(str(term_dimension) + 'i')
         file = open(self.getPathRandomIndexing(), "rb")
         vocabulary = self.read_vocabulary()
-        ri_voc = {}
+        ri_voc = []
+        ri_terms = []
         for vo in vocabulary:
             if (vo != '***NumberDifferentDocs***'):
                 record = file.read(4 * term_dimension)
                 decoded = self.randomStruct.unpack(record)
-                ri_voc[vo] = np.array(decoded)
+                ri_terms.append(vo)
+                ri_voc.append(np.array(decoded))
                 # print("EOO: {}:{}\n\r".format(vo,decoded))
-        return ri_voc
+        return ri_terms, np.array(ri_voc)
 
     def read_vocabulary(self, isPartial=False, number=0):
         """
