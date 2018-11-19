@@ -101,6 +101,10 @@ class FileManager:
 
         idDocsToRead = []
         extractedVocs = []
+
+        plFiles = []
+        plScoreOutputFile = open(self.getPathPLScore(),"w+b")
+        plOutputFile = open(self.getPathPL(),"w+b")
         for numberDoc in range(totalNumberOfDocs):
             idDocsToRead.append(True)
             extractedVocs.append(iter((self.read_vocabulary(True, numberDoc)).items()))
@@ -109,6 +113,11 @@ class FileManager:
             lengthsToReadInPLs.append(0)
             offsetNextWord.append(0)
             offsetPreWord.append(0)
+           
+
+        for pathPL in self.getListPartialPLs():
+            plFiles.append(open(pathPL, "rb"))
+
 
         currentWords = dict()
         exitVoc = open(self.getPathVoc(), "w+")
@@ -148,7 +157,7 @@ class FileManager:
                 offsetPreWord[idDoc] = offsetNextWord[idDoc]
                 offsetsInPLs[idDoc] = offsetsInPLs[idDoc] + preLength
                 nbLinesRedInVOCs[idDoc] += 1
-                otherPart = self.read_postList(offsetsInPLs[idDoc], lengthsToReadInPLs[idDoc], True, idDoc,  sorted = False)
+                otherPart = self.read_postList(offsetsInPLs[idDoc], lengthsToReadInPLs[idDoc], True, idDoc,  sorted = False,filePL=plFiles[idDoc])
                 mergingPLs.update(otherPart)
                 idDocsToRead[idDoc] = True
 
@@ -162,11 +171,16 @@ class FileManager:
                 for idfAndScore in mergingPLs.values():
                     idfAndScore[0] = (1 + math.log(idfAndScore[1])) * math.log(nbTotalDocuments / (1 + len(mergingPLs)))
 
-            self.save_postList(mergingPLs)
-            self.save_postList_by_score(mergingPLs)
+            self.save_postList(mergingPLs,filePL=plOutputFile)
+            self.save_postList_by_score(mergingPLs,filePlScore=plScoreOutputFile)
             currentWords.pop(word)
-        # Close voc file
+        # Close files
+        plOutputFile.close()
         exitVoc.close()
+        plScoreOutputFile.close()
+        for filePL in plFiles:
+            filePL.close()
+        # delete temp files
         for pathVoc in listPartialVocs:
             os.remove(pathVoc)
         for pathPL in listPartialPLs:
@@ -183,12 +197,19 @@ class FileManager:
         if numberPart == -1:
             numberPart = self.numberPartialFiles
 
+
+        if not isPartial:
+            plFile = open(self.getPathPL(), "w+b")
+            scoreFile = open(self.getPathPLScore(), "w+b")
+        else:
+            plFile = open(self.getPathPLPartial(numberPart), "a+b")
+
         for word, unsortedPL in completeVoc:
             # TODO enable is partial there
-            self.save_postList(unsortedPL, isPartial=isPartial, numberPart=numberPart)
+            self.save_postList(unsortedPL, isPartial=isPartial, numberPart=numberPart,filePL=plFile)
 
             if not isPartial:
-                self.save_postList_by_score(unsortedPL)
+                self.save_postList_by_score(unsortedPL, filePlScore=scoreFile)
 
     # Save vocabulary that contains both voc and pls
     def save_vocabularyAndPL_file(self, voc, isPartial=False):
@@ -235,19 +256,22 @@ class FileManager:
             file.write("{},{}\n".format(word, offset))
         file.close()
 
-    def save_postList_by_score(self, postingList, offset=-1):
+    def save_postList_by_score(self, postingList, offset=-1, filePlScore = None):
         """ Save the postingList of A word after ordered it by score in
         non ascending order """
         # destination file for redin and wrting (r+)b
-        if offset == -1:
-            # Append
-            file = open(self.getPathPLScore(), "a+b")
-            offset = 0
+        if filePlScore is not None:
+            file = filePlScore
         else:
-            file = open(self.getPathPLScore(), "w+b")
+            if offset == -1:
+                # Append
+                file = open(self.getPathPLScore(), "a+b")
+                offset = 0
+            else:
+                file = open(self.getPathPLScore(), "w+b")
 
         try:
-            if (offset != 0):
+            if (offset != 0) and filePlScore is None:
                 file.seek(self.CONST_SIZE_ON_DISK * offset)
             # Encode the record and write it to the dest file
             for idDoc, score in sorted(postingList.items(), key=lambda s: (-s[1][0], s[0])):
@@ -257,9 +281,10 @@ class FileManager:
         except IOError:
             pass
         finally:
-            file.close()
+            if filePlScore is None:
+                file.close()
 
-    def save_postList(self, postingList, offset=-1, isPartial=False, numberPart=0):
+    def save_postList(self, postingList, offset=-1, isPartial=False, numberPart=0,filePL= None):
         """
         Preconditions:
             postingList: is a dictionary of Doc Id and Scores.
@@ -269,7 +294,9 @@ class FileManager:
             The fonction update the file postingLites.data withe the new postingList after "offet" pairs <Doc Id, Scores>,
         """
         # destination file for redin and wrting (r+)b
-        if (offset == -1) and not isPartial:
+        if filePL is not None:
+            file = filePL
+        elif (offset == -1) and not isPartial:
             # Append
             file = open(self.getPathPL(), "a+b")
             offset = 0
@@ -279,7 +306,7 @@ class FileManager:
             file = open(self.getPathPLPartial(numberPart), "a+b")
 
         try:
-            if (offset > 0):
+            if (offset > 0) and filePl is None:
                 file.seek(self.CONST_SIZE_ON_DISK * offset)
             # Encode the record and write it to the dest file
             for idDoc, score in sorted(postingList.items()):
@@ -289,7 +316,8 @@ class FileManager:
         except IOError:
             pass
         finally:
-            file.close()
+            if filePL is None:
+                file.close()
 
     # Save vocabulary that contains number of occurencies
     # The voc and pl are saved to filename+"."+number+"."+extension+".temp"
@@ -348,7 +376,7 @@ class FileManager:
         file.close()
         return voc
 
-    def read_postList(self, offset, length, isPartial=False, number=0, returnPostingListOrderedByScore=False, sorted = True):
+    def read_postList(self, offset, length, isPartial=False, number=0, returnPostingListOrderedByScore=False, sorted = False,filePL=None):
         """
         Precondtions:
             offset: is the numbers of pairs <Doc Id, Scores> already written in the binary doc
@@ -362,17 +390,22 @@ class FileManager:
             filename = self.getPathPLPartial(number)
         else:
             filename = self.getPathPL()
-        file = open(filename, "rb")
+        if filePL is None:
+            file = open(filename, "rb")
+        else:
+            file = filePL
+
         if returnPostingListOrderedByScore:
             filePLScore = open(self.getPathPLScore(), "rb")
+
         if sorted:
             postingList = SortedDict()
         else :
             postingList = {}
         postingListByScore = []
         try:
-
-            file.seek(self.CONST_SIZE_ON_DISK * offset)
+            if filePL is None:
+                file.seek(self.CONST_SIZE_ON_DISK * offset)
             if returnPostingListOrderedByScore:
                 filePLScore.seek(self.CONST_SIZE_ON_DISK * offset)
             for x in range(0, length):
@@ -408,4 +441,5 @@ class FileManager:
             # Nothing for this example
             pass
         finally:
-            file.close()
+            if filePL is None:
+                file.close()
