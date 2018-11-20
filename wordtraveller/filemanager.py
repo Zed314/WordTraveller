@@ -105,6 +105,7 @@ class FileManager:
         plFiles = []
         plScoreOutputFile = open(self.getPathPLScore(),"w+b")
         plOutputFile = open(self.getPathPL(),"w+b")
+
         for numberDoc in range(totalNumberOfDocs):
             idDocsToRead.append(True)
             extractedVocs.append(iter((self.read_vocabulary(True, numberDoc)).items()))
@@ -210,14 +211,20 @@ class FileManager:
 
             if not isPartial:
                 self.save_postList_by_score(unsortedPL, filePlScore=scoreFile)
+        if not isPartial:
+            plFile.close()
+            scoreFile.close()
+        else :
+            plFile.close()
 
-    # Save vocabulary that contains both voc and pls
+    
     def save_vocabularyAndPL_file(self, voc, isPartial=False):
         """
+        Save invertedFile that contains both voc and pls
         Preconditions:
             voc: is an array of words and SortedDict Doc Id and Scores.
         Postconditions:
-            The function saves the vocs in a file named self.postingListsFileName 
+            The function saves the vocs in a file named self.getVocFilename 
             pls in a file "self.postingListsFileName".
         """
         # map vocabulary offset
@@ -445,3 +452,5 @@ class FileManager:
         finally:
             if filePL is None:
                 file.close()
+            if returnPostingListOrderedByScore:
+                filePLScore.close()
