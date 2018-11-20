@@ -9,7 +9,7 @@ class RandomIndexing:
 
     terms_done = dict()
 
-    def __init__(self, term_dimension=1000, start=0, end=999):
+    def __init__(self, term_dimension=1000, start=2, end=40):
         self.documents = {}
         self.voc_doc = {}
         self.TERM_DIMENSION = term_dimension
