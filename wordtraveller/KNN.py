@@ -1,4 +1,5 @@
 import numpy as np
+import argparse
 from scipy import spatial
 import wordtraveller.filemanager as fm
 import wordtraveller.randomIndexing as ri
@@ -40,19 +41,33 @@ def cosin_distance(vector1, vector2):
         return dot_product / ((normA * normB) ** 0.5)
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("-d", type=str, default='./workspace/',
+                        help="dossier avec les fichier VOC et PL résultat de l'indexation")
+    parser.add_argument("-f", type=str,
+                        help="nom de fichier VOC et PL ", required=True)
+    parser.add_argument("-t", type=str,
+                        help="term pour chercher les termes plus proches ", required=True)
+
+    args = parser.parse_args()
+
     group = np.array([[1, 1.1], [1, 1], [0, 0], [0, 0.1]])
     # print(" {} {} {}".format(group[0], group[1], cosine_similarity()))
     random_indexing = ri.RandomIndexing()
+    filemanager = fm.FileManager(args.f, args.d)
 
-    filemanager = fm.FileManager('allDocs', './workspace/randomIndexing/')
     ri_term, ri_voc = filemanager.read_random_indexing(random_indexing.getTermDimension())
 
-    indexToSearch = ri_term.index("purple")
 
-    # for i,ri1 in enumerate(ri_voc):
-    #     if i<20000 and i>19990:
-    #         print("{} : {}".format(ri_term[i],ri_voc[i]))
-    print("Finding: {} | {}".format(ri_term[indexToSearch],ri_voc[indexToSearch]))
-    res = classify(ri_voc[indexToSearch], ri_voc, 20)
-    for mot in res:
-        print("Proche: {} {}".format(ri_term[mot], ri_voc[mot]))
+    try:
+        indexToSearch = ri_term.index(args.t)
+        # for i,ri1 in enumerate(ri_voc):
+        #     if i<20000 and i>19990:
+        #         print("{} : {}".format(ri_term[i],ri_voc[i]))
+        print("Finding: {} ".format(ri_term[indexToSearch]))
+        res = classify(ri_voc[indexToSearch], ri_voc, 20)
+        for i,mot in enumerate(res):
+            print("{:<3} : {}".format(i,ri_term[mot]))
+    except ValueError as e:
+        print(args.t + ' is not in the indexed list')
