@@ -36,19 +36,20 @@ def analysis_parameters():
     # print('Args : {}'.format(args))
     filemanager = fm.FileManager(args.f, args.d)
     savedVoc = filemanager.read_vocabulary()
-    
+
     random_indexing = None
     if args.randomindexing:
         random_indexing = ri.RandomIndexing()
 
     epsilon = 1
 
-    switchAlgo = {"naive": naivetopk.naive_top_k_algo,
+    switchAlgo = {"naive": naivetopk.apply_naive_top_k_algo,
                   "fagins": faginstopk.apply_top_k_algo,
                   "faginsTA": faginsta.apply_fagins_ta}
 
     algoFunct = switchAlgo[args.algo]
     words = preprocessor.process(args.q)
+    print (words)
 
     # TODO: random indexing: voir comment l'appliquer
     if args.randomindexing:
@@ -58,6 +59,7 @@ def analysis_parameters():
                 print("{} : {}".format(ri1,ri_voc[ri1]))
 
     result = algoFunct(words, savedVoc, filemanager, epsilon, args.n)
+    print(result)
 
     switchView = {"simple": view.displayResults,
                   "fullText": view.displayResultsText}
