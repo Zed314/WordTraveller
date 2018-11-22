@@ -1,7 +1,6 @@
 import unittest
 from wordtraveller import analysis, query
 from wordtraveller import filemanager as fm
-from sortedcontainers import SortedDict
 from pathlib import Path
 import send2trash
 import os
@@ -12,7 +11,7 @@ class TestAnalysis(unittest.TestCase):
     # http://www.writewords.org.uk/word_count.asp
 
     def test_simple(self):
-        voc = SortedDict()
+        voc = dict()
         currentWorkspace = './tests/workspace/test1/'
         filename = 'test1'
 
@@ -31,7 +30,7 @@ class TestAnalysis(unittest.TestCase):
         self.assertEqual(mot3, {3: [0, 1]})
 
     def test_with_stopwords(self):
-        voc = SortedDict()
+        voc = dict()
         currentWorkspace = './tests/workspace/test2/'
         filename = 'test2'
 
@@ -54,7 +53,7 @@ class TestAnalysis(unittest.TestCase):
         self.assertEqual(stop1, {})
 
     def test_merging(self):
-        voc = SortedDict()
+        voc = dict()
         currentWorkspace = './tests/workspace/test3/'
         filename = 'test3'
 
@@ -65,7 +64,7 @@ class TestAnalysis(unittest.TestCase):
         for path in pathlist:
             analysis.analyse_newspaper(path, voc)
             filemanager.save_vocabularyAndPL_file(voc, True)
-            voc = SortedDict()
+            voc = dict()
 
         filemanager.mergePartialVocsAndPL(False)
 
@@ -88,7 +87,7 @@ class TestAnalysis(unittest.TestCase):
         self.assertEqual(sortedByScore, [(0, 3),(0, 6)])
 
     def test_merging_3_files(self):
-        voc = SortedDict()
+        voc = dict()
         currentWorkspace = './tests/workspace/test4/'
         filename = 'test4merging3files'
 
@@ -96,26 +95,11 @@ class TestAnalysis(unittest.TestCase):
 
         filemanager = fm.FileManager(filename, currentWorkspace)
 
-        # try:
-        #     os.remove(filemanager.getPathPL())
-        # except FileNotFoundError:
-        #     pass
-        # try:
-        #     os.remove(filemanager.getPathPLScore())
-        # except FileNotFoundError:
-        #     pass
-        # try:
-        #     os.remove(filemanager.getPathVoc())
-        # except FileNotFoundError:
-        #     pass
-        # os.remove(self.getPathPL())
-        # os.remove(self.getPathPLScore())
-        # os.remove(self.getPathVoc())
 
         for path in pathlist:
             analysis.analyse_newspaper(path, voc)
             filemanager.save_vocabularyAndPL_file(voc, True)
-            voc = SortedDict()
+            voc = dict()
 
         filemanager.mergePartialVocsAndPL(False)
 
@@ -156,7 +140,7 @@ class TestAnalysis(unittest.TestCase):
         self.assertEqual(mot, {}, 'll is considered a stopword')
 
     def test_merging_3_files_scores(self):
-        voc = SortedDict()
+        voc = dict()
         currentWorkspace = './tests/workspace/test4/'
         filename = 'test4merging3filesscores'
 
@@ -165,9 +149,9 @@ class TestAnalysis(unittest.TestCase):
         filemanager = fm.FileManager(filename, currentWorkspace)
 
         for path in pathlist:
-            analysis.analyse_newspaper(path, voc, True)
+            analysis.analyse_newspaper(path, voc, computeIDF=True)
             filemanager.save_vocabularyAndPL_file(voc, True)
-            voc = SortedDict()
+            voc = dict()
 
         filemanager.mergePartialVocsAndPL(True)
 
@@ -211,6 +195,15 @@ class TestAnalysis(unittest.TestCase):
         # self.assertEqual(mot, {23: [0, 1]})
         # mot = query.get_posting_list(savedVoc, "ll", filemanager)
         # self.assertEqual(mot, {}, 'll is considered a stopword')
+
+
+    @classmethod
+    def tearDownClass(cls):
+        for folderName, subfolders, filenames in os.walk('./tests/workspace/'):
+            for filename in filenames:
+                if (filename.endswith('.vo') or filename.endswith('.pl')):
+                    print('Deleting from folder ' + folderName + ': ' + filename)
+                    send2trash.send2trash(folderName + '/' + filename)
 
 
 if __name__ == '__main__':

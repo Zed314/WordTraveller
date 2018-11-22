@@ -55,6 +55,14 @@ class TestFileManager(unittest.TestCase):
         # for numDoc, score in pl.items():
         #     print("{} => {}.".format(numDoc, score))
 
+    @classmethod
+    def tearDownClass(cls):
+        for folderName, subfolders, filenames in os.walk('./tests/workspace/'):
+            for filename in filenames:
+                if (filename.endswith('.vo') or filename.endswith('.pl')):
+                    print('Deleting from folder ' + folderName + ': ' + filename)
+                    send2trash.send2trash(folderName + '/' + filename)
+
         
 if __name__ == '__main__':
     for folderName, subfolders, filenames in os.walk('./tests/workspace/'):
