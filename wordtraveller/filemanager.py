@@ -206,7 +206,7 @@ class FileManager:
             plFile = open(self.getPathPLPartial(numberPart), "a+b")
 
         for word, unsortedPL in completeVoc:
-            # TODO enable is partial there
+            
             self.save_postList(unsortedPL, isPartial=isPartial, numberPart=numberPart,filePL=plFile)
 
             if not isPartial:
