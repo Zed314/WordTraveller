@@ -20,7 +20,7 @@ def analysis_parameters():
     parser.add_argument("--zip", type=str,
                         help="compression à faire à la fin ")
     parser.add_argument("--partial", type=int,default=-1,
-                        help='créer les fichiers par réunion de plusieurs fichiers avec une granularité (par défaut : un pour chaque journal)')
+                        help='créer les fichiers par réunion de plusieurs fichiers avec une granularité de documents choisie. Valeur conseillée : 1000.')
     parser.add_argument("--stemmer", action='store_true',
                         help='activer stemmer')
     parser.add_argument("--randomindexing", action='store_true',
@@ -43,12 +43,29 @@ def analysis_parameters():
 
 
     if args.partial !=-1:
+        nbDocsInMemory = 0
+        stepFlush = args.partial
         for newspaper_path in tqdm(list(pathlist)):
-            analysis.analyse_newspaper(newspaper_path, vocabulary, randomIndexing, True)
-            filemanager.save_vocabularyAndPL_file(vocabulary, True)
-            vocabulary = dict()
+            
+            docsRedInDocIteration = -1
+            nbDocsRedInThisJournal = 0
+            while(docsRedInDocIteration !=0):
+                docsRedInDocIteration = analysis.analyse_newspaper(newspaper_path,vocabulary,None,False,nbDocsRedInThisJournal,nbDocsRedInThisJournal+stepFlush)
+                nbDocsInMemory += docsRedInDocIteration
+                nbDocsRedInThisJournal += docsRedInDocIteration
+                if nbDocsInMemory >= stepFlush:
+                    filemanager.save_vocabularyAndPL_file(vocabulary, isPartial = True)
+                    vocabulary = dict()
+                    nbDocsInMemory = 0
+        
+        if nbDocsInMemory!=0:
+            filemanager.save_vocabularyAndPL_file(vocabulary, isPartial = True)
+            
+        print("Merging in progress…")
+
         filemanager.mergePartialVocsAndPL()
         print("PL and VOC merged succesfully")
+
     else :
         for newspaper_path in tqdm(list(pathlist)):
             analysis.analyse_newspaper(newspaper_path, vocabulary, randomIndexing, True)
