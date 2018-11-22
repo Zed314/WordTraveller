@@ -41,7 +41,7 @@ def setPreprocessor(preprocessorToSet):
 
 
 def analyse_newspaper(path, voc, randomIndexing=None, computeIDF=False, nbDocToStart = 0, nbDocToScan = -1):
-    analyse_newspaper_optimized(path, voc, randomIndexing, computeIDF, nbDocToStart, nbDocToScan) 
+    return analyse_newspaper_optimized(path, voc, randomIndexing, computeIDF, nbDocToStart, nbDocToScan) 
     # if randomIndexing is not None :
     #     return analyse_newspaper_optimized(path, voc, randomIndexing, computeIDF, nbDocToStart, nbDocToScan)    
     
