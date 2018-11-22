@@ -6,8 +6,8 @@ from sortedcontainers import SortedDict
 from pathlib import Path
 
 
-def conjunctive_queries(words, voc, filemanager):
-    posting_lists = [query.get_posting_list(voc, word, filemanager) for word in words]
+def conjunctive_queries(posting_lists):
+    #posting_lists = [query.get_posting_list(voc, word, filemanager) for word in words]
     # print("**********************posting_lists: {}".format(posting_lists))
     smallest_pl_length = len(posting_lists[0])
     smallest_pl = posting_lists[0]
@@ -34,8 +34,8 @@ def conjunctive_queries(words, voc, filemanager):
     return docs
 
 
-def disjunctive_queries(words, voc, filemanager):
-    posting_lists = [query.get_posting_list(voc, word, filemanager) for word in words]
+def disjunctive_queries(posting_lists):
+    #posting_lists = [query.get_posting_list(voc, word, filemanager) for word in words]
     # print("pl: {}".format(posting_lists))
     docs = set()
     for posting_list in posting_lists:
@@ -45,13 +45,15 @@ def disjunctive_queries(words, voc, filemanager):
 
     return docs
 
-
-#get_docs_func can be conjunctive_queries or disjunctive_queries
-def naive_top_k_algo(words, voc, filemanager, epsilon, k, get_docs_func=disjunctive_queries):
+def apply_naive_top_k_algo(words, voc, filemanager, epsilon, k, get_docs_func=disjunctive_queries):
     posting_lists = [query.get_posting_list(voc, word, filemanager) for word in words]
     if all((not posting_list) for posting_list in posting_lists):
         return []
-    docs = get_docs_func(words, voc, filemanager)
+    return naive_top_k_algo(posting_lists, k, get_docs_func)
+
+#get_docs_func can be conjunctive_queries or disjunctive_queries
+def naive_top_k_algo(posting_lists, k, get_docs_func):
+    docs = get_docs_func( posting_lists)
     aggregated_posting_list = aggregate_scores(posting_lists, docs, aggregative_function_mean)
     return find_top_k(aggregated_posting_list, k)
 
