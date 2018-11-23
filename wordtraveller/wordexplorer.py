@@ -41,7 +41,7 @@ def analysis_parameters():
     if args.randomindexing:
         random_indexing = ri.RandomIndexing()
 
-    epsilon = 1
+    epsilon = 0
 
     switchAlgo = {"naive": naivetopk.apply_naive_top_k_algo,
                   "fagins": faginstopk.apply_top_k_algo,

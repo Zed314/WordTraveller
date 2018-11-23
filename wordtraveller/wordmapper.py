@@ -40,11 +40,23 @@ def analysis_parameters():
 
     if args.stemmer:
         analysis.setPreprocessor(preprocessing.Preprocessor(True))
+    
+    # TODO : enable per newspaper
+    if args.partial ==-2:
+        print("Partial analysis in progress")
+        for newspaper_path in tqdm(list(pathlist)):
+            docsRedInDocIteration = analysis.analyse_newspaper(newspaper_path,vocabulary,None,False)
+            filemanager.save_vocabularyAndPL_file(vocabulary, isPartial = True)
+            vocabulary = dict()
+                    
+        print("Merging in progress…")
 
-
+        filemanager.mergePartialVocsAndPL()
+        print("PL and VOC merged succesfully")  
     if args.partial !=-1:
         nbDocsInMemory = 0
         stepFlush = args.partial
+   
         for newspaper_path in tqdm(list(pathlist)):
             
             docsRedInDocIteration = -1
@@ -67,6 +79,7 @@ def analysis_parameters():
         print("PL and VOC merged succesfully")
 
     else :
+        print("Non partial")
         for newspaper_path in tqdm(list(pathlist)):
             analysis.analyse_newspaper(newspaper_path, vocabulary, randomIndexing, True)
         filemanager.save_vocabularyAndPL_file(vocabulary)
