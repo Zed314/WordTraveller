@@ -29,7 +29,7 @@ def analysis_parameters():
                         help="type de visualisation. Options possible: simple ou fullText ")
     parser.add_argument("--vpath", type=str, default="./data/latimesMini/",
                         help="path des fichier sources pour --view fullText")
-    parser.add_argument("--improvedrequest", action='store_true',
+    parser.add_argument("--improvedquery", action='store_true',
                         help="activer recherche de synonymes pour l'amélioration de la requête")
 
 
