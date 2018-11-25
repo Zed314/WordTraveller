@@ -70,7 +70,9 @@ def analysis_parameters():
 
     else :
         for newspaper_path in tqdm(list(pathlist)):
-            analysis.analyse_newspaper(newspaper_path, vocabulary, randomIndexing, True)
+            analysis.analyse_newspaper(newspaper_path, vocabulary, randomIndexing, False)
+
+        analysis.computeIDF(vocabulary)
         filemanager.save_vocabularyAndPL_file(vocabulary)
         
         print("Inverted file created !")
@@ -80,11 +82,10 @@ def analysis_parameters():
         print ("Compressing…")
         filemanager = fm.FileManager(args.f, args.o)
 
-        zip.compressPLVBYTE("exit.pl",filemanager)
-        zip.decompressPLVBYTE("exit.pl",filemanager)
-        zip.compressZip(filemanager.getPathPL())
-        zip.compressZip(filemanager.getPathPLScore())
-        zip.compressZip(filemanager.getPathVoc())
+        zip.compressPLVBYTEFromSavedVocAndPL(filemanager)
+        zip.decompressPLVBYTE(filemanager)
+        zip.compressZip(filemanager.getPathPLCompressed())
+        zip.compressZip(filemanager.getPathVocCompressed())
         print("Compressed !")
 
     if args.randomindexing:

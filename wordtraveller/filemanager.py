@@ -56,6 +56,20 @@ class FileManager:
     def getPathPLScore(self):
         return self.workspace + self.postingListsFileName + ".score" + self.extensionPL
 
+    def doesCompressedVersionExists(self):
+        return  os.path.isfile(self.getPathVocCompressed()) and os.path.isfile(self.getPathPLCompressed())
+
+    def doesUnCompressedVersionExists(self):
+        return  os.path.isfile(self.getPathVoc()) and os.path.isfile(self.getPathPL()) and os.path.isfile(self.getPathPLScore())
+
+
+    def getPathVocCompressed(self):
+        return  self.getPathVoc()+".compressed"
+
+    def getPathPLCompressed(self):
+        return  self.getPathPL()+".compressed"
+
+
     def getPathPLPartial(self, number):
         return self.workspace + self.postingListsFileName + "." + str(number) + ".temp" + self.extensionPL
 

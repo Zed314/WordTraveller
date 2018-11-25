@@ -106,6 +106,15 @@ def analyse_newspaper_multithread(paths, voc, randIndexing=None, computeIDF=Fals
 
     return res
 
+def computeIDF(voc):
+    nbDiffDocs = len(voc["***NumberDifferentDocs***"])
+    for term, pl in voc.items():
+        if term == "***NumberDifferentDocs***":
+            continue
+        nbDocsWithWord = len(voc[term])
+        for idfAndScore in pl.values():
+            idfAndScore[0] = (1+math.log(idfAndScore[1])) * \
+                math.log(nbDiffDocs/(1+nbDocsWithWord))
 
 def analyse_newspaper_naive(path, voc, randIndexing=None, computeIDF=False, nbDocToStart=0, nbDocToScan=-1):
 
