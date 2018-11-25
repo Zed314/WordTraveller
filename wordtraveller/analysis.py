@@ -2,6 +2,7 @@
 import math
 import re
 import time
+import numpy
 from pathlib import Path
 from threading import Thread
 
@@ -113,8 +114,8 @@ def computeIDF(voc):
             continue
         nbDocsWithWord = len(voc[term])
         for idfAndScore in pl.values():
-            idfAndScore[0] = (1+math.log(idfAndScore[1])) * \
-                math.log(nbDiffDocs/(1+nbDocsWithWord))
+            idfAndScore[0] = (1+numpy.log(idfAndScore[1])) * \
+                numpy.log(nbDiffDocs/(1+nbDocsWithWord))
 
 def analyse_newspaper_naive(path, voc, randIndexing=None, computeIDF=False, nbDocToStart=0, nbDocToScan=-1):
 
