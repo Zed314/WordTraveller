@@ -1,0 +1,25 @@
+
+
+
+python3 -m wordtraveller.wordmapper -d data/latimesMini -f testDemoStemmer --stemmer
+
+python3 -m wordtraveller.wordmapper -d data/latimesMini -f testDemo 
+
+python3 -m wordtraveller.wordmapper -d data/latimesMini -f testPartial300 --partial 300
+
+python3 -m wordtraveller.wordmapper -d data/latimesMini -f testPartial10 --partial 10
+
+python3 -m wordtraveller.wordmapper -d data/latimesMini -f testDemoRI --randomindexing
+
+# Demo is available and have to be found and put into workspace
+python3 -m wordtraveller.wordexplorer -q time,make -d  ./workspace/ -f testDemo2 --algo=naive -n 3
+python3 -m wordtraveller.wordexplorer -q time,make -d  ./workspace/ -f testDemo2 --algo=fagins -n 3
+python3 -m wordtraveller.wordexplorer -q time,make -d  ./workspace/ -f testDemo2 --algo=faginsTA -n 3
+
+python3 -m wordtraveller.wordexplorer -q time,make -d  ./workspace/ -f testDemo2 --algo=fagins -n 3 --view fullText --vpath data/latimes/
+
+
+python3 -m wordtraveller.KNN  -d  ./workspace/ -f testDemoRI -t investment
+
+
+
