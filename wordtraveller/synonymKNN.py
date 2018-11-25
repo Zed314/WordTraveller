@@ -52,8 +52,8 @@ def get_synonyms(term, n, term_dimension, filemanager):
         for term_index in result:
             # print("{:<3} : {}".format(i,ri_term[mot]))
             synonym_result.append(ri_term[term_index])
-    except ValueError as e:
-        print(args.t + ' is not in the indexed list')
+    except ValueError:
+        raise Exception(term + ' not found in the indexed list')
 
     return synonym_result
 
@@ -71,8 +71,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    group = np.array([[1, 1.1], [1, 1], [0, 0], [0, 0.1]])
-    # print(" {} {} {}".format(group[0], group[1], cosine_similarity()))
     random_indexing = ri.RandomIndexing()
     filemanager = fm.FileManager(args.f, args.d)
 
@@ -85,10 +83,7 @@ if __name__ == "__main__":
     stemmed = preprocessor.process(args.t)
     try:
         indexToSearch = ri_term.index(stemmed[0])
-        # for i,ri1 in enumerate(ri_voc):
-        #     if i<20000 and i>19990:
-        #         print("{} : {}".format(ri_term[i],ri_voc[i]))
-        print("Finding: {} ".format(ri_term[indexToSearch]))
+        print("Synonymes for : {} ".format(ri_term[indexToSearch]))
         res = classify(ri_voc[indexToSearch], ri_voc, 20)
         for i,term_index in enumerate(res):
             print("{:<3} : {}".format(i,ri_term[term_index]))

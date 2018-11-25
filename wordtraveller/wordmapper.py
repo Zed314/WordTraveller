@@ -19,7 +19,7 @@ def analysis_parameters():
                         help="dossier pour enregistrer les fichiers après l'indexation ")
     parser.add_argument("--zip", type=str,
                         help="compression à faire à la fin ")
-    parser.add_argument("--partial", type=int,default=-1,
+    parser.add_argument("--partial", type=int, default=-1,
                         help='créer les fichiers par réunion de plusieurs fichiers avec une granularité de documents choisie. Valeur conseillée : 1000.')
     parser.add_argument("--stemmer", action='store_true',
                         help='activer stemmer')
@@ -27,10 +27,11 @@ def analysis_parameters():
                         help='activer random indexing')
     args = parser.parse_args()
 
+    latimes_path = args.d
     if not args.d.endswith("/"):
-        path = args.d + "/"
+        latimes_path += "/"
 
-    pathlist = Path(args.d).glob('**/la*')
+    pathlist = Path(latimes_path).glob('**/la*')
 
     vocabulary = dict()
     filemanager = fm.FileManager(args.f, args.o)
@@ -63,7 +64,7 @@ def analysis_parameters():
             nbDocsRedInThisJournal = 0
             while(docsRedInDocIteration !=0):
                 # TODO: default random Indexing to None ?
-                docsRedInDocIteration = analysis.analyse_newspaper(newspaper_path,vocabulary,None,False,nbDocsRedInThisJournal,nbDocsRedInThisJournal+stepFlush)
+                docsRedInDocIteration = analysis.analyse_newspaper(newspaper_path,vocabulary,random_indexing,False,nbDocsRedInThisJournal,nbDocsRedInThisJournal+stepFlush)
                 nbDocsInMemory += docsRedInDocIteration
                 nbDocsRedInThisJournal += docsRedInDocIteration
                 if nbDocsInMemory >= stepFlush:

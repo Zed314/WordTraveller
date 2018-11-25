@@ -19,28 +19,24 @@ def analysis_parameters():
                         help="nom de fichier VOC et PL ", required=True)
     parser.add_argument("-q", type=str,
                         help="requête des termes separés par un virgule. Ex: voiture,maison ", required=True)
-    parser.add_argument("--file", type=str,
-                        help="fichier avec un nombre de mots pour la requête (à definir la structure de ce fichier)")
+    # parser.add_argument("--file", type=str,
+    #                     help="fichier avec un nombre de mots pour la requête (à definir la structure de ce fichier)")
     parser.add_argument("-n", type=int, default=3,
                         help="nombre de résultats souhaité de documents ")
     parser.add_argument("--algo", type=str, default="naive",
-                        help="algorithme souhaité pour l'indexation ")
+                        help="algorithme souhaité pour la rêquete ")
     parser.add_argument("--view", type=str, default="simple",
-                        help="type de visulasation simple ou fullText ")
+                        help="type de visualisation. Options possible: simple ou fullText ")
     parser.add_argument("--vpath", type=str, default="./data/latimesMini/",
                         help="path des fichier sources pour --view fullText")
     parser.add_argument("--improvedrequest", action='store_true',
-                        help='activer recherche de synonymes')
+                        help="activer recherche de synonymes pour l'amélioration de la requête")
 
 
     args = parser.parse_args()
     # print('Args : {}'.format(args))
     filemanager = fm.FileManager(args.f, args.d)
     savedVoc = filemanager.read_vocabulary()
-
-    random_indexing = None
-    if args.improvedrequest:
-        random_indexing = ri.RandomIndexing()
 
     epsilon = 0
 
@@ -50,21 +46,24 @@ def analysis_parameters():
 
     algoFunct = switchAlgo[args.algo]
     
-    raw_words = args.q
-    words = preprocessor.process(raw_words)
-    
+    words = preprocessor.process(args.q)
     words_request = []
     if args.improvedrequest:
-        for word in raw_words.split(","):
+        random_indexing = ri.RandomIndexing()
+        for word in words:
             words_request.append(word)
-            synonymes = synknn.get_synonyms(word,2,random_indexing.getTermDimension(),filemanager)
-            # print("synonymes {} ".format(synonymes))
-            if len(synonymes) == 2:
-                words_request.append(synonymes[1])
-        
-        print("Improved request: {}".format(words_request))
 
-    result = algoFunct(words, savedVoc, filemanager, epsilon, args.n)
+            try:
+                synonymes = synknn.get_synonyms(word,2,random_indexing.getTermDimension(),filemanager)
+                # print("synonymes {} ".format(synonymes))
+                if len(synonymes) == 2:
+                    words_request.append(synonymes[1])
+            except Exception as e:
+                print(e)
+        print("Improved request: {}".format(words_request))
+    else:
+        words_request = words
+    result = algoFunct(words_request, savedVoc, filemanager, epsilon, args.n)
     # print(result)
 
     switchView = {"simple": view.displayResults,
