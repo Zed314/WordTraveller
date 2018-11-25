@@ -313,6 +313,7 @@ class FileManager:
             file = open(self.getPathPLPartial(numberPart), "a+b")
 
         try:
+            # FIXME: filePL is file instead?
             if (offset > 0) and filePl is None:
                 file.seek(self.CONST_SIZE_ON_DISK * offset)
             # Encode the record and write it to the dest file

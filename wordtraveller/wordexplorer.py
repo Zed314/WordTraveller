@@ -6,6 +6,7 @@ import wordtraveller.faginstopkvf as faginstopk
 import wordtraveller.view as view
 import wordtraveller.preprocessing as preprocessing
 import wordtraveller.randomIndexing as ri
+import wordtraveller.synonymKNN as synknn
 
 preprocessor = preprocessing.Preprocessor(True)
 
@@ -28,8 +29,8 @@ def analysis_parameters():
                         help="type de visulasation simple ou fullText ")
     parser.add_argument("--vpath", type=str, default="./data/latimesMini/",
                         help="path des fichier sources pour --view fullText")
-    parser.add_argument("--randomindexing", action='store_true',
-                        help='activer query random indexing')
+    parser.add_argument("--improvedrequest", action='store_true',
+                        help='activer recherche de synonymes')
 
 
     args = parser.parse_args()
@@ -38,7 +39,7 @@ def analysis_parameters():
     savedVoc = filemanager.read_vocabulary()
 
     random_indexing = None
-    if args.randomindexing:
+    if args.improvedrequest:
         random_indexing = ri.RandomIndexing()
 
     epsilon = 0
@@ -48,22 +49,28 @@ def analysis_parameters():
                   "faginsTA": faginsta.apply_fagins_ta}
 
     algoFunct = switchAlgo[args.algo]
-    words = preprocessor.process(args.q)
-    print (words)
-
-    # TODO: random indexing: voir comment l'appliquer
-    if args.randomindexing:
-        ri_voc = filemanager.read_random_indexing(random_indexing.getTermDimension())
-        for i,ri1 in enumerate(ri_voc):
-            if i<20:
-                print("{} : {}".format(ri1,ri_voc[ri1]))
+    
+    raw_words = args.q
+    words = preprocessor.process(raw_words)
+    
+    words_request = []
+    if args.improvedrequest:
+        for word in raw_words.split(","):
+            words_request.append(word)
+            synonymes = synknn.get_synonyms(word,2,random_indexing.getTermDimension(),filemanager)
+            # print("synonymes {} ".format(synonymes))
+            if len(synonymes) == 2:
+                words_request.append(synonymes[1])
+        
+        print("Improved request: {}".format(words_request))
 
     result = algoFunct(words, savedVoc, filemanager, epsilon, args.n)
-    print(result)
+    # print(result)
 
     switchView = {"simple": view.displayResults,
                   "fullText": view.displayResultsText}
     viewFunct = switchView[args.view]
+    print("\nResults: ")
     viewFunct(result, args.vpath)
 
 

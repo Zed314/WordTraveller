@@ -34,14 +34,14 @@ def analysis_parameters():
 
     vocabulary = dict()
     filemanager = fm.FileManager(args.f, args.o)
-    randomIndexing = None
+    random_indexing = None
     if args.randomindexing:
-        randomIndexing = ri.RandomIndexing()
+        random_indexing = ri.RandomIndexing()
 
     if args.stemmer:
         analysis.setPreprocessor(preprocessing.Preprocessor(True))
     
-    # TODO : enable per newspaper
+    # TODO: enable per newspaper
     if args.partial ==-2:
         print("Partial analysis in progress")
         for newspaper_path in tqdm(list(pathlist)):
@@ -62,6 +62,7 @@ def analysis_parameters():
             docsRedInDocIteration = -1
             nbDocsRedInThisJournal = 0
             while(docsRedInDocIteration !=0):
+                # TODO: default random Indexing to None ?
                 docsRedInDocIteration = analysis.analyse_newspaper(newspaper_path,vocabulary,None,False,nbDocsRedInThisJournal,nbDocsRedInThisJournal+stepFlush)
                 nbDocsInMemory += docsRedInDocIteration
                 nbDocsRedInThisJournal += docsRedInDocIteration
@@ -81,13 +82,13 @@ def analysis_parameters():
     else :
         print("Non partial")
         for newspaper_path in tqdm(list(pathlist)):
-            analysis.analyse_newspaper(newspaper_path, vocabulary, randomIndexing, True)
+            analysis.analyse_newspaper(newspaper_path, vocabulary, random_indexing, True)
         filemanager.save_vocabularyAndPL_file(vocabulary)
         
     print("Inverted file created !")
     
     if args.randomindexing:
-        filemanager.save_random_indexing(randomIndexing.getTermsVectors(),randomIndexing.getTermDimension())
+        filemanager.save_random_indexing(random_indexing.getTermsVectors(),random_indexing.getTermDimension())
         print("Random indexing created")
 
 if __name__ == "__main__" :
