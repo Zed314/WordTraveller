@@ -2,6 +2,7 @@ import wordtraveller.filemanager as fm
 import wordtraveller.analysis as analysis
 import wordtraveller.preprocessing as preprocessing
 import wordtraveller.randomIndexing as ri
+import wordtraveller.compressor as zip
 import argparse
 from pathlib import Path
 from sortedcontainers import SortedDict
@@ -17,9 +18,9 @@ def analysis_parameters():
                         help="nom de fichier pour enregistrer les fichiers après l'indexation ", required=True)
     parser.add_argument("-o", type=str, default='./workspace/',
                         help="dossier pour enregistrer les fichiers après l'indexation ")
-    parser.add_argument("--zip", type=str,
-                        help="compression à faire à la fin ")
-    parser.add_argument("--partial", type=int, default=-1,
+    parser.add_argument("--zip", action='store_true',
+                        help="compression zip à la fin")
+    parser.add_argument("--partial", type = int, default = -1,
                         help='créer les fichiers par réunion de plusieurs fichiers avec une granularité de documents choisie. Valeur conseillée : 1000.')
     parser.add_argument("--stemmer", action='store_true',
                         help='activer stemmer')
@@ -79,18 +80,38 @@ def analysis_parameters():
 
         filemanager.mergePartialVocsAndPL()
         print("PL and VOC merged succesfully")
+        print("Inverted file created !")
 
     else :
         print("Non partial")
         for newspaper_path in tqdm(list(pathlist)):
+<<<<<<< HEAD
             analysis.analyse_newspaper(newspaper_path, vocabulary, random_indexing, True)
+=======
+            analysis.analyse_newspaper(newspaper_path, vocabulary, randomIndexing, False)
+
+        analysis.computeIDF(vocabulary)
+>>>>>>> addZip
         filemanager.save_vocabularyAndPL_file(vocabulary)
         
-    print("Inverted file created !")
+        print("Inverted file created !")
     
+    if args.zip:
+        
+        print ("Compressing…")
+        filemanager = fm.FileManager(args.f, args.o)
+
+        zip.compressPLVBYTEFromSavedVocAndPL(filemanager)
+        zip.decompressPLVBYTE(filemanager)
+        zip.compressZip(filemanager.getPathPLCompressed())
+        zip.compressZip(filemanager.getPathVocCompressed())
+        print("Compressed !")
+
     if args.randomindexing:
         filemanager.save_random_indexing(random_indexing.getTermsVectors(),random_indexing.getTermDimension())
         print("Random indexing created")
+
+    
 
 if __name__ == "__main__" :
     analysis_parameters()
