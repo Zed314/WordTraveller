@@ -85,13 +85,9 @@ def analysis_parameters():
     else :
         print("Non partial")
         for newspaper_path in tqdm(list(pathlist)):
-<<<<<<< HEAD
-            analysis.analyse_newspaper(newspaper_path, vocabulary, random_indexing, True)
-=======
             analysis.analyse_newspaper(newspaper_path, vocabulary, randomIndexing, False)
 
         analysis.computeIDF(vocabulary)
->>>>>>> addZip
         filemanager.save_vocabularyAndPL_file(vocabulary)
         
         print("Inverted file created !")
