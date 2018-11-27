@@ -48,7 +48,7 @@ def analysis_parameters():
     
     words = preprocessor.process(args.q)
     words_request = []
-    if args.improvedrequest:
+    if args.improvedquery:
         random_indexing = ri.RandomIndexing()
         for word in words:
             words_request.append(word)

@@ -8,8 +8,12 @@ from pathlib import Path
 from sortedcontainers import SortedDict
 from tqdm import tqdm
 
+MAX_RANDOM_INDEXING = 12
+
 
 def analysis_parameters():
+    global MAX_RANDOM_INDEXING
+
     parser = argparse.ArgumentParser()
 
     parser.add_argument("-d", type=str,
@@ -20,7 +24,7 @@ def analysis_parameters():
                         help="dossier pour enregistrer les fichiers après l'indexation ")
     parser.add_argument("--zip", action='store_true',
                         help="compression zip à la fin")
-    parser.add_argument("--partial", type = int, default = -1,
+    parser.add_argument("--partial", type=int, default=-1,
                         help='créer les fichiers par réunion de plusieurs fichiers avec une granularité de documents choisie. Valeur conseillée : 1000.')
     parser.add_argument("--stemmer", action='store_true',
                         help='activer stemmer')
@@ -42,59 +46,72 @@ def analysis_parameters():
 
     if args.stemmer:
         analysis.setPreprocessor(preprocessing.Preprocessor(True))
-    
+
     # TODO: enable per newspaper
-    if args.partial ==-2:
+    if args.partial == -2:
         print("Partial analysis in progress")
         for newspaper_path in tqdm(list(pathlist)):
-            docsRedInDocIteration = analysis.analyse_newspaper(newspaper_path,vocabulary,None,False)
-            filemanager.save_vocabularyAndPL_file(vocabulary, isPartial = True)
+            docsRedInDocIteration = analysis.analyse_newspaper(newspaper_path, vocabulary, None, False)
+            filemanager.save_vocabularyAndPL_file(vocabulary, isPartial=True)
             vocabulary = dict()
-                    
+
         print("Merging in progress…")
 
         filemanager.mergePartialVocsAndPL()
-        print("PL and VOC merged succesfully")  
-    if args.partial !=-1:
+        print("PL and VOC merged succesfully")
+    if args.partial != -1:
         nbDocsInMemory = 0
         stepFlush = args.partial
-   
+
+        rand_indexing_counter = 0
         for newspaper_path in tqdm(list(pathlist)):
-            
+
             docsRedInDocIteration = -1
             nbDocsRedInThisJournal = 0
-            while(docsRedInDocIteration !=0):
-                # TODO: default random Indexing to None ?
-                docsRedInDocIteration = analysis.analyse_newspaper(newspaper_path,vocabulary,random_indexing,False,nbDocsRedInThisJournal,nbDocsRedInThisJournal+stepFlush)
+            while(docsRedInDocIteration != 0):
+                if rand_indexing_counter < MAX_RANDOM_INDEXING:
+                    docsRedInDocIteration = analysis.analyse_newspaper(
+                        newspaper_path, vocabulary, random_indexing, False, nbDocsRedInThisJournal, nbDocsRedInThisJournal+stepFlush)
+                else:
+                    docsRedInDocIteration = analysis.analyse_newspaper(
+                        newspaper_path, vocabulary, None, False, nbDocsRedInThisJournal, nbDocsRedInThisJournal+stepFlush)
                 nbDocsInMemory += docsRedInDocIteration
                 nbDocsRedInThisJournal += docsRedInDocIteration
                 if nbDocsInMemory >= stepFlush:
-                    filemanager.save_vocabularyAndPL_file(vocabulary, isPartial = True)
+                    filemanager.save_vocabularyAndPL_file(
+                        vocabulary, isPartial=True)
                     vocabulary = dict()
                     nbDocsInMemory = 0
-        
-        if nbDocsInMemory!=0:
-            filemanager.save_vocabularyAndPL_file(vocabulary, isPartial = True)
-            
+                rand_indexing_counter += 1
+
+        if nbDocsInMemory != 0:
+            filemanager.save_vocabularyAndPL_file(vocabulary, isPartial=True)
+
         print("Merging in progress…")
 
         filemanager.mergePartialVocsAndPL()
         print("PL and VOC merged succesfully")
         print("Inverted file created !")
 
-    else :
+    else:
         print("Non partial")
+        rand_indexing_counter = 0
         for newspaper_path in tqdm(list(pathlist)):
-            analysis.analyse_newspaper(newspaper_path, vocabulary, randomIndexing, False)
-
+            if rand_indexing_counter < MAX_RANDOM_INDEXING:
+                rand_indexing_counter += 1
+                analysis.analyse_newspaper(
+                    newspaper_path, vocabulary, random_indexing, False)
+            else:
+                analysis.analyse_newspaper(
+                    newspaper_path, vocabulary, None, False)
         analysis.computeIDF(vocabulary)
         filemanager.save_vocabularyAndPL_file(vocabulary)
-        
+
         print("Inverted file created !")
-    
+
     if args.zip:
-        
-        print ("Compressing…")
+
+        print("Compressing…")
         filemanager = fm.FileManager(args.f, args.o)
 
         zip.compressPLVBYTEFromSavedVocAndPL(filemanager)
@@ -104,10 +121,10 @@ def analysis_parameters():
         print("Compressed !")
 
     if args.randomindexing:
-        filemanager.save_random_indexing(random_indexing.getTermsVectors(),random_indexing.getTermDimension())
+        filemanager.save_random_indexing(
+            random_indexing.getTermsVectors(), random_indexing.getTermDimension())
         print("Random indexing created")
 
-    
 
-if __name__ == "__main__" :
+if __name__ == "__main__":
     analysis_parameters()

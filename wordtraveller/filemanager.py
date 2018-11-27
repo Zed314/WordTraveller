@@ -53,6 +53,9 @@ class FileManager:
     def getPathRandomIndexing(self):
         return self.workspace + self.vocabularyFileName + '.ri'
 
+    def getPathRandomIndexingVO(self):
+        return self.workspace + self.vocabularyFileName + '.vori'
+
     def getPathPLScore(self):
         return self.workspace + self.postingListsFileName + ".score" + self.extensionPL
 
@@ -354,20 +357,37 @@ class FileManager:
         self.save_vocabularyAndPL_file(voc, True)
         pass
 
+    def save_random_indexing_voc(self, voc):
+        file = open(self.getPathRandomIndexingVO(), "w")
+        for word in voc:
+            file.write("{}\n".format(word))
+        file.close()
+
     def save_random_indexing(self, terms, term_dimension):
         self.randomStruct = struct.Struct(str(term_dimension) + 'i')
-        vocabulary = self.read_vocabulary()
         file = open(self.getPathRandomIndexing(), "wb")
-
-        for vo in vocabulary:
+        existant_voc = []
+        for vo in terms:
             if (vo != '***NumberDifferentDocs***'):
                 binaryBuff = self.randomStruct.pack(*terms[vo])
+                existant_voc.append(vo)
                 file.write(binaryBuff)
+        self.save_random_indexing_voc(existant_voc)
+
+    def read_random_indexing_vo(self):
+        filename = self.getPathRandomIndexingVO()
+        file = open(filename, "r")
+        voc = []
+        for line in file:
+            data = line.rstrip('\n\r')
+            voc.append(data)
+        file.close()
+        return voc
 
     def read_random_indexing(self, term_dimension):
         self.randomStruct = struct.Struct(str(term_dimension) + 'i')
         file = open(self.getPathRandomIndexing(), "rb")
-        vocabulary = self.read_vocabulary()
+        vocabulary = self.read_random_indexing_vo()
         ri_voc = []
         ri_terms = []
         for vo in vocabulary:
