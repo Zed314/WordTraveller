@@ -4,6 +4,7 @@ import wordtraveller.preprocessing as preprocessing
 import wordtraveller.randomIndexing as ri
 import wordtraveller.compressor as zip
 import argparse
+import time
 from pathlib import Path
 from sortedcontainers import SortedDict
 from tqdm import tqdm
@@ -21,7 +22,7 @@ def analysis_parameters():
     parser.add_argument("--zip", action='store_true',
                         help="compression zip à la fin")
     parser.add_argument("--partial", type = int, default = -1,
-                        help='créer les fichiers par réunion de plusieurs fichiers avec une granularité de documents choisie. Valeur conseillée : 1000.')
+                        help='créer les fichiers par réunion de plusieurs fichiers avec une granularité de documents choisie. Si -2, alors granularité d\'un journal. Valeur conseillée : 1000.')
     parser.add_argument("--stemmer", action='store_true',
                         help='activer stemmer')
     parser.add_argument("--randomindexing", action='store_true',
@@ -43,16 +44,13 @@ def analysis_parameters():
     if args.stemmer:
         analysis.setPreprocessor(preprocessing.Preprocessor(True))
     
-    # TODO: enable per newspaper
     if args.partial ==-2:
         print("Partial analysis in progress")
         for newspaper_path in tqdm(list(pathlist)):
             docsRedInDocIteration = analysis.analyse_newspaper(newspaper_path,vocabulary,None,False)
             filemanager.save_vocabularyAndPL_file(vocabulary, isPartial = True)
             vocabulary = dict()
-                    
         print("Merging in progress…")
-
         filemanager.mergePartialVocsAndPL()
         print("PL and VOC merged succesfully")  
     if args.partial !=-1:
@@ -65,7 +63,7 @@ def analysis_parameters():
             nbDocsRedInThisJournal = 0
             while(docsRedInDocIteration !=0):
                 # TODO: default random Indexing to None ?
-                docsRedInDocIteration = analysis.analyse_newspaper(newspaper_path,vocabulary,random_indexing,False,nbDocsRedInThisJournal,nbDocsRedInThisJournal+stepFlush)
+                docsRedInDocIteration = analysis.analyse_newspaper(newspaper_path,vocabulary,random_indexing, False,nbDocsRedInThisJournal,nbDocsRedInThisJournal+stepFlush)
                 nbDocsInMemory += docsRedInDocIteration
                 nbDocsRedInThisJournal += docsRedInDocIteration
                 if nbDocsInMemory >= stepFlush:
@@ -85,7 +83,7 @@ def analysis_parameters():
     else :
         print("Non partial")
         for newspaper_path in tqdm(list(pathlist)):
-            analysis.analyse_newspaper(newspaper_path, vocabulary, randomIndexing, False)
+            analysis.analyse_newspaper(newspaper_path, vocabulary, random_indexing, False)
 
         analysis.computeIDF(vocabulary)
         filemanager.save_vocabularyAndPL_file(vocabulary)
@@ -98,9 +96,13 @@ def analysis_parameters():
         filemanager = fm.FileManager(args.f, args.o)
 
         zip.compressPLVBYTEFromSavedVocAndPL(filemanager)
-        zip.decompressPLVBYTE(filemanager)
+
         zip.compressZip(filemanager.getPathPLCompressed())
+
         zip.compressZip(filemanager.getPathVocCompressed())
+
+        zip.compressZip(filemanager.getPathPLScore())
+
         print("Compressed !")
 
     if args.randomindexing:

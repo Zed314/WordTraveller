@@ -98,9 +98,7 @@ def analyse_newspaper_multithread(paths, voc, randIndexing=None, computeIDF=Fals
     if computeIDF:
         nbDiffDocs = len(voc["***NumberDifferentDocs***"])
         for term, pl in voc.items():
-            if term == "***NumberDifferentDocs***":
-                continue
-            nbDocsWithWord = len(voc[term])
+            nbDocsWithWord = len(pl)
             for idfAndScore in pl.values():
                 idfAndScore[0] = (1+math.log(idfAndScore[1])) * \
                     math.log(nbDiffDocs/(1+nbDocsWithWord))
@@ -110,9 +108,9 @@ def analyse_newspaper_multithread(paths, voc, randIndexing=None, computeIDF=Fals
 def computeIDF(voc):
     nbDiffDocs = len(voc["***NumberDifferentDocs***"])
     for term, pl in voc.items():
+        nbDocsWithWord = len(pl)
         if term == "***NumberDifferentDocs***":
-            continue
-        nbDocsWithWord = len(voc[term])
+                continue
         for idfAndScore in pl.values():
             idfAndScore[0] = (1+numpy.log(idfAndScore[1])) * \
                 numpy.log(nbDiffDocs/(1+nbDocsWithWord))
@@ -156,7 +154,8 @@ def analyse_newspaper_naive(path, voc, randIndexing=None, computeIDF=False, nbDo
     if computeIDF:
         nbDiffDocs = len(voc["***NumberDifferentDocs***"])
         for term, pl in voc.items():
-
+            if term == "***NumberDifferentDocs***":
+                continue
             nbDocsWithWord = len(voc[term])
             for idfAndScore in pl.values():
 
@@ -236,8 +235,6 @@ def analyse_newspaper_optimized(path, voc, randIndexing=None, computeIDF=False, 
     if computeIDF:
         nbDiffDocs = len(voc["***NumberDifferentDocs***"])
         for term, pl in voc.items():
-            if term == "***NumberDifferentDocs***":
-                continue
             nbDocsWithWord = len(voc[term])
             for idfAndScore in pl.values():
                 idfAndScore[0] = (1+math.log(idfAndScore[1])) * \

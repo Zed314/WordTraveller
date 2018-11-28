@@ -30,6 +30,7 @@ class FileManager:
         # create the workspace
         if not os.path.exists(workspace):
             os.makedirs(workspace)
+
         # create the files
         if not os.path.isfile(self.getPathVoc()):
             file = open(self.getPathVoc(), "wb")
@@ -37,9 +38,10 @@ class FileManager:
         if not os.path.isfile(self.getPathPL()):
             file = open(self.getPathPL(), "wb")
             file.close()
+        if not os.path.isfile(self.getPathPLScore()):
+            file = open(self.getPathVoc(), "wb")
+            file.close()
 
-    # #e assume that the PLs are sorted by ids
-    # happen at the end of file
 
     def getPathVoc(self):
         return self.workspace + self.vocabularyFileName + self.extensionVoc
@@ -57,7 +59,7 @@ class FileManager:
         return self.workspace + self.postingListsFileName + ".score" + self.extensionPL
 
     def doesCompressedVersionExists(self):
-        return  os.path.isfile(self.getPathVocCompressed()) and os.path.isfile(self.getPathPLCompressed())
+        return  os.path.isfile(self.getPathVocCompressed()+".gz") and os.path.isfile(self.getPathPLCompressed()+".gz") and os.path.isfile(self.getPathPLScore()+".gz")
 
     def doesUnCompressedVersionExists(self):
         return  os.path.isfile(self.getPathVoc()) and os.path.isfile(self.getPathPL()) and os.path.isfile(self.getPathPLScore())
@@ -329,7 +331,8 @@ class FileManager:
             file = open(self.getPathPLPartial(numberPart), "a+b")
 
         try:
-            # FIXME: filePL is file instead?
+            # FIXME: filePL is file instead? => No, as filePL is the parameter, we do not have
+            # to do an offset if we use the preopened file in parameters
             if (offset > 0) and filePl is None:
                 file.seek(self.CONST_SIZE_ON_DISK * offset)
             # Encode the record and write it to the dest file

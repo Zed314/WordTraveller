@@ -1,14 +1,17 @@
 import argparse
-import wordtraveller.filemanager as fm
-import wordtraveller.naivetopk as naivetopk
+
+import wordtraveller.compressor as compressor
 import wordtraveller.faginstavf as faginsta
 import wordtraveller.faginstopkvf as faginstopk
-import wordtraveller.view as view
+import wordtraveller.filemanager as fm
+import wordtraveller.naivetopk as naivetopk
 import wordtraveller.preprocessing as preprocessing
 import wordtraveller.randomIndexing as ri
 import wordtraveller.synonymKNN as synknn
+import wordtraveller.view as view
 
 preprocessor = preprocessing.Preprocessor(True)
+
 
 def analysis_parameters():
     parser = argparse.ArgumentParser()
@@ -19,8 +22,6 @@ def analysis_parameters():
                         help="nom de fichier VOC et PL ", required=True)
     parser.add_argument("-q", type=str,
                         help="requête des termes separés par un virgule. Ex: voiture,maison ", required=True)
-    # parser.add_argument("--file", type=str,
-    #                     help="fichier avec un nombre de mots pour la requête (à definir la structure de ce fichier)")
     parser.add_argument("-n", type=int, default=3,
                         help="nombre de résultats souhaité de documents ")
     parser.add_argument("--algo", type=str, default="naive",
@@ -32,9 +33,8 @@ def analysis_parameters():
     parser.add_argument("--improvedquery", action='store_true',
                         help="activer recherche de synonymes pour l'amélioration de la requête")
 
-
     args = parser.parse_args()
-    # print('Args : {}'.format(args))
+    
     filemanager = fm.FileManager(args.f, args.d)
     savedVoc = filemanager.read_vocabulary()
 
@@ -45,17 +45,17 @@ def analysis_parameters():
                   "faginsTA": faginsta.apply_fagins_ta}
 
     algoFunct = switchAlgo[args.algo]
-    
+
     words = preprocessor.process(args.q)
     words_request = []
-    if args.improvedrequest:
+    if args.improvedquery:
         random_indexing = ri.RandomIndexing()
         for word in words:
             words_request.append(word)
 
             try:
-                synonymes = synknn.get_synonyms(word,2,random_indexing.getTermDimension(),filemanager)
-                # print("synonymes {} ".format(synonymes))
+                synonymes = synknn.get_synonyms(
+                    word, 2, random_indexing.getTermDimension(), filemanager)
                 if len(synonymes) == 2:
                     words_request.append(synonymes[1])
             except Exception as e:
@@ -63,8 +63,15 @@ def analysis_parameters():
         print("Improved request: {}".format(words_request))
     else:
         words_request = words
+
+    if (not filemanager.doesUnCompressedVersionExists()) and filemanager.doesCompressedVersionExists():
+        print("Unzipping in progress…")
+        compressor.decompressZip(filemanager.getPathPLCompressed(),filemanager.getPathPLCompressed())
+        compressor.decompressZip(filemanager.getPathVocCompressed(),filemanager.getPathVocCompressed())
+        compressor.decompressZip(filemanager.getPathPLScore(),filemanager.getPathPLScore())
+        compressor.decompressPLVBYTE(filemanager)
+
     result = algoFunct(words_request, savedVoc, filemanager, epsilon, args.n)
-    # print(result)
 
     switchView = {"simple": view.displayResults,
                   "fullText": view.displayResultsText}
