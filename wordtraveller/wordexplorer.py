@@ -24,6 +24,8 @@ def analysis_parameters():
                         help="requête des termes separés par un virgule. Ex: voiture,maison ", required=True)
     parser.add_argument("-n", type=int, default=3,
                         help="nombre de résultats souhaité de documents ")
+    parser.add_argument("--stemmer", action='store_true',
+                        help="activer le stemming sur les termes de la requête")
     parser.add_argument("--algo", type=str, default="naive",
                         help="algorithme souhaité pour la rêquete ")
     parser.add_argument("--view", type=str, default="simple",
@@ -37,7 +39,11 @@ def analysis_parameters():
     
     filemanager = fm.FileManager(args.f, args.d)
     savedVoc = filemanager.read_vocabulary()
-
+    if args.stemmer:
+        print("Stemmer activated")
+        preprocessor = preprocessing.Preprocessor(True)
+    else :
+        preprocessor = preprocessing.Preprocessor(False)
     epsilon = 0
 
     switchAlgo = {"naive": naivetopk.apply_naive_top_k_algo,
