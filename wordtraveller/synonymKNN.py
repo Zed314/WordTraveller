@@ -25,8 +25,8 @@ def classify_cosinus_distance(inX, dataset, k):
     return nearest_neighbors
 
 def classify(inX, dataSet, k):
-    # return classify_cosinus_distance(inX,dataSet,k)
-    return classify_euclidean(inX,dataSet,k)
+    return classify_cosinus_distance(inX,dataSet,k)
+    # return classify_euclidean(inX,dataSet,k)
 
 def cosin_distance(vector1, vector2):
     dot_product = 0.0
