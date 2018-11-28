@@ -9,7 +9,7 @@ from pathlib import Path
 from sortedcontainers import SortedDict
 from tqdm import tqdm
 
-MAX_RANDOM_INDEXING = 12
+MAX_RANDOM_INDEXING = 10
 
 
 def analysis_parameters():

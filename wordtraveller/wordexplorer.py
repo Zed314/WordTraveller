@@ -66,7 +66,7 @@ def analysis_parameters():
                     words_request.append(synonymes[1])
             except Exception as e:
                 print(e)
-        print("Improved request: {}".format(words_request))
+        print("Improved query: {}".format(words_request))
     else:
         words_request = words
 
