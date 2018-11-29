@@ -17,7 +17,7 @@ class FileManager:
             filename: the custom filename for the voc and postinglist.
             workspace: is the folder we want to work in. Should have an '/' at the end.
         Postconditions:
-            The fonction update the file postingLites.data withe the new postingList after "offet" paires <Doc Id, Scores>
+            The fonction update the file postingLites.data with the new postingList after "offet" paires <Doc Id, Scores>
         """
         self.vocabularyFileName = fileName
         self.postingListsFileName = fileName
@@ -30,6 +30,7 @@ class FileManager:
         # create the workspace
         if not os.path.exists(workspace):
             os.makedirs(workspace)
+
         # create the files
         if not os.path.isfile(self.getPathVoc()):
             file = open(self.getPathVoc(), "wb")
@@ -37,9 +38,10 @@ class FileManager:
         if not os.path.isfile(self.getPathPL()):
             file = open(self.getPathPL(), "wb")
             file.close()
+        if not os.path.isfile(self.getPathPLScore()):
+            file = open(self.getPathVoc(), "wb")
+            file.close()
 
-    # #e assume that the PLs are sorted by ids
-    # happen at the end of file
 
     def getPathVoc(self):
         return self.workspace + self.vocabularyFileName + self.extensionVoc
@@ -53,8 +55,25 @@ class FileManager:
     def getPathRandomIndexing(self):
         return self.workspace + self.vocabularyFileName + '.ri'
 
+    def getPathRandomIndexingVO(self):
+        return self.workspace + self.vocabularyFileName + '.vori'
+
     def getPathPLScore(self):
         return self.workspace + self.postingListsFileName + ".score" + self.extensionPL
+
+    def doesCompressedVersionExists(self):
+        return  os.path.isfile(self.getPathVocCompressed()+".gz") and os.path.isfile(self.getPathPLCompressed()+".gz") and os.path.isfile(self.getPathPLScore()+".gz")
+
+    def doesUnCompressedVersionExists(self):
+        return  os.path.isfile(self.getPathVoc()) and os.path.isfile(self.getPathPL()) and os.path.isfile(self.getPathPLScore())
+
+
+    def getPathVocCompressed(self):
+        return  self.getPathVoc()+".compressed"
+
+    def getPathPLCompressed(self):
+        return  self.getPathPL()+".compressed"
+
 
     def getPathPLPartial(self, number):
         return self.workspace + self.postingListsFileName + "." + str(number) + ".temp" + self.extensionPL
@@ -103,22 +122,21 @@ class FileManager:
         extractedVocs = []
 
         plFiles = []
-        plScoreOutputFile = open(self.getPathPLScore(),"w+b")
-        plOutputFile = open(self.getPathPL(),"w+b")
+        plScoreOutputFile = open(self.getPathPLScore(), "w+b")
+        plOutputFile = open(self.getPathPL(), "w+b")
 
         for numberDoc in range(totalNumberOfDocs):
             idDocsToRead.append(True)
-            extractedVocs.append(iter((self.read_vocabulary(True, numberDoc)).items()))
+            extractedVocs.append(
+                iter((self.read_vocabulary(True, numberDoc)).items()))
             offsetsInPLs.append(0)
             nbLinesRedInVOCs.append(0)
             lengthsToReadInPLs.append(0)
             offsetNextWord.append(0)
             offsetPreWord.append(0)
-           
 
         for pathPL in self.getListPartialPLs():
             plFiles.append(open(pathPL, "rb"))
-
 
         currentWords = dict()
         exitVoc = open(self.getPathVoc(), "w+")
@@ -154,11 +172,13 @@ class FileManager:
             # For all the documents with this word
             for idDoc in currentWords[word]:
                 preLength = lengthsToReadInPLs[idDoc]
-                lengthsToReadInPLs[idDoc] = offsetNextWord[idDoc] - offsetPreWord[idDoc]
+                lengthsToReadInPLs[idDoc] = offsetNextWord[idDoc] - \
+                    offsetPreWord[idDoc]
                 offsetPreWord[idDoc] = offsetNextWord[idDoc]
                 offsetsInPLs[idDoc] = offsetsInPLs[idDoc] + preLength
                 nbLinesRedInVOCs[idDoc] += 1
-                otherPart = self.read_postList(offsetsInPLs[idDoc], lengthsToReadInPLs[idDoc], True, idDoc,  sorted = False,filePL=plFiles[idDoc])
+                otherPart = self.read_postList(
+                    offsetsInPLs[idDoc], lengthsToReadInPLs[idDoc], True, idDoc,  sorted=False, filePL=plFiles[idDoc])
                 mergingPLs.update(otherPart)
                 idDocsToRead[idDoc] = True
 
@@ -170,10 +190,12 @@ class FileManager:
 
             if recomputeIDF:
                 for idfAndScore in mergingPLs.values():
-                    idfAndScore[0] = (1 + math.log(idfAndScore[1])) * math.log(nbTotalDocuments / (1 + len(mergingPLs)))
+                    idfAndScore[0] = (1 + math.log(idfAndScore[1])) * \
+                        math.log(nbTotalDocuments / (1 + len(mergingPLs)))
 
-            self.save_postList(mergingPLs,filePL=plOutputFile)
-            self.save_postList_by_score(mergingPLs,filePlScore=plScoreOutputFile)
+            self.save_postList(mergingPLs, filePL=plOutputFile)
+            self.save_postList_by_score(
+                mergingPLs, filePlScore=plScoreOutputFile)
             currentWords.pop(word)
         # Close files
         plOutputFile.close()
@@ -198,7 +220,6 @@ class FileManager:
         if numberPart == -1:
             numberPart = self.numberPartialFiles
 
-
         if not isPartial:
             plFile = open(self.getPathPL(), "w+b")
             scoreFile = open(self.getPathPLScore(), "w+b")
@@ -206,18 +227,18 @@ class FileManager:
             plFile = open(self.getPathPLPartial(numberPart), "a+b")
 
         for word, unsortedPL in completeVoc:
-            # TODO enable is partial there
-            self.save_postList(unsortedPL, isPartial=isPartial, numberPart=numberPart,filePL=plFile)
+
+            self.save_postList(unsortedPL, isPartial=isPartial,
+                               numberPart=numberPart, filePL=plFile)
 
             if not isPartial:
                 self.save_postList_by_score(unsortedPL, filePlScore=scoreFile)
         if not isPartial:
             plFile.close()
             scoreFile.close()
-        else :
+        else:
             plFile.close()
 
-    
     def save_vocabularyAndPL_file(self, voc, isPartial=False):
         """
         Save invertedFile that contains both voc and pls
@@ -263,7 +284,7 @@ class FileManager:
             file.write("{},{}\n".format(word, offset))
         file.close()
 
-    def save_postList_by_score(self, postingList, offset=-1, filePlScore = None):
+    def save_postList_by_score(self, postingList, offset=-1, filePlScore=None):
         """ Save the postingList of A word after ordered it by score in
         non ascending order """
         # destination file for redin and wrting (r+)b
@@ -291,7 +312,7 @@ class FileManager:
             if filePlScore is None:
                 file.close()
 
-    def save_postList(self, postingList, offset=-1, isPartial=False, numberPart=0,filePL= None):
+    def save_postList(self, postingList, offset=-1, isPartial=False, numberPart=0, filePL=None):
         """
         Preconditions:
             postingList: is a dictionary of Doc Id and Scores.
@@ -313,6 +334,8 @@ class FileManager:
             file = open(self.getPathPLPartial(numberPart), "a+b")
 
         try:
+            # FIXME: filePL is file instead? => No, as filePL is the parameter, we do not have
+            # to do an offset if we use the preopened file in parameters
             if (offset > 0) and filePl is None:
                 file.seek(self.CONST_SIZE_ON_DISK * offset)
             # Encode the record and write it to the dest file
@@ -337,20 +360,37 @@ class FileManager:
         self.save_vocabularyAndPL_file(voc, True)
         pass
 
+    def save_random_indexing_voc(self, voc):
+        file = open(self.getPathRandomIndexingVO(), "w")
+        for word in voc:
+            file.write("{}\n".format(word))
+        file.close()
+
     def save_random_indexing(self, terms, term_dimension):
         self.randomStruct = struct.Struct(str(term_dimension) + 'i')
-        vocabulary = self.read_vocabulary()
         file = open(self.getPathRandomIndexing(), "wb")
-
-        for vo in vocabulary:
+        existant_voc = []
+        for vo in terms:
             if (vo != '***NumberDifferentDocs***'):
                 binaryBuff = self.randomStruct.pack(*terms[vo])
+                existant_voc.append(vo)
                 file.write(binaryBuff)
+        self.save_random_indexing_voc(existant_voc)
+
+    def read_random_indexing_vo(self):
+        filename = self.getPathRandomIndexingVO()
+        file = open(filename, "r")
+        voc = []
+        for line in file:
+            data = line.rstrip('\n\r')
+            voc.append(data)
+        file.close()
+        return voc
 
     def read_random_indexing(self, term_dimension):
         self.randomStruct = struct.Struct(str(term_dimension) + 'i')
         file = open(self.getPathRandomIndexing(), "rb")
-        vocabulary = self.read_vocabulary()
+        vocabulary = self.read_random_indexing_vo()
         ri_voc = []
         ri_terms = []
         for vo in vocabulary:
@@ -385,7 +425,7 @@ class FileManager:
         file.close()
         return voc
 
-    def read_postList(self, offset, length, isPartial=False, number=0, returnPostingListOrderedByScore=False, sorted = False,filePL=None):
+    def read_postList(self, offset, length, isPartial=False, number=0, returnPostingListOrderedByScore=False, sorted=False, filePL=None):
         """
         Precondtions:
             offset: is the numbers of pairs <Doc Id, Scores> already written in the binary doc
@@ -409,7 +449,7 @@ class FileManager:
 
         if sorted:
             postingList = SortedDict()
-        else :
+        else:
             postingList = {}
         postingListByScore = []
         try:

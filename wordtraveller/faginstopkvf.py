@@ -8,7 +8,7 @@ import operator
 
 # Vu que les int ne peuvent pas se modifier par reference, j'ai du creer une variable globale
 # Cette variable me sert pour apres savoir si les scores qui restent dans m sont plus grands que ceux déjà existants
-last_score_of_c = 0
+last_score_of_c = 100
 
 
 def apply_top_k_algo(words, voc, filemanager, epsilon, k, typeRequest = 'disjunctive'):
@@ -61,14 +61,14 @@ def push_to_m(m, c, docId, score, nb_of_PL, aggregative_function):
         if(len(m[docId]) == nb_of_PL):
             mean_score = aggregative_function(m[docId],nb_of_PL)
             c[docId] = mean_score
-            last_score_of_c = mean_score
+            last_score_of_c = c[min(c.keys(), key=(lambda k: c[k]))]
             del m[docId]
     elif nb_of_PL == 1:
         m[docId] = [score]
         if(len(m[docId]) == nb_of_PL):
             mean_score = aggregative_function(m[docId],nb_of_PL)
             c[docId] = mean_score
-            last_score_of_c = mean_score
+            last_score_of_c = c[min(c.keys(), key=(lambda k: c[k]))]
             del m[docId]
     else:
         m[docId] = [score]
@@ -135,10 +135,10 @@ def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k, ty
                         del c[c_value]
                         break
             c[doc_id] = score
-            last_score_of_c = score
+            last_score_of_c = c[min(c.keys(), key=(lambda k: c[k]))]
         elif(len(c) < k and typeRequest == 'disjunctive'):
             c[doc_id] = score
-            last_score_of_c = score
+            last_score_of_c = c[min(c.keys(), key=(lambda k: c[k]))]
     # We sort depending on the score, in the descending order
     c = sorted(c.items(),key=operator.itemgetter(1),reverse=True)
     return c

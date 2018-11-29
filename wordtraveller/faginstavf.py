@@ -5,12 +5,10 @@ from sortedcontainers import SortedList
 from pathlib import Path
 import operator
 
-# Vu que les int ne peuvent pas se modifier par reference, j'ai du creer une variable global
-# Cette variable me sers pour apres savoir si les scores qui restent dans m sont plus grandes que celles déjà existantes
+# Vu que les int ne peuvent pas se modifier par reference, j'ai du créer une variable globale
+# Cette variable me sert pour apres savoir si les scores qui restent dans m sont plus grands que ceux déjà existants
 last_score_of_c = 0
 
-def test():
-    return "adrien" # TODO : ?
 def apply_fagins_ta(words, voc, filemanager, epsilon, k):
 
     posting_lists_ordered_by_id = dict()
