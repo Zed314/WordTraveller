@@ -12,6 +12,18 @@ last_score_of_c = 100
 
 
 def apply_top_k_algo(words, voc, filemanager, epsilon, k, typeRequest = 'disjunctive'):
+    """
+        Apply the fagins top k algorithm
+        Preconditions:
+            words : an array of words to do the research on
+            voc : a dictionnay of words and offsets
+            filemanager : a filemanager to grab the posting lists
+            epsilon : parameter for the algorithm
+            k : number of results
+            typeRequest : type of request
+        Postconditions:
+            Returns top k documents
+        """
     posting_lists_ordered_by_id = dict()
     posting_lists_ordered_by_score = dict()
 
@@ -50,6 +62,7 @@ def push_to_m(m, c, docId, score, nb_of_PL, aggregative_function):
         docId: document ID.
         score: score of this document in the posting list.
         nb_of_PL: number of posting lists used in the algorithm.
+        aggregative_function: aggregation function to use for the scores when the request have several words
     Postconditions:
         The function save the tuple [docId,score] to m.
         If the tuple has been already seen by all the posting list apply
@@ -72,32 +85,37 @@ def push_to_m(m, c, docId, score, nb_of_PL, aggregative_function):
             del m[docId]
     else:
         m[docId] = [score]
-    # print('c: {} || m: {}'.format(c, m))
 
 
 def get_score_by_doc_id(doc_id, postingListsOrderedById, nb_of_PL, aggregation_function):
-    score = 0
     all_scores = []
     for posting_list in postingListsOrderedById:
         if(doc_id in postingListsOrderedById[posting_list]):
             score_doc_id = postingListsOrderedById[posting_list][doc_id]
-            # score_doc_id[0] = score, score_doc_id[1] = term frequency
             all_scores.append(score_doc_id[0])#1 ou 0 ?
-            # Pour mockData()
-            # all_scores.append(score_doc_id)
     score = aggregation_function(all_scores, nb_of_PL)
     return score
 
 
 def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k, typeRequest = 'disjunctive'):
     global last_score_of_c
-    """ Returns the top k element in an array of tuples, where the first member
-    of a tuple is the doc id and the second is the score """
+
+    """
+    Execute the fagins top k algorithm.
+    Preconditions:
+        postingListsOrderedById : A list of posting lists ordred by Id of the word of the request
+        postingListsOrderedByScore : A list of posting lists ordereds by Score of the words of the request
+        k : number of documents wanted
+        typeRequest : type of request
+        aggregative_function : aggregation function to use for the scores when the request have several words
+    Postconditions:
+        Returns the top k element in an array of tuples, where the first member
+        of a tuple is the doc id and the second is the score
+            
+        """
     iterators = dict()
     currentScores = SortedList()
-    # posting_list_id sera le terme de la posting_list
     for posting_list_id in postingListsOrderedByScore:
-        # TODO : Remove obligation to reverse
         iterators[posting_list_id] = iter(postingListsOrderedByScore[posting_list_id])
         # next donne la tuple <score,idDocument>
         score,idDoc = next(iterators[posting_list_id])
@@ -128,7 +146,6 @@ def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k, ty
         score = get_score_by_doc_id(
             doc_id, postingListsOrderedById, nb_of_PL, aggregative_function_mean)
         if(score > last_score_of_c):
-            # TODO: regarder s'il y a moyen de ne pas faire for loop
             if(len(c) == k):
                 for c_value in c:
                     if(c[c_value] == last_score_of_c):

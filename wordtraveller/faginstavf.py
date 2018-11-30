@@ -75,13 +75,16 @@ def compute_mu(docId, postingListsOrderedById, nb_of_PL, aggregative_function):
 def find_fagins_ta(postingListsOrderedById, postingListsOrderedByScore, epsilon, k, aggregative_function=aggregative_function_mean):
     global last_score_of_c
     """
-        Execute the fagins algorithm.
-        Preconditions :
+    Execute the fagins algorithm.
+    Preconditions:
         postingListsOrderedById : A list of posting lists ordred by Id of the word of the request
         postingListsOrderedByScore : A list of posting lists ordereds by Score of the words of the request
         epsilon : the parameter of the algorithm
         k : number of documents wanted
         aggregative_function : aggregation function to use for the scores when the request have several words
+    Postconditions:
+        Returns the top k element in an array of tuples, where the first member
+        of a tuple is the doc id and the second is the score
     """
     iterators = dict()
     currentScores = SortedList()
