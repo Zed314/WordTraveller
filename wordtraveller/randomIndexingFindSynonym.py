@@ -59,13 +59,16 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument("-d", type=str, default='./workspace/',
-                        help="dossier avec les fichier VOC et PL résultat de l'indexation")
+                        help="dossier avec les fichier VOC et RI résultat de l'indexation")
     parser.add_argument("-f", type=str,
                         help="nom de fichier VOC et PL ", required=True)
     parser.add_argument("-t", type=str,
                         help="term pour chercher les termes plus proches ", required=True)
     parser.add_argument("--stemmer", action='store_true',
                         help='activer stemmer')
+    parser.add_argument("-n",type=str,required=True,
+                        help='nombre de synonymes pour la requête')
+
 
     args = parser.parse_args()
 
@@ -82,7 +85,7 @@ if __name__ == "__main__":
     try:
         indexToSearch = ri_term.index(stemmed[0])
         print("Synonymes for : {} ".format(ri_term[indexToSearch]))
-        res = classify(ri_voc[indexToSearch], ri_voc, 20)
+        res = classify(ri_voc[indexToSearch], ri_voc, int(args.n))
         for i,term_index in enumerate(res):
             print("{:<3} : {}".format(i,ri_term[term_index]))
     except ValueError as e:

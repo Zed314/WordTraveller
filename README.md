@@ -12,7 +12,7 @@ The project is built and tested on Python 3.6
 - `pip3 install -r requirements.txt`
 
 ## Executing
-See Wiki : [Fonctionnement du logiciel](https://github.com/Zed314/WordTraveller/wiki/Fonctionnement-du-logiciel "Fonctionnement du logiciel")
+See Wiki : [Fonctionnement du logiciel](https://github.com/Zed314/WordTraveller/wiki "Fonctionnement du logiciel")
 
 ## Executing tests
 - `python3 -m tests.[test_module] -v` (-v parameter for higher verbosity)
