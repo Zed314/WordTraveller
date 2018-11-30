@@ -27,7 +27,7 @@ def analysis_parameters():
     parser.add_argument("--stemmer", action='store_true',
                         help="activer le stemming sur les termes de la requête")
     parser.add_argument("--algo", type=str, default="naive",
-                        help="algorithme souhaité pour la rêquete ")
+                        help="algorithme souhaité pour la requête ")
     parser.add_argument("--view", type=str, default="simple",
                         help="type de visualisation. Options possible: simple ou fullText ")
     parser.add_argument("--vpath", type=str, default="./data/latimesMini/",

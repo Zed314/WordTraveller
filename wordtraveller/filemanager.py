@@ -334,9 +334,8 @@ class FileManager:
             file = open(self.getPathPLPartial(numberPart), "a+b")
 
         try:
-            # FIXME: filePL is file instead? => No, as filePL is the parameter, we do not have
             # to do an offset if we use the preopened file in parameters
-            if (offset > 0) and filePl is None:
+            if (offset > 0) and filePL is None:
                 file.seek(self.CONST_SIZE_ON_DISK * offset)
             # Encode the record and write it to the dest file
             for idDoc, score in sorted(postingList.items()):
