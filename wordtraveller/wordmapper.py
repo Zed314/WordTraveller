@@ -37,10 +37,14 @@ def analysis_parameters():
     if not args.d.endswith("/"):
         latimes_path += "/"
 
+    workspace_path = args.o
+    if not args.d.endswith("/"):
+        workspace_path += "/"
+
     pathlist = Path(latimes_path).glob('**/la*')
 
     vocabulary = dict()
-    filemanager = fm.FileManager(args.f, args.o)
+    filemanager = fm.FileManager(args.f, workspace_path)
     random_indexing = None
     if args.randomindexing:
         random_indexing = ri.RandomIndexing()

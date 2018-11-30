@@ -479,13 +479,7 @@ class FileManager:
                     filed = self.struct.unpack(record)
                     idDoc = filed[0]
                     score = filed[1]
-                    # todo replace all over the code
-                    # if len(postingListByScore) == 0:
-                    #     postingListByScore.append((score,[idDoc]))
-                    # elif score == postingListByScore[-1][0]:
-                    #     postingListByScore[-1][1].append(idDoc)
-                    # else:
-                    #     postingListByScore.append((score,[idDoc]))
+                    
                     postingListByScore.append((score, idDoc))
 
             if returnPostingListOrderedByScore:

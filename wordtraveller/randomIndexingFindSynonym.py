@@ -72,8 +72,13 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+
+    workspace_path = args.d
+    if not args.d.endswith("/"):
+        workspace_path += "/"
+
     random_indexing = ri.RandomIndexing()
-    filemanager = fm.FileManager(args.f, args.d)
+    filemanager = fm.FileManager(args.f, workspace_path)
 
     ri_term, ri_voc = filemanager.read_random_indexing(random_indexing.getTermDimension())
     if args.stemmer:
