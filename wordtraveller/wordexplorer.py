@@ -27,7 +27,7 @@ def analysis_parameters():
     parser.add_argument("--stemmer", action='store_true',
                         help="activer le stemming sur les termes de la requête")
     parser.add_argument("--algo", type=str, default="naive",
-                        help="algorithme souhaité pour la rêquete ")
+                        help="algorithme souhaité pour la requête ")
     parser.add_argument("--view", type=str, default="simple",
                         help="type de visualisation. Options possible: simple ou fullText ")
     parser.add_argument("--vpath", type=str, default="./data/latimes/",
@@ -67,7 +67,7 @@ def analysis_parameters():
                     words_request.append(synonymes[1])
             except Exception as e:
                 print(e)
-        print("Improved request: {}".format(words_request))
+        print("Improved query: {}".format(words_request))
     else:
         words_request = words
 
