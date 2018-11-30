@@ -322,10 +322,13 @@ class FileManager:
         """
         Preconditions:
             postingList: is a dictionary of Doc Id and Scores.
-            offset: is the numbers of paires <Doc Id, Scores> alredy written in the binary doc, the PL will be written affter  it, (offset < size of the file.)
+            offset: is the numbers of pairs <Doc Id, Scores> alredy written in the binary doc, the PL will be written affter  it, (offset < size of the file.)
                     if == -1, we append
+            isPartial: whether or not we should asve in a partial file
+            numberPart: the number of the partial file
+            filePL: if non None, the method will store into this file (without applying the offset)
         Postconditions:
-            The fonction update the file postingLites.data withe the new postingList after "offet" pairs <Doc Id, Scores>,
+            The fonction update the file postingLites.data with the new postingList after "offet" pairs <Doc Id, Scores>,
         """
         # destination file for redin and wrting (r+)b
         if filePL is not None:
@@ -491,8 +494,6 @@ class FileManager:
                 return postingList
 
         except IOError:
-            # Your error handling here
-            # Nothing for this example
             pass
         finally:
             if filePL is None:
