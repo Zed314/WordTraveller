@@ -7,7 +7,7 @@ import wordtraveller.filemanager as fm
 import wordtraveller.naivetopk as naivetopk
 import wordtraveller.preprocessing as preprocessing
 import wordtraveller.randomIndexing as ri
-import wordtraveller.synonymKNN as synknn
+import wordtraveller.randomIndexingFindSynonym as synknn
 import wordtraveller.view as view
 
 preprocessor = preprocessing.Preprocessor(True)
@@ -36,6 +36,7 @@ def analysis_parameters():
                         help="activer recherche de synonymes pour l'amélioration de la requête")
 
     args = parser.parse_args()
+    latimes_path = args.d
     if not args.d.endswith("/"):
         latimes_path += "/"
     filemanager = fm.FileManager(args.f, args.d)
