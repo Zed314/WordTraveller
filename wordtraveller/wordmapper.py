@@ -26,7 +26,7 @@ def analysis_parameters():
     parser.add_argument("--zip", action='store_true',
                         help="compression zip à la fin")
     parser.add_argument("--partial", type = int, default = -1,
-                        help='créer les fichiers par réunion de plusieurs fichiers avec une granularité de documents choisie. Si -2, alors granularité d\'un journal. Valeur conseillée : 1000.')
+                        help='créer les fichiers par réunion de plusieurs fichiers avec une granularité de documents choisie. Si -2, alors granularité d\'un journal. Valeur conseillée : 2000.')
     parser.add_argument("--stemmer", action='store_true',
                         help='activer stemmer')
     parser.add_argument("--randomindexing", action='store_true',

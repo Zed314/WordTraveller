@@ -1,15 +1,14 @@
 from pathlib import Path
 
 
+""" Methods related to the display of results of the algorithms """
+
 def displayResults(results, path):
     if(len(results)):
         for i, result in enumerate(results):
             id = result[0]
             score = result[1]
             print('%3s. DocID[ %6s] - Score(%s)'%(i+1, id, score))
-            # print ("postion: {}".format(i+1))
-            # print ("score: {}".format(score))
-            # print ("doc id: {}".format(id))
     else:
         print("No results to show")
 
@@ -37,7 +36,14 @@ def displayResultsText(results, path="./data/latimesMini/"):
 
 
 def getFullText(path, docs_ids_to_find):
-
+    """ 
+    Returns the whole text of the documents 
+    Preconditions :
+        path : path to the location of the documents we want to display
+        docs_ids_to_find : id of the documents we want to find
+    Postconditions :
+        Returns the text of the documents requested
+    """
     pathlist = Path(path).glob('**/la*')
     docs = dict()
 
