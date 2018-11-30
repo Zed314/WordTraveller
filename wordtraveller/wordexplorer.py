@@ -30,13 +30,14 @@ def analysis_parameters():
                         help="algorithme souhaité pour la rêquete ")
     parser.add_argument("--view", type=str, default="simple",
                         help="type de visualisation. Options possible: simple ou fullText ")
-    parser.add_argument("--vpath", type=str, default="./data/latimesMini/",
+    parser.add_argument("--vpath", type=str, default="./data/latimes/",
                         help="path des fichier sources pour --view fullText")
     parser.add_argument("--improvedquery", action='store_true',
                         help="activer recherche de synonymes pour l'amélioration de la requête")
 
     args = parser.parse_args()
-    
+    if not args.d.endswith("/"):
+        latimes_path += "/"
     filemanager = fm.FileManager(args.f, args.d)
     savedVoc = filemanager.read_vocabulary()
     if args.stemmer:

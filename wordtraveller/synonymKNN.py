@@ -46,11 +46,9 @@ def get_synonyms(term, n, term_dimension, filemanager):
 
     try:
         indexToSearch = ri_term.index(term)
-        # print("Finding: {} ".format(ri_term[indexToSearch]))
         result = classify(ri_voc[indexToSearch], ri_voc, n)
         synonym_result = []
         for term_index in result:
-            # print("{:<3} : {}".format(i,ri_term[mot]))
             synonym_result.append(ri_term[term_index])
     except ValueError:
         raise Exception(term + ' not found in the indexed list')

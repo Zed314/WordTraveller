@@ -142,29 +142,3 @@ def find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, k, ty
     # We sort depending on the score, in the descending order
     c = sorted(c.items(),key=operator.itemgetter(1),reverse=True)
     return c
-
-
-if __name__ == "__main__":
-
-    # Applying Top K Algorithm to mockdata
-    # postingListsOrderedById, postingListsOrderedByScore = createMockData()
-    # top_k = find_fagins_top_k(postingListsOrderedById, postingListsOrderedByScore, 3)
-
-    currentWorkspace = './workspace/testalex/'
-    filename = 'test1'
-    filemanag = fm.FileManager(filename, currentWorkspace)
-
-    tempVoc = SortedDict()
-
-    pathlist = Path("./tests/data/test4/").glob('**/la*')
-    for path in pathlist:
-        analysis.analyse_newspaper(path, tempVoc, True)
-    filemanag.save_vocabularyAndPL_file(tempVoc)
-
-    savedVoc = filemanag.read_vocabulary()
-
-    # print("savedDoc : {}".format(savedVoc))
-
-    # print(query.get_posting_list(savedVoc, "aa", filemanag))
-    topk = apply_top_k_algo(['aa', 'bb'], savedVoc, filemanag, 0.2 ,3, 'disjunctive')
-    print('result: {} '.format(topk))
