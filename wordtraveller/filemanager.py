@@ -8,8 +8,6 @@ from sortedcontainers import SortedDict
 
 class FileManager:
     CONST_SIZE_ON_DISK = 12
-    # 8
-    CONST_SIZE_ON_DISK_EXTENDED = 12
 
     def __init__(self, fileName, workspace="./workspace/"):
         """
@@ -17,7 +15,7 @@ class FileManager:
             filename: the custom filename for the voc and postinglist.
             workspace: is the folder we want to work in. Should have an '/' at the end.
         Postconditions:
-            The fonction update the file postingLites.data with the new postingList after "offet" paires <Doc Id, Scores>
+            Create the voc file, posting list ordered by id and posting list ordered by score if they do not exist yet
         """
         self.vocabularyFileName = fileName
         self.postingListsFileName = fileName
@@ -42,7 +40,6 @@ class FileManager:
             file = open(self.getPathVoc(), "wb")
             file.close()
 
-
     def getPathVoc(self):
         return self.workspace + self.vocabularyFileName + self.extensionVoc
 
@@ -62,18 +59,16 @@ class FileManager:
         return self.workspace + self.postingListsFileName + ".score" + self.extensionPL
 
     def doesCompressedVersionExists(self):
-        return  os.path.isfile(self.getPathVocCompressed()+".gz") and os.path.isfile(self.getPathPLCompressed()+".gz") and os.path.isfile(self.getPathPLScore()+".gz")
+        return os.path.isfile(self.getPathVocCompressed()+".gz") and os.path.isfile(self.getPathPLCompressed()+".gz") and os.path.isfile(self.getPathPLScore()+".gz")
 
     def doesUnCompressedVersionExists(self):
-        return  os.path.isfile(self.getPathVoc()) and os.path.isfile(self.getPathPL()) and os.path.isfile(self.getPathPLScore())
-
+        return os.path.isfile(self.getPathVoc()) and os.path.isfile(self.getPathPL()) and os.path.isfile(self.getPathPLScore())
 
     def getPathVocCompressed(self):
-        return  self.getPathVoc()+".compressed"
+        return self.getPathVoc()+".compressed"
 
     def getPathPLCompressed(self):
-        return  self.getPathPL()+".compressed"
-
+        return self.getPathPL()+".compressed"
 
     def getPathPLPartial(self, number):
         return self.workspace + self.postingListsFileName + "." + str(number) + ".temp" + self.extensionPL
@@ -99,9 +94,14 @@ class FileManager:
             listPartialVocs.append(self.getPathVocPartial(i))
         return listPartialVocs
 
-    # Merge all the partial vocs and pl created during analysis
     def mergePartialVocsAndPL(self, recomputeIDF=True):
+        """ Merge all the partial vocs and pl created during analysis 
+        Preconditions: 
+            recomputeIDF : wether or not we should recompute the idf in the end, otherwise the idfs will be equal to zero.
 
+        Postconditions: 
+            A merged vocabulary file and posting list ordered by id is created. A posting list ordered by score is created.
+        """
         # Get all the PLs and VOCs
         listPartialVocs = self.getListPartialVocs()
         listPartialPLs = self.getListPartialPLs()
@@ -203,7 +203,7 @@ class FileManager:
         plScoreOutputFile.close()
         for filePL in plFiles:
             filePL.close()
-        # delete temp files
+        # Delete temporary files
         for pathVoc in listPartialVocs:
             os.remove(pathVoc)
         for pathPL in listPartialPLs:
@@ -212,10 +212,12 @@ class FileManager:
     def save_postLists_from_complete_voc(self, completeVoc, isPartial=False, numberPart=-1):
         """
         Preconditions:
-            postingListsIndex: is an sorted array of  words and unsorted dict of Doc Id and Scores.
+            completeVoc: is an sorted list of words and unsorted dict of Doc Id and Scores.
+            isPartial: notify whether or not we are saving a partial inverted file
+            numberPart: the number of the partial file
         Postconditions:
-            The fonction save the pls in a partial or full pl file.
-            If not partial, the posting list is also stored by score
+            The fonction save completeVoc in a partial or full inverted file.
+            If not partial, the posting list is also sorted by score and stored.
         """
         if numberPart == -1:
             numberPart = self.numberPartialFiles
@@ -243,10 +245,10 @@ class FileManager:
         """
         Save invertedFile that contains both voc and pls
         Preconditions:
-            voc: is an array of words and SortedDict Doc Id and Scores.
+            voc: is an unsorted list of words and SortedDict Doc Id and Scores.
         Postconditions:
-            The function saves the vocs in a file named self.getVocFilename 
-            pls in a file "self.postingListsFileName".
+            The fonction saves voc in a partial or full inverted file.
+            If not partial, the posting list is also sorted by score and stored.
         """
         # map vocabulary offset
         vocabulary = []
@@ -272,9 +274,9 @@ class FileManager:
     def save_vocabulary(self, voc, isPartial=False):
         """
         Preconditions:
-            voc: is a sorted array of words and offset.
+            voc: is a sorted list of words and offset.
         postconditions:
-            the dictionary is saved in vocabulary.vo
+            voc file is saved
         """
         if isPartial:
             file = open(self.getPathVocPartial(self.numberPartialFiles), "w")
@@ -285,8 +287,12 @@ class FileManager:
         file.close()
 
     def save_postList_by_score(self, postingList, offset=-1, filePlScore=None):
-        """ Save the postingList of A word after ordered it by score in
-        non ascending order """
+        """ Save the postingList by score in non ascending order 
+        Preconditions : 
+            postingList: a sorted list by score in non ascending order
+            offset: offset in the file, if -1, append at the end
+            filePlScore: if non None, the method will store into this file (without applying the offset)
+            """
         # destination file for redin and wrting (r+)b
         if filePlScore is not None:
             file = filePlScore
@@ -334,9 +340,8 @@ class FileManager:
             file = open(self.getPathPLPartial(numberPart), "a+b")
 
         try:
-            # FIXME: filePL is file instead? => No, as filePL is the parameter, we do not have
             # to do an offset if we use the preopened file in parameters
-            if (offset > 0) and filePl is None:
+            if (offset > 0) and filePL is None:
                 file.seek(self.CONST_SIZE_ON_DISK * offset)
             # Encode the record and write it to the dest file
             for idDoc, score in sorted(postingList.items()):

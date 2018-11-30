@@ -7,6 +7,13 @@ from pathlib import Path
 
 
 def conjunctive_queries(posting_lists):
+    """
+    To find each DOC ID for which all the query terms are present
+    Preconditions:
+        posting_lists: all the postingLists.
+    Postconditions:
+        Returns an array of doc
+    """
     #posting_lists = [query.get_posting_list(voc, word, filemanager) for word in words]
     # print("**********************posting_lists: {}".format(posting_lists))
     smallest_pl_length = len(posting_lists[0])
@@ -35,6 +42,13 @@ def conjunctive_queries(posting_lists):
 
 
 def disjunctive_queries(posting_lists):
+    """
+    To find each DOC ID for which at least one query terms are present
+    Preconditions:
+        posting_lists: all the postingLists.
+    Postconditions:
+        Returns an array of doc
+    """
     #posting_lists = [query.get_posting_list(voc, word, filemanager) for word in words]
     # print("pl: {}".format(posting_lists))
     docs = set()
@@ -46,6 +60,18 @@ def disjunctive_queries(posting_lists):
     return docs
 
 def apply_naive_top_k_algo(words, voc, filemanager, epsilon, k, get_docs_func=disjunctive_queries):
+    """
+    Apply the naive top k algorithm
+    Preconditions:
+        words : an array of words to do the research on
+        voc : a dictionnay of words and offsets
+        filemanager : a filemanager to grab the posting lists
+        epsilon : parameter for the algorithm
+        k : number of results
+        get_docs_func : type of request(can be conjunctive_queries or disjunctive_queries)
+    Postconditions:
+        Returns top k documents
+    """
     posting_lists = [query.get_posting_list(voc, word, filemanager) for word in words]
     if all((not posting_list) for posting_list in posting_lists):
         return []
@@ -59,6 +85,15 @@ def naive_top_k_algo(posting_lists, k, get_docs_func):
 
 
 def aggregate_scores(posting_lists, docs, aggregative_function):
+    """
+    Aggregate scores.
+    Preconditions:
+        posting_lists: all the postingLists.
+        docs: documents need to be sorted
+        aggregative_function: function used for aggregate scores
+    Postconditions:
+        Returns aggregated postingLists
+    """
     aggregated_posting_list = dict()
     scores = []
     for doc in docs:
@@ -73,7 +108,12 @@ def aggregate_scores(posting_lists, docs, aggregative_function):
 
 
 def aggregative_function_sum(scores):
-    """ We agregated the idf score and not the number of occurences"""
+    """
+    Preconditions:
+        scores: array of scores (int or float).
+    Postconditions:
+        Returns the sum of this values.
+    """
     res = 0
     for score in scores:
         res += score[0]
@@ -81,6 +121,12 @@ def aggregative_function_sum(scores):
 
 
 def aggregative_function_mean(scores):
+    """
+    Preconditions:
+        scores: array of scores (int or float).
+    Postconditions:
+        Returns the mean of this values.
+    """
     res = 0
     for score in scores:
         res += score[0]
@@ -88,6 +134,12 @@ def aggregative_function_mean(scores):
 
 
 def aggregative_function_min(scores):
+    """
+    Preconditions:
+        scores: array of scores (int or float).
+    Postconditions:
+        Returns the minimum of this values.
+    """
     res = scores[0]
     for score in scores:
         res = min(res, score)
@@ -95,25 +147,15 @@ def aggregative_function_min(scores):
 
 
 def find_top_k(aggregated_posting_list, k):
+    """
+    Execute the naive top k algorithm.
+    Preconditions:
+        aggregated_posting_list : A list of posting lists with aggregated scores
+        k : number of documents wanted
+    Postconditions:
+        Returns an array of top k documents
+    """
     sorted_list = sorted(aggregated_posting_list.items(), key=operator.itemgetter(1), reverse=True)
     first_k_doc = [x for x in sorted_list[:k] if x[1] != 0]
     return first_k_doc
 
-if __name__ == "__main__" :
-
-
-    pathlist = Path("./tests/data/test4/").glob('**/la*')
-
-    vocabulary = SortedDict()
-    filemanager = filemanager.FileManager("test500", "./workspace/")
-    # for i, newspaper_path in enumerate(pathlist):
-    #     if i < 2:
-    #         analysis.analyse_newspaper(newspaper_path, vocabulary, True)
-    #         filemanager.save_vocabularyAndPL_file(vocabulary, True)
-    #         vocabulary = SortedDict()
-    #         print('file %s finished!' % i)
-    # filemanager.mergePartialVocsAndPL()
-    savedVoc = filemanager.read_vocabulary()
-    words = ["manipul", 'maniscalco', 'manischewitz']
-    result = naive_top_k_algo(words, savedVoc, filemanager, 10, disjunctive_queries)
-    print("Result: {}".format(result))

@@ -7,6 +7,7 @@ import wordtraveller.filemanager as fm
 
 
 def vbyteRec(v):
+    """Compute vbyte recursively"""
     if v<128:
         return [v]
     else:
@@ -15,11 +16,15 @@ def vbyteRec(v):
         b = vbyteRec(v2)
         return vbyteRec(k) + b
 def vbyte(v):
+    """ Compute vbyte """
     res = vbyteRec(v)
     res[-1] = res[-1]+128
     return res
 
 def compressPLVBYTEFromSavedVocAndPL(filemanager):
+    """ Compress existing Posting List and VOC using vbyte algorithm
+    and save it in files given by filemanager.getPathPLCompressed and
+    filemanager.getPathVocCompressed"""
     filePLCompressed = open(filemanager.getPathPLCompressed(), "w+b")
     fileVocExit = open(filemanager.getPathVocCompressed(), "w+")
     filePL = open(filemanager.getPathPL(),"rb")
@@ -31,9 +36,6 @@ def compressPLVBYTEFromSavedVocAndPL(filemanager):
         donnees = ligne.rstrip('\n\r').split(",")
         word = donnees[0]
         offsetVocEntry = int(donnees[1])
-
-#        pl = query.get_posting_list(savedVoc,word, filemanager,False)
-#        pl = sorted(pl.items(), key=lambda pl: pl[0])
         offsetVocExit = 0
         valPre = 0
 
@@ -114,10 +116,12 @@ def decompressPLVBYTE(filemanager):
     filePLCompressed.close()
 
 def compressZip(path):
+    """Compress a file given in parameters into path+".gz" using gzip"""
     with open(path, 'rb') as f_in, gzip.open(str(path)+".gz", 'wb') as f_out:
         shutil.copyfileobj(f_in, f_out)
 
 def decompressZip(pathIn, pathOut):
+    "Decompress a file given in parameters using gzip"""
     with gzip.open(pathIn + ".gz", 'rb') as f_in:
         with open(pathOut, 'wb') as f_out:
             shutil.copyfileobj(f_in, f_out)
