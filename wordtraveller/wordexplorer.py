@@ -39,7 +39,7 @@ def analysis_parameters():
     latimes_path = args.d
     if not args.d.endswith("/"):
         latimes_path += "/"
-    filemanager = fm.FileManager(args.f, args.d)
+    filemanager = fm.FileManager(args.f, latimes_path)
     savedVoc = filemanager.read_vocabulary()
     if args.stemmer:
         print("Stemmer activated")
