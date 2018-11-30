@@ -1,4 +1,6 @@
 # WordTraveller
+You can find the Report at Rapport Wordtraveller.pdf
+
 Place the latimes' folder at the `data` folder of the project
 
 It requires the punkt corpus.
