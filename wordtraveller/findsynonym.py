@@ -1,21 +1,22 @@
 import codecs
 from pathlib import Path
+import nltk
 
 from lxml import etree
 
 import gensim
-import jieba
+import argparse
 import wordtraveller.preprocessing as preprocessing
 from gensim.models.word2vec import LineSentence
 
 
-def read_source_file():
+def read_source_file(path):
     """ Read the raw newspaper data from ./data/latimes/ and return the content
     of the p tags (after preprocessing)
     Postcondition : Returns a list of words foundt in ./data/latimes
     """
-    preprocessor = preprocessing.Preprocessor()
-    pathlist = Path("./data/latimes/").glob('**/la*')
+    preprocessor = preprocessing.Preprocessor(True)
+    pathlist = Path(path).glob('**/la*')
     terms = []
     for i, newspaper_path in enumerate(pathlist):
         raw = newspaper_path.read_text()
@@ -40,9 +41,9 @@ def write_file(target_file_name, content):
     file_write.close()
 
 
-def separate_word(separated_file):
+def separate_word(separated_file, path = "./data/latimes/"):
     """ Helper function to write words into the file located at the path in parameter """
-    terms = read_source_file()
+    terms = read_source_file(path)
     word_line = ' '.join(terms)
     output = codecs.open(separated_file, 'w', 'utf-8')
     output.write(word_line)
@@ -77,10 +78,8 @@ def get_similar_words_list(w, model, topn=10):
     result_words = []
     try:
         similary_words = model.most_similar(w, topn=10)
-        print(similary_words)
         for (word, similarity) in similary_words:
             result_words.append(word)
-        print(result_words)
     except:
         print("There are some errors!" + w)
 
@@ -92,3 +91,31 @@ def load_models(model_path):
     Postcondition : Returns the model    
     """
     return gensim.models.Word2Vec.load(model_path)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d", type=str,
+                        help="dossier avec les documents à entraîner")
+    parser.add_argument("-f", type=str,
+                        help="nom de modèle entraîné ", required=True)
+    parser.add_argument("-t", type=str,
+                        help="term pour chercher les termes plus proches ", required=True)
+    parser.add_argument("-n", type=str, required=True,
+                        help='nombre de synonymes pour la requête')
+
+    args = parser.parse_args()
+    path = args.d
+
+    separated_file = "./workspace/separated_words.txt"  # separeted words file
+    model_path = "./workspace/" + args.f # model file
+    print(model_path)
+
+    if args.d:
+        source_separated_words_file = separate_word(separated_file, args.d)
+        source_separated_words_file = separated_file  # if separated word file exist, don't separate_word again
+        build_model(source_separated_words_file, model_path)  # if model file is exist, don't buile modl
+
+    model = load_models(model_path)
+    word = nltk.stem.PorterStemmer().stem(args.t)
+    words = get_similar_words_str(word, model)
+    print(words)
