@@ -175,11 +175,6 @@ def analyse_newspaper_optimized(path, voc, randIndexing=None, computeIDF=False, 
     currDoc = 0
     nbDocScanned = 0
     documentText = ""
-    if type(voc) is dict:
-        # print ("voc is a dict")
-        pass
-    else:
-        print("voc is NOT a dict !")
     for line in file:
         if line.startswith("<DOCID>"):
             currDocId = int(line[len("<DOCID> "):-len(" </DOCID>\n")])
